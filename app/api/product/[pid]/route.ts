@@ -20,6 +20,13 @@ export async function GET(
   const pid = params.pid;
   const searchParams = request.nextUrl.searchParams
   const context = searchParams.get('context') ?? ''
+  const channelId = searchParams.get('channel_id') ?? null
+
+  if (!channelId) {
+    return new Response("Channel ID missing", {
+      status: 422,
+    });
+  }
 
   console.log('contextinroute (GET)', context, 'ex', params)
 
@@ -38,8 +45,6 @@ export async function GET(
     myHeaders.append("X-Auth-Token", accessToken);
     myHeaders.append("Accept", " application/json");
     myHeaders.append("Content-Type", " application/json");
-
-    const channelId = 1602127;
 
     const localeQueries = availableLocales.map((locale) => {
       if (locale.code === defaultLocale) {
@@ -117,6 +122,13 @@ export async function PUT(
   const pid = params.pid;
   const searchParams = request.nextUrl.searchParams
   const context = searchParams.get('context') ?? ''
+  const channelId = searchParams.get('channel_id') ?? null
+
+  if (!channelId) {
+    return new Response("Channel ID missing", {
+      status: 422,
+    });
+  }
 
   console.log('contextinroute (PUT)', context, 'ex', params)
 
@@ -127,8 +139,6 @@ export async function PUT(
     console.log('after get session')
     const bigcommerce = bigcommerceClient(accessToken, storeHash);
 
-    
-
     if (body["locale"] && body.locale !== defaultLocale) {
       const selectedLocale = body.locale;
 
@@ -136,8 +146,6 @@ export async function PUT(
       myHeaders.append("X-Auth-Token", accessToken);
       myHeaders.append("Accept", " application/json");
       myHeaders.append("Content-Type", " application/json");
-
-      const channelId = 1602127;
 
       const mutationQuery = `
         mutation (
@@ -147,7 +155,7 @@ export async function PUT(
             setProductBasicInformation(input: $input) {
               product {
                 id
-                ${selectedLocale}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${1602127}", locale: "${selectedLocale}" }) {
+                ${selectedLocale}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${selectedLocale}" }) {
                   basicInformation {
                     name
                     description
