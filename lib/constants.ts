@@ -13,7 +13,7 @@ export const availableLocales:Array<{code:string, label: string}> = [
   },
 ];
 
-export const translatableProductFields:Array<{key:string, label: string, type: string, required: boolean}> = [
+export const translatableProductFields:Array<{key:string, label: string, type: "input" | "textarea", required: boolean}> = [
   {
     key: 'name',
     label: 'Name',

@@ -10,10 +10,15 @@
     "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "npm run pages:build && wrangler pages dev",
     "deploy": "npm run pages:build && wrangler pages deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
+    "postinstall": "node ./postinstall.mjs",
+    "postgres-seed": "node scripts/postgres-db.mjs"
   },
   "dependencies": {
     "@bigcommerce/big-design": "^1.1.0",
+    "@edge-csrf/nextjs": "^2.3.0-rc1",
+    "@tinymce/tinymce-react": "^5.1.1",
+    "@vercel/postgres": "^0.9.0",
     "better-sqlite3": "^11.1.2",
     "bigcommerce-design-patterns": "^0.5.5",
     "cookie": "^0.6.0",

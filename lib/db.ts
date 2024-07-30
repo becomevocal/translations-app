@@ -11,6 +11,9 @@ switch (DB_TYPE) {
     case 'hardcoded':
         db = require('./dbs/hardcoded');
         break;
+    case 'postgres':
+        db = require('./dbs/postgres');
+        break;
     case 'mysql':
         db = require('./dbs/mysql');
         break;

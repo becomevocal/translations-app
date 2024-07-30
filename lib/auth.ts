@@ -60,15 +60,15 @@ export function getBCVerify({ signed_payload_jwt }: QueryParams) {
     ) as SessionProps;
 }
 
-export function setSession(session: SessionProps) {
-    console.log('set session', session)
-    db.setUser(session);
-    console.log('after setUser')
-    db.setStore(session);
-    console.log('after setStore')
-    db.setStoreUser(session);
-    console.log('after setStoreUser')
-}
+// export function setSession(session: SessionProps) {
+//     console.log('set session', session)
+//     db.setUser(session);
+//     console.log('after setUser')
+//     db.setStore(session);
+//     console.log('after setStore')
+//     db.setStoreUser(session);
+//     console.log('after setStoreUser')
+// }
 
 export async function getSession({ query: { context = '' } }) {
     if (typeof context !== 'string') return;

@@ -28,7 +28,7 @@ export async function GET(
     });
   }
 
-  console.log('contextinroute (GET)', context, 'ex', params)
+  // console.log('contextinroute (GET)', context, 'ex', params)
 
   try {
     const { accessToken, storeHash } = await getSession({ query: { context } });
@@ -130,7 +130,7 @@ export async function PUT(
     });
   }
 
-  console.log('contextinroute (PUT)', context, 'ex', params)
+  // console.log('contextinroute (PUT)', context, 'ex', params)
 
   try {
     let result: any;

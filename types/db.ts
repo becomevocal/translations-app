@@ -1,22 +1,35 @@
-import { SessionProps } from './index';
+import { SessionProps } from "./index";
 
 export interface StoreData {
-    accessToken?: string;
-    scope?: string;
-    storeHash: string;
+  accessToken?: string;
+  scope?: string;
+  storeHash: string;
 }
 
 export interface UserData {
-    email: string;
-    username?: string;
+  email: string;
+  username?: string;
+}
+
+export interface UserInfo {
+  email: string;
+  id: number;
+  username?: string;
+}
+
+export interface AuthProps {
+  access_token?: string;
+  context: string;
+  scope?: string;
+  user: UserInfo;
 }
 
 export interface Db {
-    hasStoreUser(storeHash: string, userId: number): Promise<boolean> | boolean;
-    setUser(session: SessionProps): Promise<void>;
-    setStore(session: SessionProps): Promise<void>;
-    setStoreUser(session: SessionProps): Promise<void>;
-    getStoreToken(storeId: string): Promise<string> | null;
-    deleteStore(session: SessionProps): Promise<void>;
-    deleteUser(session: SessionProps): Promise<void>;
+  hasStoreUser(storeHash: string, userId: number): Promise<boolean> | boolean;
+  setUser(user: UserInfo): Promise<void>;
+  setStore(session: SessionProps): Promise<void>;
+  setStoreUser(session: SessionProps): Promise<void>;
+  getStoreToken(storeId: string): Promise<string> | null;
+  deleteStore(session: SessionProps): Promise<void>;
+  deleteUser(session: SessionProps): Promise<void>;
 }
