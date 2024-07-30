@@ -77,10 +77,7 @@ export async function getSession({ query: { context = '' } }) {
         return { accessToken: HARDCODED_ACCESS_TOKEN, storeHash: HARDCODED_STORE_HASH, user: null } as any;
     }
 
-    console.log('context', context)
-
     const { context: storeHash, user } = await decodePayload(context) as jwt.JwtPayload;
-    console.log(storeHash, user)
     const hasUser = await db.hasStoreUser(storeHash, user?.id);
 
     // Before retrieving session/ hitting APIs, check user
@@ -89,8 +86,6 @@ export async function getSession({ query: { context = '' } }) {
     }
 
     const accessToken = await db.getStoreToken(storeHash);
-
-    console.log(accessToken)
 
     return { accessToken, storeHash, user } as any;
 }

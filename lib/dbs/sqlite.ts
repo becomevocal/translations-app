@@ -48,8 +48,6 @@ export function setStoreUser(session: SessionProps) {
     const stmtSelect = db.prepare('SELECT * FROM storeUsers WHERE userId = ? AND storeHash = ?');
     const storeUser = stmtSelect.get(String(userId), storeHash) as any;
 
-    console.log('etst', storeUser)
-
     if (accessToken) {
         if (!storeUser) {
             const stmtInsert = db.prepare('INSERT INTO storeUsers (isAdmin, storeHash, userId) VALUES (?, ?, ?)');

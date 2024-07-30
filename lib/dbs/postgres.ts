@@ -61,6 +61,19 @@ export async function deleteUser(storeHash: string, user: User) {
   `;
 }
 
+export async function hasStoreUser(storeHash: string, userId: string) {
+    if (!storeHash || !userId) return false;
+
+    const { rows } = await sql`
+        SELECT *
+        FROM storeUsers
+        WHERE userId=${userId} AND storeHash = ${storeHash}
+        LIMIT 1;
+    `;
+
+    return rows.length > 0;
+}
+
 export async function getStoreToken(storeHash: string): Promise<string | null> {
   if (!storeHash) return null;
 

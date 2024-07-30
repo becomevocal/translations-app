@@ -22,6 +22,7 @@
     "better-sqlite3": "^11.1.2",
     "bigcommerce-design-patterns": "^0.5.5",
     "cookie": "^0.6.0",
+    "dotenv": "^16.4.5",
     "jose": "^5.6.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.10.2",
