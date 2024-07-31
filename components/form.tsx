@@ -5,6 +5,8 @@ import {
   H1,
   HR,
   Input,
+  Grid,
+  GridItem,
   Panel,
   Select,
   Form as StyledForm,
@@ -12,6 +14,7 @@ import {
   Text,
   FlexItem,
   FormGroup,
+  FormControlLabel,
 } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { alertsManager } from "@/pages/_app";
@@ -32,6 +35,7 @@ import {
 } from "bigcommerce-design-patterns";
 import ErrorMessage from "./error";
 import Loading from "./loading";
+import { Editor } from "@tinymce/tinymce-react";
 
 interface FormProps {
   channels: { id: number; name: string }[];
@@ -50,7 +54,8 @@ function ProductForm({ channels }: FormProps) {
   const [currentChannel, setChannel] = useState<number>(1);
   const [productData, setProductData] = useState<any>({});
   const [isProductInfoLoading, setProductInfoLoading] = useState(true);
-  const [hasProductInfoLoadingError, setProductInfoLoadingError] = useState(false);
+  const [hasProductInfoLoadingError, setProductInfoLoadingError] =
+    useState(false);
   const [isProductSaving, setProductSaving] = useState(false);
 
   useEffect(() => {
@@ -58,9 +63,11 @@ function ProductForm({ channels }: FormProps) {
       setProductInfoLoading(true);
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const context = urlParams.get('context');
-        const res = await fetch(`/api/product/${pid}?context=${context}&channel_id=${currentChannel}`);
-        const data = await res.json() as any;
+        const context = urlParams.get("context");
+        const res = await fetch(
+          `/api/product/${pid}?context=${context}&channel_id=${currentChannel}`
+        );
+        const data = (await res.json()) as any;
         setProductData(data);
         setForm(getFormObjectForLocale(data, currentLocale));
       } catch (error) {
@@ -90,13 +97,16 @@ function ProductForm({ channels }: FormProps) {
 
       // Get context jwt
       const urlParams = new URLSearchParams(window.location.search);
-      const context = urlParams.get('context');
+      const context = urlParams.get("context");
 
-      fetch(`/api/product/${pid}?context=${context}&channel_id=${currentChannel}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
+      fetch(
+        `/api/product/${pid}?context=${context}&channel_id=${currentChannel}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      )
         .then(async (res) => {
           const updatedProductLocaleData = await res.json();
           setProductData((prevData: any) => ({
@@ -129,7 +139,11 @@ function ProductForm({ channels }: FormProps) {
     }
   };
 
-  const getLocaleValue = (productData: any, fieldName: string, locale: string) => {
+  const getLocaleValue = (
+    productData: any,
+    fieldName: string,
+    locale: string
+  ) => {
     return productData?.localeData?.[locale]?.[fieldName];
   };
 
@@ -168,10 +182,19 @@ function ProductForm({ channels }: FormProps) {
     setChannel(selectedChannel);
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleEditorChange = (content: string, fieldName: string) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      [fieldName]: content,
+    }));
+  };
+
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name: fieldName, value } = event?.target;
 
-    setForm(prevForm => ({
+    setForm((prevForm) => ({
       ...prevForm,
       [fieldName]: value,
     }));
@@ -189,7 +212,6 @@ function ProductForm({ channels }: FormProps) {
 
   const ActionBarButtons = (
     <>
-
       <Button
         mobileWidth="auto"
         variant="primary"
@@ -280,48 +302,123 @@ function ProductForm({ channels }: FormProps) {
           {translatableProductFields.map((field) => (
             <Box key={`${field.key}_${currentLocale}`}>
               {field.type === "textarea" && (
-                <Flex>
-                  <FlexItem flexGrow={1} paddingBottom="medium">
-                    <Box style={{ maxWidth: "40rem" }}>
-                      <FormGroup>
-                        <Textarea
-                          label={`${field.label} (${defaultLocale})`}
-                          name={`defaultLocale_${field.key}`}
-                          defaultValue={defaultLocaleProductData[field.key]}
-                          readOnly={true}
-                          rows={5}
-                          required={field.required}
-                          disabled={true}
+     
+
+                    <Grid gridColumns={{mobile: "repeat(1, 1fr)", tablet: "repeat(2, 1fr)"}} paddingBottom="medium">
+                    <GridItem>
+                      <FormControlLabel>{`${field.label} (${defaultLocale})`}</FormControlLabel>
+                    
+                      
+                      
+                        <Editor
+                          aria-label={`${field.label} in ${defaultLocale}`}
+                          value={defaultLocaleProductData[field.key]}
+                          onInit={(evt, editor) => { editor.mode.set("readonly") }}
+                          // onEditorChange={(content: string, editor: any) => {
+                          //   handleEditorChange(
+                          //     content,
+                          //     `defaultLocale_${field.key}`
+                          //   );
+                          // }}
+                          tinymceScriptSrc="/tinymce/tinymce.min.js"
+                          init={{
+                            height: 300,
+                            // inline: true,
+                            menubar: false,
+                            plugins: [
+                              "advlist",
+                              "autolink",
+                              "lists",
+                              "link",
+                              "charmap",
+                              "anchor",
+                              "searchreplace",
+                              "visualblocks",
+                              "code",
+                              "fullscreen",
+                              "insertdatetime",
+                              "table",
+                              "preview",
+                              "wordcount",
+                              "codesample",
+                              "backcolor",
+                              "pagebreak",
+                              "powerpaste",
+                            ],
+                            toolbar:
+                              "blocks fontfamily fontsize bullist numlist fullscreen |" +
+                              "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
+                              "table link codesample forecolor backcolor removeformat",
+                            content_style:
+                              `body { font-family:Source Sans 3,latin; font-size:14px; background-color: ${theme.colors.secondary20}}`,
+                            branding: false,
+                            disabled: true,
+                          }}
                         />
-                      </FormGroup>
-                    </Box>
-                  </FlexItem>
+                      
+                    
+                  </GridItem>
 
                   {currentLocale !== defaultLocale && (
-                    <FlexItem flexGrow={1} paddingBottom="medium">
-                      <Box
-                        paddingLeft={{ mobile: "none", tablet: "xLarge" }}
-                        style={{ maxWidth: "40rem" }}
-                      >
-                        <FormGroup>
-                          <Textarea
-                            label={`${field.label} (${currentLocale})`}
-                            name={field.key}
-                            value={form[field.key]}
-                            onChange={handleChange}
-                            required={field.required}
-                            rows={5}
-                          />
-                        </FormGroup>
-                      </Box>
-                    </FlexItem>
+                    <GridItem>
+                      
+                        <FormControlLabel>{`${field.label} (${currentLocale})`}</FormControlLabel>
+                        
+                        <Editor
+                          aria-label={`${field.label} in ${currentLocale}`}
+                          value={form[field.key]}
+                          onEditorChange={(content: string, editor: any) => {
+                            handleEditorChange(
+                              content,
+                              field.key
+                            );
+                          }}
+                          tinymceScriptSrc="/tinymce/tinymce.min.js"
+                          init={{
+                            height: 300,
+                            maxWidth: "38rem",
+                            // inline: true,
+                            menubar: false,
+                            plugins: [
+                              "advlist",
+                              "autolink",
+                              "lists",
+                              "link",
+                              "charmap",
+                              "anchor",
+                              "searchreplace",
+                              "visualblocks",
+                              "code",
+                              "fullscreen",
+                              "insertdatetime",
+                              "table",
+                              "preview",
+                              "wordcount",
+                              "codesample",
+                              "backcolor",
+                              "pagebreak",
+                              "powerpaste",
+                            ],
+                            toolbar:
+                              "blocks fontfamily fontsize bullist numlist fullscreen |" +
+                              "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
+                              "table link codesample forecolor backcolor removeformat",
+                            content_style:
+                              `body { font-family:Source Sans 3,latin; font-size:14px;`,
+                            branding: false,
+                          }}
+                        />
+                        
+                      
+                    </GridItem>
                   )}
-                </Flex>
+                </Grid>
               )}
               {field.type === "input" && (
-                <Flex>
-                  <FlexItem flexGrow={1} paddingBottom="medium">
-                    <Box style={{ maxWidth: "40rem" }}>
+                <Grid gridColumns={{mobile: "repeat(1, 1fr)", tablet: "repeat(2, 1fr)"}} paddingBottom="medium">
+                    <GridItem>
+                
+                    
                       <FormGroup>
                         <Input
                           label={`${field.label} (${defaultLocale})`}
@@ -332,15 +429,11 @@ function ProductForm({ channels }: FormProps) {
                           disabled={true}
                         />
                       </FormGroup>
-                    </Box>
-                  </FlexItem>
+                   
+                    </GridItem>
 
                   {currentLocale !== defaultLocale && (
-                    <FlexItem flexGrow={1} paddingBottom="medium">
-                      <Box
-                        paddingLeft={{ mobile: "none", tablet: "xLarge" }}
-                        style={{ maxWidth: "40rem" }}
-                      >
+                    <GridItem>
                         <FormGroup>
                           <Input
                             label={`${field.label} (${currentLocale})`}
@@ -350,10 +443,10 @@ function ProductForm({ channels }: FormProps) {
                             required={field.required}
                           />
                         </FormGroup>
-                      </Box>
-                    </FlexItem>
+                    
+                    </GridItem>
                   )}
-                </Flex>
+                </Grid>
               )}
             </Box>
           ))}
