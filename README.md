@@ -1,3 +1,17 @@
+# Multi-lang Translations App
+Using the GraphQL Admin API with support for multiple locales.
+
+<table>
+      <td><img width="386" alt="Screenshot 2024-07-31 at 2 26 42 AM" src="https://github.com/user-attachments/assets/6c6a115a-f1a1-456a-92f7-cee38cf2b8ef"></td>
+      <td><img width="560" alt="Screenshot 2024-07-31 at 2 26 31 AM" src="https://github.com/user-attachments/assets/bf3ffc0b-0ca1-49c6-90b7-7f27db908ee1"></td>
+    </table>
+<table>
+  <td><img width="1624" alt="Screenshot 2024-07-31 at 2 18 27 AM" src="https://github.com/user-attachments/assets/31b0b65e-8cab-4f57-a9ce-0785049a041c"></td>
+  <td><img width="1624" alt="Screenshot 2024-07-31 at 2 18 38 AM" src="https://github.com/user-attachments/assets/42575204-23d1-4d05-a2ca-6401a5313b61"></td>
+</table>
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https://developers.cloudflare.com/pages/get-started/c3).
 
 ## Getting Started
