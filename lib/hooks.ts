@@ -1,6 +1,5 @@
 import { useState } from "react";
 import useSWR from "swr";
-import { ListItem } from "../types";
 
 async function fetcher(url: string) {
   return await fetch(url).then((res) => res.json());

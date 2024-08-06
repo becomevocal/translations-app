@@ -9,7 +9,7 @@ import { Box } from "@bigcommerce/big-design";
 const ProductInfo = () => {
   const [isChannelsInfoLoading, setChannelsInfoLoading] = useState(true);
   const [hasChannelsInfoLoadingError, setChannelsInfoLoadingError] = useState(false);
-  const [channels, setChannels] = useState<{ id: number; name: string }[]>([]);
+  const [channels, setChannels] = useState<{ channel_id: number; channel_name: string, locales: {code: string, status: string, is_default: boolean }[] }[]>([]);
 
   useEffect(() => {
     const fetchChannels = async () => {

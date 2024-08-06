@@ -23,7 +23,6 @@ import { ArrowBackIcon, ArrowUpwardIcon } from "@bigcommerce/big-design-icons";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { FormData, StringKeyValue } from "@/types";
 import {
-  availableLocales,
   defaultLocale,
   translatableProductFields,
 } from "@/lib/constants";
@@ -38,7 +37,11 @@ import Loading from "./loading";
 import { Editor } from "@tinymce/tinymce-react";
 
 interface FormProps {
-  channels: { id: number; name: string }[];
+  channels: {
+    channel_id: number;
+    channel_name: string;
+    locales: { code: string; status: string, is_default: boolean }[];
+  }[];
 }
 
 interface FormErrors {
@@ -50,12 +53,12 @@ const FormErrors: FormErrors = {};
 function ProductForm({ channels }: FormProps) {
   const router = useRouter();
   const pid = Number(router.query?.pid);
-  const [currentLocale, setLocale] = useState<string>(availableLocales[1].code);
-  const [currentChannel, setChannel] = useState<number>(1);
+  console.log('channels', channels)
+  const [currentChannel, setChannel] = useState<number>(channels[0].channel_id);
+  const [currentLocale, setLocale] = useState<string>(channels[0].locales[0].code);
   const [productData, setProductData] = useState<any>({});
   const [isProductInfoLoading, setProductInfoLoading] = useState(true);
-  const [hasProductInfoLoadingError, setProductInfoLoadingError] =
-    useState(false);
+  const [hasProductInfoLoadingError, setProductInfoLoadingError] = useState(false);
   const [isProductSaving, setProductSaving] = useState(false);
 
   useEffect(() => {
@@ -152,7 +155,6 @@ function ProductForm({ channels }: FormProps) {
       translatableProductFields.map((field) => {
         return [
           field.key,
-          // getMetafieldValue(field.key, locale) || productData[field.key] || ''
           getLocaleValue(productData, field.key, locale),
         ];
       })
@@ -170,16 +172,18 @@ function ProductForm({ channels }: FormProps) {
 
   const [errors, setErrors] = useState<StringKeyValue>({});
 
-  const handleLocaleChange = (selectedLocale: any) => {
+  const handleLocaleChange = (selectedLocale: string) => {
     let newFormObject = getFormObjectForLocale(productData, selectedLocale);
-
     setForm(newFormObject);
-
     setLocale(selectedLocale);
   };
 
-  const handleChannelChange = (selectedChannel: any) => {
-    setChannel(selectedChannel);
+  const handleChannelChange = (selectedChannelId: number) => {
+    const selectedChannel = channels.find(channel => channel.channel_id === selectedChannelId);
+    if (selectedChannel) {
+      setChannel(selectedChannelId);
+      setLocale(selectedChannel.locales[0].code);
+    }
   };
 
   const handleEditorChange = (content: string, fieldName: string) => {
@@ -227,11 +231,17 @@ function ProductForm({ channels }: FormProps) {
   const channelOptions = useMemo(
     () =>
       channels.map((channel) => ({
-        value: channel.id,
-        content: channel.name,
+        value: channel.channel_id,
+        content: channel.channel_name,
       })),
     [channels]
   );
+
+  const selectedChannel = channels.find(channel => channel.channel_id === currentChannel);
+  const localeOptions = selectedChannel ? selectedChannel.locales.map((locale) => ({
+    value: locale.code,
+    content: `${locale.code} ${locale.code === defaultLocale ? "(Default)" : ""}`,
+  })) : [];
 
   if (hasProductInfoLoadingError) return <ErrorMessage />;
 
@@ -256,12 +266,7 @@ function ProductForm({ channels }: FormProps) {
                   <FlexItem flexGrow={1} paddingBottom="medium">
                     <Select
                       name="lang"
-                      options={availableLocales.map((locale) => ({
-                        value: locale.code,
-                        content: `${locale.label} ${
-                          locale.code === defaultLocale ? "(Default)" : ""
-                        }`,
-                      }))}
+                      options={localeOptions}
                       placeholder="Select Language"
                       required
                       value={currentLocale}
@@ -302,148 +307,95 @@ function ProductForm({ channels }: FormProps) {
           {translatableProductFields.map((field) => (
             <Box key={`${field.key}_${currentLocale}`}>
               {field.type === "textarea" && (
-     
-
-                    <Grid gridColumns={{mobile: "repeat(1, 1fr)", tablet: "repeat(2, 1fr)"}} paddingBottom="medium">
-                    <GridItem>
-                      <FormControlLabel>{`${field.label} (${defaultLocale})`}</FormControlLabel>
-                    
-                      
-                      
-                        <Editor
-                          aria-label={`${field.label} in ${defaultLocale}`}
-                          value={defaultLocaleProductData[field.key]}
-                          onInit={(evt, editor) => { editor.mode.set("readonly") }}
-                          // onEditorChange={(content: string, editor: any) => {
-                          //   handleEditorChange(
-                          //     content,
-                          //     `defaultLocale_${field.key}`
-                          //   );
-                          // }}
-                          tinymceScriptSrc="/tinymce/tinymce.min.js"
-                          init={{
-                            height: 300,
-                            // inline: true,
-                            menubar: false,
-                            plugins: [
-                              "advlist",
-                              "autolink",
-                              "lists",
-                              "link",
-                              "charmap",
-                              "anchor",
-                              "searchreplace",
-                              "visualblocks",
-                              "code",
-                              "fullscreen",
-                              "insertdatetime",
-                              "table",
-                              "preview",
-                              "wordcount",
-                              "codesample",
-                              "backcolor",
-                              "pagebreak",
-                              "powerpaste",
-                            ],
-                            toolbar:
-                              "blocks fontfamily fontsize bullist numlist fullscreen |" +
-                              "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
-                              "table link codesample forecolor backcolor removeformat",
-                            content_style:
-                              `body { font-family:Source Sans 3,latin; font-size:14px; background-color: ${theme.colors.secondary20}}`,
-                            branding: false,
-                            disabled: true,
-                          }}
-                        />
-                      
-                    
+                <Grid gridColumns={{mobile: "repeat(1, 1fr)", tablet: "repeat(2, 1fr)"}} paddingBottom="medium">
+                  <GridItem>
+                    <FormControlLabel>{`${field.label} (${defaultLocale})`}</FormControlLabel>
+                    <Editor
+                      aria-label={`${field.label} in ${defaultLocale}`}
+                      value={defaultLocaleProductData[field.key]}
+                      onInit={(evt, editor) => { editor.mode.set("readonly") }}
+                      tinymceScriptSrc="/tinymce/tinymce.min.js"
+                      init={{
+                        height: 300,
+                        menubar: false,
+                        plugins: [
+                          "advlist", "autolink", "lists", "link", "charmap", "anchor", "searchreplace",
+                          "visualblocks", "code", "fullscreen", "insertdatetime", "table", "preview",
+                          "wordcount", "codesample", "backcolor", "pagebreak", "powerpaste",
+                        ],
+                        toolbar:
+                          "blocks fontfamily fontsize bullist numlist fullscreen |" +
+                          "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
+                          "table link codesample forecolor backcolor removeformat",
+                        content_style:
+                          `body { font-family:Source Sans 3,latin; font-size:14px; background-color: ${theme.colors.secondary20}}`,
+                        branding: false,
+                        disabled: true,
+                      }}
+                    />
                   </GridItem>
 
                   {currentLocale !== defaultLocale && (
                     <GridItem>
-                      
-                        <FormControlLabel>{`${field.label} (${currentLocale})`}</FormControlLabel>
-                        
-                        <Editor
-                          aria-label={`${field.label} in ${currentLocale}`}
-                          value={form[field.key]}
-                          onEditorChange={(content: string, editor: any) => {
-                            handleEditorChange(
-                              content,
-                              field.key
-                            );
-                          }}
-                          tinymceScriptSrc="/tinymce/tinymce.min.js"
-                          init={{
-                            height: 300,
-                            maxWidth: "38rem",
-                            // inline: true,
-                            menubar: false,
-                            plugins: [
-                              "advlist",
-                              "autolink",
-                              "lists",
-                              "link",
-                              "charmap",
-                              "anchor",
-                              "searchreplace",
-                              "visualblocks",
-                              "code",
-                              "fullscreen",
-                              "insertdatetime",
-                              "table",
-                              "preview",
-                              "wordcount",
-                              "codesample",
-                              "backcolor",
-                              "pagebreak",
-                              "powerpaste",
-                            ],
-                            toolbar:
-                              "blocks fontfamily fontsize bullist numlist fullscreen |" +
-                              "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
-                              "table link codesample forecolor backcolor removeformat",
-                            content_style:
-                              `body { font-family:Source Sans 3,latin; font-size:14px;`,
-                            branding: false,
-                          }}
-                        />
-                        
-                      
+                      <FormControlLabel>{`${field.label} (${currentLocale})`}</FormControlLabel>
+                      <Editor
+                        aria-label={`${field.label} in ${currentLocale}`}
+                        value={form[field.key]}
+                        onEditorChange={(content: string, editor: any) => {
+                          handleEditorChange(
+                            content,
+                            field.key
+                          );
+                        }}
+                        tinymceScriptSrc="/tinymce/tinymce.min.js"
+                        init={{
+                          height: 300,
+                          maxWidth: "38rem",
+                          menubar: false,
+                          plugins: [
+                            "advlist", "autolink", "lists", "link", "charmap", "anchor", "searchreplace",
+                            "visualblocks", "code", "fullscreen", "insertdatetime", "table", "preview",
+                            "wordcount", "codesample", "backcolor", "pagebreak", "powerpaste",
+                          ],
+                          toolbar:
+                            "blocks fontfamily fontsize bullist numlist fullscreen |" +
+                            "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
+                            "table link codesample forecolor backcolor removeformat",
+                          content_style:
+                            `body { font-family:Source Sans 3,latin; font-size:14px;`,
+                          branding: false,
+                        }}
+                      />
                     </GridItem>
                   )}
                 </Grid>
               )}
               {field.type === "input" && (
                 <Grid gridColumns={{mobile: "repeat(1, 1fr)", tablet: "repeat(2, 1fr)"}} paddingBottom="medium">
-                    <GridItem>
-                
-                    
-                      <FormGroup>
-                        <Input
-                          label={`${field.label} (${defaultLocale})`}
-                          name={`defaultLocale_${field.key}`}
-                          defaultValue={defaultLocaleProductData[field.key]}
-                          readOnly={true}
-                          required={field.required}
-                          disabled={true}
-                        />
-                      </FormGroup>
-                   
-                    </GridItem>
+                  <GridItem>
+                    <FormGroup>
+                      <Input
+                        label={`${field.label} (${defaultLocale})`}
+                        name={`defaultLocale_${field.key}`}
+                        defaultValue={defaultLocaleProductData[field.key]}
+                        readOnly={true}
+                        required={field.required}
+                        disabled={true}
+                      />
+                    </FormGroup>
+                  </GridItem>
 
                   {currentLocale !== defaultLocale && (
                     <GridItem>
-                        <FormGroup>
-                          <Input
-                            label={`${field.label} (${currentLocale})`}
-                            name={field.key}
-                            value={form[field.key]}
-                            onChange={handleChange}
-                            required={field.required}
-                          />
-                        </FormGroup>
-                    
+                      <FormGroup>
+                        <Input
+                          label={`${field.label} (${currentLocale})`}
+                          name={field.key}
+                          value={form[field.key]}
+                          onChange={handleChange}
+                          required={field.required}
+                        />
+                      </FormGroup>
                     </GridItem>
                   )}
                 </Grid>

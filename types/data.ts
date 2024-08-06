@@ -2,11 +2,10 @@ export interface FormData {
     [k: string]: any;
 }
 
-export interface TableItem {
-    id: number;
-    name: string;
-    price: number;
-    stock: number;
+export interface LanguagesTableItem {
+    code: string;
+    status: string;
+    is_default: boolean;
 }
 
 export interface ListItem extends FormData {
