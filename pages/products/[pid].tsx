@@ -8,16 +8,28 @@ import { Box } from "@bigcommerce/big-design";
 
 const ProductInfo = () => {
   const [isChannelsInfoLoading, setChannelsInfoLoading] = useState(true);
-  const [hasChannelsInfoLoadingError, setChannelsInfoLoadingError] = useState(false);
-  const [channels, setChannels] = useState<{ channel_id: number; channel_name: string, locales: {code: string, status: string, is_default: boolean }[] }[]>([]);
+  const [hasChannelsInfoLoadingError, setChannelsInfoLoadingError] =
+    useState(false);
+  const [channels, setChannels] = useState<
+    {
+      channel_id: number;
+      channel_name: string;
+      locales: {
+        code: string;
+        status: string;
+        is_default: boolean;
+        title: string;
+      }[];
+    }[]
+  >([]);
 
   useEffect(() => {
     const fetchChannels = async () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const context = urlParams.get('context');
+        const context = urlParams.get("context");
         const res = await fetch(`/api/channels?context=${context}`);
-        const data = await res.json() as any;
+        const data = (await res.json()) as any;
         setChannels(data);
       } catch (error) {
         setChannelsInfoLoadingError(true);
@@ -34,9 +46,7 @@ const ProductInfo = () => {
   return (
     <Loading isLoading={isChannelsInfoLoading}>
       <Box padding="medium">
-        <ProductForm
-          channels={channels}
-        />
+        <ProductForm channels={channels} />
       </Box>
     </Loading>
   );

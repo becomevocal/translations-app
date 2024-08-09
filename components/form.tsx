@@ -2,45 +2,38 @@ import {
   Button,
   Box,
   Flex,
-  H1,
   HR,
   Input,
   Grid,
   GridItem,
-  Panel,
   Select,
   Form as StyledForm,
-  Textarea,
   Text,
   FlexItem,
   FormGroup,
-  FormControlLabel,
 } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { alertsManager } from "@/pages/_app";
 import { useRouter } from "next/router";
-import { ArrowBackIcon, ArrowUpwardIcon } from "@bigcommerce/big-design-icons";
+import { ArrowUpwardIcon } from "@bigcommerce/big-design-icons";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { FormData, StringKeyValue } from "@/types";
-import {
-  defaultLocale,
-  translatableProductFields,
-} from "@/lib/constants";
-import {
-  ActionBar,
-  ContextSelector,
-  Header,
-  Page,
-} from "bigcommerce-design-patterns";
+import { defaultLocale, translatableProductFields } from "@/lib/constants";
+import { ActionBar } from "bigcommerce-design-patterns";
 import ErrorMessage from "./error";
 import Loading from "./loading";
-import { Editor } from "@tinymce/tinymce-react";
+import Editor from "./TinyEditor";
 
 interface FormProps {
   channels: {
     channel_id: number;
     channel_name: string;
-    locales: { code: string; status: string, is_default: boolean }[];
+    locales: {
+      code: string;
+      status: string;
+      is_default: boolean;
+      title: string;
+    }[];
   }[];
 }
 
@@ -53,12 +46,14 @@ const FormErrors: FormErrors = {};
 function ProductForm({ channels }: FormProps) {
   const router = useRouter();
   const pid = Number(router.query?.pid);
-  console.log('channels', channels)
   const [currentChannel, setChannel] = useState<number>(channels[0].channel_id);
-  const [currentLocale, setLocale] = useState<string>(channels[0].locales[0].code);
+  const [currentLocale, setLocale] = useState<string>(
+    channels[0].locales[0].code
+  );
   const [productData, setProductData] = useState<any>({});
   const [isProductInfoLoading, setProductInfoLoading] = useState(true);
-  const [hasProductInfoLoadingError, setProductInfoLoadingError] = useState(false);
+  const [hasProductInfoLoadingError, setProductInfoLoadingError] =
+    useState(false);
   const [isProductSaving, setProductSaving] = useState(false);
 
   useEffect(() => {
@@ -153,10 +148,7 @@ function ProductForm({ channels }: FormProps) {
   const getFormObjectForLocale = (productData: any, locale: string) => {
     const formObject = Object.fromEntries(
       translatableProductFields.map((field) => {
-        return [
-          field.key,
-          getLocaleValue(productData, field.key, locale),
-        ];
+        return [field.key, getLocaleValue(productData, field.key, locale)];
       })
     );
 
@@ -179,10 +171,15 @@ function ProductForm({ channels }: FormProps) {
   };
 
   const handleChannelChange = (selectedChannelId: number) => {
-    const selectedChannel = channels.find(channel => channel.channel_id === selectedChannelId);
+    const selectedChannel = channels.find(
+      (channel) => channel.channel_id === selectedChannelId
+    );
     if (selectedChannel) {
       setChannel(selectedChannelId);
-      setLocale(selectedChannel.locales[0].code);
+      // Select first non-default locale when switching channels, since the default locale can't be edited
+      setLocale(
+        selectedChannel.locales?.[1]?.code || selectedChannel.locales[0].code
+      );
     }
   };
 
@@ -237,11 +234,17 @@ function ProductForm({ channels }: FormProps) {
     [channels]
   );
 
-  const selectedChannel = channels.find(channel => channel.channel_id === currentChannel);
-  const localeOptions = selectedChannel ? selectedChannel.locales.map((locale) => ({
-    value: locale.code,
-    content: `${locale.code} ${locale.code === defaultLocale ? "(Default)" : ""}`,
-  })) : [];
+  const selectedChannel = channels.find(
+    (channel) => channel.channel_id === currentChannel
+  );
+  const localeOptions = selectedChannel
+    ? selectedChannel.locales.map((locale) => ({
+        value: locale.code,
+        content: `${locale.title} ${
+          locale.code === defaultLocale ? "(Default)" : ""
+        }`,
+      }))
+    : [];
 
   if (hasProductInfoLoadingError) return <ErrorMessage />;
 
@@ -307,63 +310,28 @@ function ProductForm({ channels }: FormProps) {
           {translatableProductFields.map((field) => (
             <Box key={`${field.key}_${currentLocale}`}>
               {field.type === "textarea" && (
-                <Grid gridColumns={{mobile: "repeat(1, 1fr)", tablet: "repeat(2, 1fr)"}} paddingBottom="medium">
+                <Grid
+                  gridColumns={{
+                    mobile: "repeat(1, 1fr)",
+                    tablet: "repeat(2, 1fr)",
+                  }}
+                  paddingBottom="medium"
+                >
                   <GridItem>
-                    <FormControlLabel>{`${field.label} (${defaultLocale})`}</FormControlLabel>
                     <Editor
-                      aria-label={`${field.label} in ${defaultLocale}`}
-                      value={defaultLocaleProductData[field.key]}
-                      onInit={(evt, editor) => { editor.mode.set("readonly") }}
-                      tinymceScriptSrc="/tinymce/tinymce.min.js"
-                      init={{
-                        height: 300,
-                        menubar: false,
-                        plugins: [
-                          "advlist", "autolink", "lists", "link", "charmap", "anchor", "searchreplace",
-                          "visualblocks", "code", "fullscreen", "insertdatetime", "table", "preview",
-                          "wordcount", "codesample", "backcolor", "pagebreak", "powerpaste",
-                        ],
-                        toolbar:
-                          "blocks fontfamily fontsize bullist numlist fullscreen |" +
-                          "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
-                          "table link codesample forecolor backcolor removeformat",
-                        content_style:
-                          `body { font-family:Source Sans 3,latin; font-size:14px; background-color: ${theme.colors.secondary20}}`,
-                        branding: false,
-                        disabled: true,
-                      }}
+                      label={`${field.label} (${defaultLocale})`}
+                      initialValue={defaultLocaleProductData[field.key]}
+                      isDisabled={true}
                     />
                   </GridItem>
 
                   {currentLocale !== defaultLocale && (
                     <GridItem>
-                      <FormControlLabel>{`${field.label} (${currentLocale})`}</FormControlLabel>
                       <Editor
-                        aria-label={`${field.label} in ${currentLocale}`}
-                        value={form[field.key]}
-                        onEditorChange={(content: string, editor: any) => {
-                          handleEditorChange(
-                            content,
-                            field.key
-                          );
-                        }}
-                        tinymceScriptSrc="/tinymce/tinymce.min.js"
-                        init={{
-                          height: 300,
-                          maxWidth: "38rem",
-                          menubar: false,
-                          plugins: [
-                            "advlist", "autolink", "lists", "link", "charmap", "anchor", "searchreplace",
-                            "visualblocks", "code", "fullscreen", "insertdatetime", "table", "preview",
-                            "wordcount", "codesample", "backcolor", "pagebreak", "powerpaste",
-                          ],
-                          toolbar:
-                            "blocks fontfamily fontsize bullist numlist fullscreen |" +
-                            "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
-                            "table link codesample forecolor backcolor removeformat",
-                          content_style:
-                            `body { font-family:Source Sans 3,latin; font-size:14px;`,
-                          branding: false,
+                        label={`${field.label} (${currentLocale})`}
+                        initialValue={form[field.key]}
+                        onChange={(content: string) => {
+                          handleEditorChange(content, field.key);
                         }}
                       />
                     </GridItem>
@@ -371,7 +339,13 @@ function ProductForm({ channels }: FormProps) {
                 </Grid>
               )}
               {field.type === "input" && (
-                <Grid gridColumns={{mobile: "repeat(1, 1fr)", tablet: "repeat(2, 1fr)"}} paddingBottom="medium">
+                <Grid
+                  gridColumns={{
+                    mobile: "repeat(1, 1fr)",
+                    tablet: "repeat(2, 1fr)",
+                  }}
+                  paddingBottom="medium"
+                >
                   <GridItem>
                     <FormGroup>
                       <Input
@@ -403,7 +377,9 @@ function ProductForm({ channels }: FormProps) {
             </Box>
           ))}
 
-          <ActionBar>{ActionBarButtons}</ActionBar>
+          {currentLocale !== defaultLocale && (
+            <ActionBar>{ActionBarButtons}</ActionBar>
+          )}
         </StyledForm>
       </Box>
     </Loading>

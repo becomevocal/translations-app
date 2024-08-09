@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { bigcommerceClient, getSession } from "@/lib/auth";
+import { hardcodedAvailableLocales } from '@/lib/constants';
 
 type Channel = {
   id: number;
@@ -25,7 +26,10 @@ export async function GET(
         return {
           channel_id: channel.id,
           channel_name: channel.name,
-          locales: localesData
+          locales: localesData.map((locale: { code: string, status: string, is_default: boolean }) => ({
+            ...locale,
+            title: hardcodedAvailableLocales.find(({ id }) => id === locale.code)?.name,
+          }))
         };
       } catch (innerError) {
         console.error(`Failed to fetch locales for channel ${channel.id}:`, innerError);
@@ -37,7 +41,8 @@ export async function GET(
             {
               code: "en",
               status: "active",
-              is_default: true
+              is_default: true,
+              title: "English"
             }
           ]
         };
