@@ -152,8 +152,6 @@ function ProductForm({ channels }: FormProps) {
       })
     );
 
-    formObject.metafields = productData["metafields"];
-
     return formObject;
   };
 

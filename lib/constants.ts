@@ -13,29 +13,33 @@ export const availableLocales:Array<{code:string, label: string}> = [
   },
 ];
 
-export const translatableProductFields:Array<{key:string, label: string, type: "input" | "textarea", required: boolean}> = [
+export const translatableProductFields:Array<{key:string, label: string, type: "input" | "textarea", graphqlParentObject: string, required: boolean}> = [
   {
     key: 'name',
     label: 'Name',
     type: 'input',
+    graphqlParentObject: "basicInformation",
     required: true,
   },
   {
     key: 'description',
     label: 'Description',
     type: 'textarea',
+    graphqlParentObject: "basicInformation",
     required: true,
   },
   {
-    key: 'page_title',
+    key: 'pageTitle',
     label: 'Page Title',
     type: 'input',
+    graphqlParentObject: "seoInformation",
     required: false,
   },
   {
-    key: 'meta_keywords',
-    label: 'Meta Keywords',
+    key: 'metaDescription',
+    label: 'Meta Description',
     type: 'input',
+    graphqlParentObject: "seoInformation",
     required: false,
   },
 ];

@@ -1,4 +1,4 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest } from "next/server";
 import { bigcommerceClient, getSession } from "@/lib/auth";
 import {
   availableLocales,
@@ -6,21 +6,26 @@ import {
   translatableProductFields,
 } from "@/lib/constants";
 
-const getMetafieldId = (metafields: any, fieldName: string, locale: string) => {
-  const filteredFields = metafields.filter(
-    (meta: any) => meta.namespace === locale && meta.key === fieldName
-  );
-  return filteredFields[0]?.id;
-};
+function createGraphFieldsFromPostData(
+  postData: {[key: string]: string},
+  graphqlParentObject: string
+): { [key: string]: string } {
+  return translatableProductFields
+    .filter((productField) => productField.graphqlParentObject === graphqlParentObject)
+    .reduce<{ [key: string]: string }>((acc, field) => {
+      acc[field.key] = postData[field.key];
+      return acc;
+    }, {});
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { pid: string } }
 ) {
   const pid = params.pid;
-  const searchParams = request.nextUrl.searchParams
-  const context = searchParams.get('context') ?? ''
-  const channelId = searchParams.get('channel_id') ?? null
+  const searchParams = request.nextUrl.searchParams;
+  const context = searchParams.get("context") ?? "";
+  const channelId = searchParams.get("channel_id") ?? null;
 
   if (!channelId) {
     return new Response("Channel ID missing", {
@@ -28,18 +33,8 @@ export async function GET(
     });
   }
 
-  // console.log('contextinroute (GET)', context, 'ex', params)
-
   try {
     const { accessToken, storeHash } = await getSession({ query: { context } });
-    const bigcommerce = bigcommerceClient(accessToken, storeHash);
-
-    const { data: productData } = await bigcommerce.get(
-      `/catalog/products/${pid}`
-    );
-    const { data: metafieldsData } = await bigcommerce.get(
-      `/catalog/products/${pid}/metafields`
-    );
 
     const myHeaders = new Headers();
     myHeaders.append("X-Auth-Token", accessToken);
@@ -57,6 +52,10 @@ export async function GET(
           name
           description
         }
+        seoInformation {
+          pageTitle
+          metaDescription
+        }
       }`;
     });
 
@@ -71,6 +70,10 @@ export async function GET(
                   basicInformation {
                     name
                     description
+                  }
+                  seoInformation {
+                    pageTitle
+                    metaDescription
                   }
                   ${localeQueries}
                 }
@@ -95,14 +98,23 @@ export async function GET(
     );
     const gqlData = (await response.json()) as any;
 
-    productData.localeData = {}
+    let productData = {
+      ...gqlData.data.store.products.edges[0].node["basicInformation"],
+      ...gqlData.data.store.products.edges[0].node["seoInformation"],
+    };
+    productData.localeData = {};
     availableLocales.forEach((locale) => {
       if (defaultLocale !== locale.code) {
-        productData.localeData[locale.code] = gqlData.data.store.products.edges[0].node[locale.code]["basicInformation"];
+        productData.localeData[locale.code] = {
+          ...gqlData.data.store.products.edges[0].node[locale.code][
+            "basicInformation"
+          ],
+          ...gqlData.data.store.products.edges[0].node[locale.code][
+            "seoInformation"
+          ],
+        };
       }
     });
-    
-    productData.metafields = metafieldsData;
 
     return Response.json(productData);
   } catch (error: any) {
@@ -120,9 +132,9 @@ export async function PUT(
 ) {
   const body = (await request.json()) as any;
   const pid = params.pid;
-  const searchParams = request.nextUrl.searchParams
-  const context = searchParams.get('context') ?? ''
-  const channelId = searchParams.get('channel_id') ?? null
+  const searchParams = request.nextUrl.searchParams;
+  const context = searchParams.get("context") ?? "";
+  const channelId = searchParams.get("channel_id") ?? null;
 
   if (!channelId) {
     return new Response("Channel ID missing", {
@@ -130,13 +142,9 @@ export async function PUT(
     });
   }
 
-  // console.log('contextinroute (PUT)', context, 'ex', params)
-
   try {
     let result: any;
-    console.log('in route put', context)
     const { accessToken, storeHash } = await getSession({ query: { context } });
-    console.log('after get session')
     const bigcommerce = bigcommerceClient(accessToken, storeHash);
 
     if (body["locale"] && body.locale !== defaultLocale) {
@@ -149,13 +157,16 @@ export async function PUT(
 
       const mutationQuery = `
         mutation (
-          $input: SetProductBasicInformationInput!
+          $channelId: ID!,
+          $locale: String!,
+          $input: SetProductBasicInformationInput!,
+          $seoInput: SetProductSeoInformationInput!
         ) {
           product {
             setProductBasicInformation(input: $input) {
               product {
                 id
-                ${selectedLocale}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${selectedLocale}" }) {
+                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
                   basicInformation {
                     name
                     description
@@ -163,25 +174,44 @@ export async function PUT(
                 }
               }
             }
+            setProductSeoInformation(input: $seoInput) {
+              product {
+                id
+                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                  seoInformation {
+                    pageTitle
+                    metaDescription
+                  }
+                }
+              }
+            }
           }
         }
       `;
-
-      let updatedProductData = {} as any;
-      for (const productField of translatableProductFields) {
-        updatedProductData[productField.key] = body[productField.key];
-      }
+      
+      const productGraphData = createGraphFieldsFromPostData(body, "basicInformation");
+      const seoGraphData = createGraphFieldsFromPostData(body, "seoInformation");
 
       const graphql = JSON.stringify({
         query: mutationQuery,
         variables: {
+          channelId: `bc/store/channel/${channelId}`,
+          locale: selectedLocale,
           input: {
             productId: `bc/store/product/${pid}`,
             localeContext: {
               channelId: `bc/store/channel/${channelId}`,
               locale: selectedLocale,
             },
-            data: updatedProductData,
+            data: productGraphData,
+          },
+          seoInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: selectedLocale,
+            },
+            data: seoGraphData,
           },
         },
       });
@@ -196,56 +226,18 @@ export async function PUT(
         `https://api.bigcommerce.com/stores/${storeHash}/graphql`,
         requestOptions
       );
+      
       const gqlData = (await response.json()) as any;
 
-      // This is for a localization, so create / update metafields
-      // const { data: existingMetafields } = await bigcommerce.get(
-      //   `/catalog/products/${pid}/metafields`
-      // );
+      console.log('result', gqlData)
 
-      // for (const productField of translatableProductFields) {
-      //   let metafieldResults = [];
-      //   const existingMetafieldId = getMetafieldId(
-      //     existingMetafields,
-      //     productField.key,
-      //     selectedLocale
-      //   );
-      //   const metafieldValue = body[productField.key];
-
-      //   if (existingMetafieldId) {
-      //     // Update the metafield
-      //     const { data } = await bigcommerce.put(
-      //       `/catalog/products/${pid}/metafields/${existingMetafieldId}`,
-      //       {
-      //         value: metafieldValue,
-      //       }
-      //     );
-      //     metafieldResults.push(data);
-      //   } else {
-      //     // Create the metafield, but only if there is a value (metafields cannot be created with empty values)
-      //     if (metafieldValue !== "") {
-      //       const { data } = await bigcommerce.post(
-      //         `/catalog/products/${pid}/metafields`,
-      //         {
-      //           key: productField.key,
-      //           value: metafieldValue,
-      //           namespace: selectedLocale,
-      //           permission_set: "write_and_sf_access",
-      //         }
-      //       );
-      //       metafieldResults.push(data);
-      //     }
-      //   }
-
-      //   result = metafieldResults;
-      // }
-
-      result =
-        gqlData?.data?.product?.setProductBasicInformation?.product?.[
-          selectedLocale
-        ]?.basicInformation;
+      result = {
+        ...gqlData?.data?.product?.setProductBasicInformation?.product?.overridesForLocale?.basicInformation,
+        ...gqlData?.data?.product?.setProductSeoInformation?.product?.overridesForLocale?.seoInformation,
+      };
     } else {
       // This is for the default lang, so update the main product
+      // (currently the front-end does not allow this)
       const { data: updatedProduct } = await bigcommerce.put(
         `/catalog/products/${pid}`,
         body
