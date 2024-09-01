@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import ErrorMessage from "@/components/error";
-import ProductForm from "@/components/form";
-import Loading from "@/components/loading";
-import { FormData } from "@/types";
-import { Box } from "@bigcommerce/big-design";
+import ErrorMessage from "@/components/ErrorMessage";
+import ProductForm from "@/components/ProductForm";
+import Loading from "@/components/LoadingIndicator";
 
 const ProductInfo = () => {
   const [isChannelsInfoLoading, setChannelsInfoLoading] = useState(true);
@@ -45,9 +42,7 @@ const ProductInfo = () => {
 
   return (
     <Loading isLoading={isChannelsInfoLoading}>
-      <Box padding="medium">
-        <ProductForm channels={channels} />
-      </Box>
+      <ProductForm channels={channels} />
     </Loading>
   );
 };

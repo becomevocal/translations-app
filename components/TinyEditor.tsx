@@ -65,7 +65,9 @@ export default function Editor({
                 "blocks fontfamily fontsize bullist numlist fullscreen |" +
                 "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
                 "table link codesample forecolor backcolor removeformat",
-              content_style: `body { font-family:Source Sans 3,latin; font-size:14px; background-color: ${theme.colors.secondary20}}`,
+              content_style: `body { font-family:Source Sans 3,latin; font-size:14px; background-color: ${
+                isDisabled ? theme.colors.secondary20 : "white"
+              }}`,
               branding: false,
               disabled: isDisabled,
 

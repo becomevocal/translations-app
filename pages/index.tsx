@@ -1,10 +1,10 @@
-import { Box, H1, HR, Button, Dropdown, DropdownItem, DropdownLinkItem, Panel, Small, Table, Link as StyledLink, Form, Flex, FlexItem, Input, Badge, Text } from '@bigcommerce/big-design';
+import { Button, Dropdown, DropdownItem, DropdownLinkItem, Table, Link as StyledLink, Badge, Text } from '@bigcommerce/big-design';
 import { MoreHorizIcon, SearchIcon } from '@bigcommerce/big-design-icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ReactElement, useState, useEffect } from 'react';
-import ErrorMessage from '@/components/error';
-import Loading from '@/components/loading';
+import ErrorMessage from '@/components/ErrorMessage';
+import Loading from '@/components/LoadingIndicator';
 import { LanguagesTableItem } from '@/types';
 import { AdvancedPanel, Page } from 'bigcommerce-design-patterns';
 
