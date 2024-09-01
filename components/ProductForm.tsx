@@ -123,8 +123,6 @@ function reducer(state: State, action: Action): State {
       };
     case "SET_PRODUCT_SAVING":
       return { ...state, isProductSaving: action.payload };
-    case "SET_ERRORS":
-      return { ...state, errors: action.payload };
     default:
       return state;
   }
@@ -143,8 +141,6 @@ const getFormObjectForLocale = (
     }
   );
 };
-
-const FormErrors: Record<string, string> = {}; // Define this based on your validation rules
 
 function ProductForm({ channels }: ProductFormProps) {
   const [state, dispatch] = useReducer(reducer, {
@@ -278,16 +274,6 @@ function ProductForm({ channels }: ProductFormProps) {
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target;
       dispatch({ type: "SET_FORM", payload: { ...form, [name]: value } });
-
-      if (!value && FormErrors[name]) {
-        dispatch({
-          type: "SET_ERRORS",
-          payload: { ...errors, [name]: FormErrors[name] },
-        });
-      } else {
-        const { [name]: _, ...newErrors } = errors;
-        dispatch({ type: "SET_ERRORS", payload: newErrors });
-      }
     },
     [form, errors]
   );
@@ -440,6 +426,7 @@ function ProductForm({ channels }: ProductFormProps) {
                           value={form[field.key as keyof ProductFields]}
                           onChange={handleChange}
                           required={field.required}
+                          minLength={4}
                         />
                       </FormGroup>
                     </GridItem>
