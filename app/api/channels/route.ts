@@ -18,7 +18,7 @@ export async function GET(
     const { accessToken, storeHash } = await getSession({ query: { context } });
     const bigcommerce = bigcommerceClient(accessToken, storeHash);
 
-    const { data: channelsData } = await bigcommerce.get('/channels');
+    const { data: channelsData } = await bigcommerce.get('/channels?available=true');
 
     const result = await Promise.all(channelsData.map(async (channel: Channel) => {
       try {
