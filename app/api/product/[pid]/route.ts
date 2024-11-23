@@ -7,11 +7,13 @@ import {
 } from "@/lib/constants";
 
 function createGraphFieldsFromPostData(
-  postData: {[key: string]: string},
+  postData: { [key: string]: string },
   graphqlParentObject: string
 ): { [key: string]: string } {
   return translatableProductFields
-    .filter((productField) => productField.graphqlParentObject === graphqlParentObject)
+    .filter(
+      (productField) => productField.graphqlParentObject === graphqlParentObject
+    )
     .reduce<{ [key: string]: string }>((acc, field) => {
       acc[field.key] = postData[field.key];
       return acc;
@@ -56,7 +58,24 @@ export async function GET(
           pageTitle
           metaDescription
         }
-      }`;
+      }
+      `;
+    });
+
+    const localeOptionQueries = availableLocales.map((locale) => {
+      if (locale.code === defaultLocale) {
+        return "";
+      }
+
+      return `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+        values {
+          id
+          label
+        }
+      }
+      `;
     });
 
     const graphql = JSON.stringify({
@@ -74,6 +93,21 @@ export async function GET(
                   seoInformation {
                     pageTitle
                     metaDescription
+                  }
+                  options {
+                    edges {
+                      node {
+                        id
+                        displayName
+                        isShared
+                        values {
+                          id
+                          label
+                          isDefault
+                        }
+                        ${localeOptionQueries}
+                      }
+                    }
                   }
                   ${localeQueries}
                 }
@@ -101,6 +135,7 @@ export async function GET(
     let productData = {
       ...gqlData.data.store.products.edges[0].node["basicInformation"],
       ...gqlData.data.store.products.edges[0].node["seoInformation"],
+      options: gqlData.data.store.products.edges[0].node["options"],
     };
     productData.localeData = {};
     availableLocales.forEach((locale) => {
@@ -112,6 +147,15 @@ export async function GET(
           ...gqlData.data.store.products.edges[0].node[locale.code][
             "seoInformation"
           ],
+          options: gqlData.data.store.products.edges[0].node.options.edges.map(
+            (edge: any) => ({
+              node: {
+                id: edge.node.id,
+                displayName: edge.node[locale.code]?.displayName || null,
+                values: edge.node[locale.code]?.values || []
+              }
+            })
+          )
         };
       }
     });
@@ -161,6 +205,7 @@ export async function PUT(
           $locale: String!,
           $input: SetProductBasicInformationInput!,
           $seoInput: SetProductSeoInformationInput!
+          $optionsInput: SetProductOptionsInformationInput!
         ) {
           product {
             setProductBasicInformation(input: $input) {
@@ -185,12 +230,43 @@ export async function PUT(
                 }
               }
             }
+            setProductOptionsInformation (input: $optionsInput) {
+              product {
+                id
+                options {
+                  edges {
+                    node {
+                      id
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       `;
-      
-      const productGraphData = createGraphFieldsFromPostData(body, "basicInformation");
-      const seoGraphData = createGraphFieldsFromPostData(body, "seoInformation");
+
+      const productGraphData = createGraphFieldsFromPostData(
+        body,
+        "basicInformation"
+      );
+      const seoGraphData = createGraphFieldsFromPostData(
+        body,
+        "seoInformation"
+      );
+      const optionData = createGraphFieldsFromPostData(body, "options");
 
       const graphql = JSON.stringify({
         query: mutationQuery,
@@ -213,6 +289,31 @@ export async function PUT(
             },
             data: seoGraphData,
           },
+          optionsInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: selectedLocale,
+            },
+            data: {
+              options: [
+                {
+                  optionId: "bc/store/productOption/487",
+                  data: {
+                    dropdown: {
+                      displayName: "test1",
+                      values: [
+                        {
+                          valueId: "bc/store/productOptionValue/1850",
+                          label: "test2",
+                        },
+                      ],
+                    }
+                  },
+                }
+              ]
+            }
+          }
         },
       });
       const requestOptions = {
@@ -226,14 +327,16 @@ export async function PUT(
         `https://api.bigcommerce.com/stores/${storeHash}/graphql`,
         requestOptions
       );
-      
+
       const gqlData = (await response.json()) as any;
 
-      console.log('result', gqlData)
-
       result = {
-        ...gqlData?.data?.product?.setProductBasicInformation?.product?.overridesForLocale?.basicInformation,
-        ...gqlData?.data?.product?.setProductSeoInformation?.product?.overridesForLocale?.seoInformation,
+        ...gqlData?.data?.product?.setProductBasicInformation?.product
+          ?.overridesForLocale?.basicInformation,
+        ...gqlData?.data?.product?.setProductSeoInformation?.product
+          ?.overridesForLocale?.seoInformation,
+          options: gqlData?.data?.product?.setProductOptionsInformation?.product
+          ?.options?.edges,
       };
     } else {
       // This is for the default lang, so update the main product

@@ -51,12 +51,36 @@ interface ProductFields {
   description: string;
   pageTitle: string;
   metaDescription: string;
+  options?: {
+    [optionId: string]: {
+      displayName: string;
+      values: {
+        [valueId: string]: string;
+      };
+    };
+  };
 }
 
-interface ProductData extends ProductFields {
+interface ProductData {
+  name: string;
+  description: string;
+  pageTitle: string;
+  metaDescription: string;
   localeData: {
     [key: string]: ProductFields;
   };
+  options?: {
+    edges: Array<{
+      node: {
+        id: string;
+        displayName: string;
+        values: {
+          id: string;
+          label: string;
+        }[];
+      }
+    }>
+  }
 }
 
 interface State {
@@ -132,14 +156,46 @@ const getFormObjectForLocale = (
   productData: ProductData,
   locale: string
 ): ProductFields => {
-  return (
-    productData.localeData[locale] || {
-      name: "",
-      description: "",
-      pageTitle: "",
-      metaDescription: "",
-    }
-  );
+  // Get the base locale data or initialize empty object
+  const localeData = productData.localeData[locale] || {
+    name: "",
+    description: "",
+    pageTitle: "",
+    metaDescription: "",
+  };
+
+  // Initialize options object
+  const options: ProductFields['options'] = {};
+
+  // Transform options data if it exists
+  if (productData.options?.edges) {
+    productData.options.edges.forEach(({ node }) => {
+      const optionId = node.id;
+      
+      // Find locale-specific data for this option
+      const localeOption = localeData.options?.find(
+        opt => opt.node.id === optionId
+      )?.node;
+
+      options[optionId] = {
+        displayName: localeOption?.displayName || '',
+        values: {}
+      };
+
+      // Transform option values
+      node.values.forEach(value => {
+        const localeValue = localeOption?.values?.find(
+          v => v.id === value.id
+        );
+        options[optionId].values[value.id] = localeValue?.label || '';
+      });
+    });
+  }
+
+  return {
+    ...localeData,
+    options
+  };
 };
 
 function ProductForm({ channels }: ProductFormProps) {
@@ -204,6 +260,7 @@ function ProductForm({ channels }: ProductFormProps) {
           }
         );
         const updatedProductLocaleData: ProductFields = await res.json();
+        
         dispatch({
           type: "SET_PRODUCT_DATA",
           payload: {
@@ -273,9 +330,36 @@ function ProductForm({ channels }: ProductFormProps) {
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target;
-      dispatch({ type: "SET_FORM", payload: { ...form, [name]: value } });
+      
+      // Handle option and value changes
+      if (name.startsWith('option_') || name.startsWith('value_')) {
+        const [type, id] = name.split('_');
+        const newForm = { ...form };
+        
+        if (!newForm.options) {
+          newForm.options = {};
+        }
+
+        if (type === 'option') {
+          if (!newForm.options[id]) {
+            newForm.options[id] = { displayName: '', values: {} };
+          }
+          newForm.options[id].displayName = value;
+        } else if (type === 'value') {
+          const [optionId, valueId] = id.split(':');
+          if (!newForm.options[optionId]) {
+            newForm.options[optionId] = { displayName: '', values: {} };
+          }
+          newForm.options[optionId].values[valueId] = value;
+        }
+
+        dispatch({ type: "SET_FORM", payload: newForm });
+      } else {
+        // Handle regular field changes
+        dispatch({ type: "SET_FORM", payload: { ...form, [name]: value } });
+      }
     },
-    [form, errors]
+    [form]
   );
 
   const channelOptions = useMemo(
@@ -372,7 +456,7 @@ function ProductForm({ channels }: ProductFormProps) {
                     <Editor
                       label={`${field.label} (${defaultLocale})`}
                       initialValue={
-                        productData[field.key as keyof ProductFields]
+                        String(productData[field.key as keyof ProductFields] || '')
                       }
                       isDisabled={true}
                     />
@@ -382,7 +466,7 @@ function ProductForm({ channels }: ProductFormProps) {
                     <GridItem>
                       <Editor
                         label={`${field.label} (${currentLocale})`}
-                        initialValue={form[field.key as keyof ProductFields]}
+                        initialValue={String(form[field.key as keyof ProductFields] || '')}
                         onChange={(content: string) =>
                           handleEditorChange(
                             content,
@@ -408,7 +492,7 @@ function ProductForm({ channels }: ProductFormProps) {
                         label={`${field.label} (${defaultLocale})`}
                         name={`defaultLocale_${field.key}`}
                         defaultValue={
-                          productData[field.key as keyof ProductFields]
+                          String(productData[field.key as keyof ProductFields] || '')
                         }
                         readOnly={true}
                         required={field.required}
@@ -423,7 +507,7 @@ function ProductForm({ channels }: ProductFormProps) {
                         <Input
                           label={`${field.label} (${currentLocale})`}
                           name={field.key}
-                          value={form[field.key as keyof ProductFields]}
+                          value={String(form[field.key as keyof ProductFields] ?? '')}
                           onChange={handleChange}
                           required={field.required}
                           minLength={4}
@@ -432,6 +516,85 @@ function ProductForm({ channels }: ProductFormProps) {
                     </GridItem>
                   )}
                 </Grid>
+              )}
+              {field.type === "optionsList" && (
+                <Box>
+                  {productData.options?.edges.map((option) => (
+                    <Box key={option.node.id} marginBottom="medium">
+                      <Grid
+                        gridColumns={{
+                          mobile: "repeat(1, 1fr)",
+                          tablet: "repeat(2, 1fr)",
+                        }}
+                        paddingBottom="small"
+                      >
+                        <GridItem>
+                          <FormGroup>
+                            <Input
+                              label={`${option.node.displayName} (${defaultLocale})`}
+                              name={`defaultLocale_option_${option.node.id}`}
+                              defaultValue={option.node.displayName}
+                              readOnly={true}
+                              disabled={true}
+                            />
+                          </FormGroup>
+                        </GridItem>
+
+                        {currentLocale !== defaultLocale && (
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`${option.node.displayName} (${currentLocale})`}
+                                name={`option_${option.node.id}`}
+                                value={form.options?.[option.node.id]?.displayName || ''}
+                                onChange={handleChange}
+                                required={field.required}
+                              />
+                            </FormGroup>
+                          </GridItem>
+                        )}
+                      </Grid>
+
+                      {option.node.values.map((value) => (
+                        <Grid
+                          key={value.id}
+                          gridColumns={{
+                            mobile: "repeat(1, 1fr)",
+                            tablet: "repeat(2, 1fr)",
+                          }}
+                          paddingBottom="small"
+                          paddingLeft="medium"
+                        >
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`${value.label} (${defaultLocale})`}
+                                name={`defaultLocale_value_${value.id}`}
+                                defaultValue={value.label}
+                                readOnly={true}
+                                disabled={true}
+                              />
+                            </FormGroup>
+                          </GridItem>
+
+                          {currentLocale !== defaultLocale && (
+                            <GridItem>
+                              <FormGroup>
+                                <Input
+                                  label={`${value.label} (${currentLocale})`}
+                                  name={`value_${option.node.id}:${value.id}`}
+                                  value={form.options?.[option.node.id]?.values?.[value.id] || ''}
+                                  onChange={handleChange}
+                                  required={field.required}
+                                />
+                              </FormGroup>
+                            </GridItem>
+                          )}
+                        </Grid>
+                      ))}
+                    </Box>
+                  ))}
+                </Box>
               )}
             </Box>
           ))}
