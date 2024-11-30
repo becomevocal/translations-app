@@ -7,6 +7,7 @@ import {
 } from "@/lib/constants";
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { createGraphQLClient } from '@/lib/graphql-client';
 
 function createGraphFieldsFromPostData(
   postData: { [key: string]: string },
@@ -121,11 +122,7 @@ export async function GET(
 
   try {
     const { accessToken, storeHash } = await getSession({ query: { context } });
-
-    const myHeaders = new Headers();
-    myHeaders.append("X-Auth-Token", accessToken);
-    myHeaders.append("Accept", " application/json");
-    myHeaders.append("Content-Type", " application/json");
+    const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     const localeQueries = availableLocales.map((locale) => {
       if (locale.code === defaultLocale) {
@@ -162,7 +159,7 @@ export async function GET(
       `;
     });
 
-    const graphql = JSON.stringify({
+    const graphql = {
       query: `
         query {
           store {
@@ -200,21 +197,10 @@ export async function GET(
           }
         }
       `,
-      variables: {},
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: graphql,
-      redirect: "follow" as RequestRedirect,
+      variables: {}
     };
 
-    const response = await fetch(
-      `https://api.bigcommerce.com/stores/${storeHash}/graphql`,
-      requestOptions
-    );
-    const gqlData = (await response.json()) as any;
+    const gqlData = await graphQLClient.request(graphql.query, graphql.variables);
 
     if (!gqlData?.data?.store?.products?.edges?.[0]?.node) {
       debugLog(gqlData, 'GET-error-response-');
@@ -248,19 +234,13 @@ export async function GET(
     availableLocales.forEach((locale) => {
       if (defaultLocale !== locale.code) {
         const localeNode = gqlData.data.store.products.edges[0].node[locale.code];
-        
-        if (!localeNode?.basicInformation) {
-          console.warn(`Missing basicInformation for locale ${locale.code}`);
-          return; // skip this locale
-        }
-
-        const options = gqlData.data.store.products.edges[0].node.options.edges;
+        const options = gqlData.data.store.products.edges[0].node?.options?.edges;
         
         normalizedProductData.localeData[locale.code] = {
-          name: localeNode?.basicInformation?.name,
-          description: localeNode?.basicInformation?.description,
-          pageTitle: localeNode?.seoInformation?.pageTitle,
-          metaDescription: localeNode?.seoInformation?.metaDescription,
+          name: localeNode?.basicInformation?.name ?? null,
+          description: localeNode?.basicInformation?.description ?? null,
+          pageTitle: localeNode?.seoInformation?.pageTitle ?? null,
+          metaDescription: localeNode?.seoInformation?.metaDescription ?? null,
           options: transformGraphQLOptionsDataToLocaleData(options, locale.code)
         };
       }
@@ -295,15 +275,10 @@ export async function PUT(
   try {
     let result: any;
     const { accessToken, storeHash } = await getSession({ query: { context } });
-    const bigcommerce = bigcommerceClient(accessToken, storeHash);
+    const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     if (body["locale"] && body.locale !== defaultLocale) {
       const selectedLocale = body.locale;
-
-      const myHeaders = new Headers();
-      myHeaders.append("X-Auth-Token", accessToken);
-      myHeaders.append("Accept", " application/json");
-      myHeaders.append("Content-Type", " application/json");
 
       const mutationQuery = `
         mutation (
@@ -406,24 +381,7 @@ export async function PUT(
         }
       };
 
-      const graphql = JSON.stringify({
-        query: mutationQuery,
-        variables: graphVariables
-      });
-      
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: graphql,
-        redirect: "follow" as RequestRedirect,
-      };
-
-      const response = await fetch(
-        `https://api.bigcommerce.com/stores/${storeHash}/graphql`,
-        requestOptions
-      );
-
-      const gqlData = (await response.json()) as any;
+      const gqlData = await graphQLClient.request(mutationQuery, graphVariables);
 
       result = {
         ...gqlData?.data?.product?.setProductBasicInformation?.product
@@ -437,7 +395,7 @@ export async function PUT(
     } else {
       // This is for the default lang, so update the main product
       // (currently the front-end does not allow this)
-      const { data: updatedProduct } = await bigcommerce.put(
+      const { data: updatedProduct } = await bigcommerceClient(accessToken, storeHash).put(
         `/catalog/products/${pid}`,
         body
       );
