@@ -44,3 +44,6 @@ next-env.d.ts
 
 # Tinymce
 /public/tinymce/
+
+# Logs
+/logs

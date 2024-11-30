@@ -51,14 +51,17 @@ interface ProductFields {
   description: string;
   pageTitle: string;
   metaDescription: string;
-  options?: {
-    [optionId: string]: {
-      displayName: string;
-      values: {
-        [valueId: string]: string;
-      };
-    };
-  };
+}
+
+interface ProductOptionValue {
+  id: string;
+  label: string;
+}
+
+interface ProductOption {
+  id: string;
+  displayName: string;
+  values: ProductOptionValue[];
 }
 
 interface ProductData {
@@ -67,27 +70,35 @@ interface ProductData {
   pageTitle: string;
   metaDescription: string;
   localeData: {
-    [key: string]: ProductFields;
+    [key: string]: FormFields;
   };
   options?: {
     edges: Array<{
-      node: {
-        id: string;
-        displayName: string;
-        values: {
-          id: string;
-          label: string;
-        }[];
-      }
-    }>
-  }
+      node: ProductOption;
+    }>;
+  };
+}
+
+interface FormOptionValue {
+  [valueId: string]: string;
+}
+
+interface FormOption {
+  displayName: string;
+  values: FormOptionValue;
+}
+
+interface FormFields extends ProductFields {
+  options?: {
+    [optionId: string]: FormOption;
+  };
 }
 
 interface State {
   currentChannel: number;
   currentLocale: string;
   productData: ProductData;
-  form: ProductFields;
+  form: FormFields;
   isProductInfoLoading: boolean;
   hasProductInfoLoadingError: boolean;
   isProductSaving: boolean;
@@ -98,7 +109,7 @@ type Action =
   | { type: "SET_CHANNEL"; payload: number }
   | { type: "SET_LOCALE"; payload: string }
   | { type: "SET_PRODUCT_DATA"; payload: ProductData }
-  | { type: "SET_FORM"; payload: ProductFields }
+  | { type: "SET_FORM"; payload: FormFields }
   | { type: "SET_PRODUCT_INFO_LOADING"; payload: boolean }
   | { type: "SET_PRODUCT_INFO_LOADING_ERROR"; payload: boolean }
   | { type: "SET_PRODUCT_SAVING"; payload: boolean }
@@ -155,46 +166,18 @@ function reducer(state: State, action: Action): State {
 const getFormObjectForLocale = (
   productData: ProductData,
   locale: string
-): ProductFields => {
-  // Get the base locale data or initialize empty object
+): FormFields => {
   const localeData = productData.localeData[locale] || {
     name: "",
     description: "",
     pageTitle: "",
     metaDescription: "",
+    options: {}
   };
-
-  // Initialize options object
-  const options: ProductFields['options'] = {};
-
-  // Transform options data if it exists
-  if (productData.options?.edges) {
-    productData.options.edges.forEach(({ node }) => {
-      const optionId = node.id;
-      
-      // Find locale-specific data for this option
-      const localeOption = localeData.options?.find(
-        opt => opt.node.id === optionId
-      )?.node;
-
-      options[optionId] = {
-        displayName: localeOption?.displayName || '',
-        values: {}
-      };
-
-      // Transform option values
-      node.values.forEach(value => {
-        const localeValue = localeOption?.values?.find(
-          v => v.id === value.id
-        );
-        options[optionId].values[value.id] = localeValue?.label || '';
-      });
-    });
-  }
 
   return {
     ...localeData,
-    options
+    options: localeData.options || {}
   };
 };
 
@@ -259,7 +242,7 @@ function ProductForm({ channels }: ProductFormProps) {
             body: JSON.stringify({ ...form, locale: currentLocale }),
           }
         );
-        const updatedProductLocaleData: ProductFields = await res.json();
+        const updatedProductLocaleData: FormFields = await res.json();
         
         dispatch({
           type: "SET_PRODUCT_DATA",
@@ -318,7 +301,7 @@ function ProductForm({ channels }: ProductFormProps) {
   );
 
   const handleEditorChange = useCallback(
-    (content: string, fieldName: keyof ProductFields) => {
+    (content: string, fieldName: keyof FormFields) => {
       dispatch({
         type: "SET_FORM",
         payload: { ...form, [fieldName]: content },
@@ -456,7 +439,7 @@ function ProductForm({ channels }: ProductFormProps) {
                     <Editor
                       label={`${field.label} (${defaultLocale})`}
                       initialValue={
-                        String(productData[field.key as keyof ProductFields] || '')
+                        String(productData[field.key as keyof FormFields] || '')
                       }
                       isDisabled={true}
                     />
@@ -466,11 +449,11 @@ function ProductForm({ channels }: ProductFormProps) {
                     <GridItem>
                       <Editor
                         label={`${field.label} (${currentLocale})`}
-                        initialValue={String(form[field.key as keyof ProductFields] || '')}
+                        initialValue={String(form[field.key as keyof FormFields] || '')}
                         onChange={(content: string) =>
                           handleEditorChange(
                             content,
-                            field.key as keyof ProductFields
+                            field.key as keyof FormFields
                           )
                         }
                       />
@@ -492,7 +475,7 @@ function ProductForm({ channels }: ProductFormProps) {
                         label={`${field.label} (${defaultLocale})`}
                         name={`defaultLocale_${field.key}`}
                         defaultValue={
-                          String(productData[field.key as keyof ProductFields] || '')
+                          String(productData[field.key as keyof FormFields] || '')
                         }
                         readOnly={true}
                         required={field.required}
@@ -507,7 +490,7 @@ function ProductForm({ channels }: ProductFormProps) {
                         <Input
                           label={`${field.label} (${currentLocale})`}
                           name={field.key}
-                          value={String(form[field.key as keyof ProductFields] ?? '')}
+                          value={String(form[field.key as keyof FormFields] ?? '')}
                           onChange={handleChange}
                           required={field.required}
                           minLength={4}
