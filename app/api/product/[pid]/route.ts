@@ -124,83 +124,12 @@ export async function GET(
     const { accessToken, storeHash } = await getSession({ query: { context } });
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
-    const localeQueries = availableLocales.map((locale) => {
-      if (locale.code === defaultLocale) {
-        return "";
-      }
-
-      return `
-      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
-        basicInformation {
-          name
-          description
-        }
-        seoInformation {
-          pageTitle
-          metaDescription
-        }
-      }
-      `;
+    const gqlData = await graphQLClient.getProductLocaleData({
+      pid,
+      channelId,
+      availableLocales,
+      defaultLocale
     });
-
-    const localeOptionQueries = availableLocales.map((locale) => {
-      if (locale.code === defaultLocale) {
-        return "";
-      }
-
-      return `
-      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
-        displayName
-        values {
-          id
-          label
-        }
-      }
-      `;
-    });
-
-    const graphql = {
-      query: `
-        query {
-          store {
-            products (filters: {ids: ["bc/store/product/${pid}"]}) {
-              edges {
-                node {
-                  id
-                  basicInformation {
-                    name
-                    description
-                  }
-                  seoInformation {
-                    pageTitle
-                    metaDescription
-                  }
-                  options {
-                    edges {
-                      node {
-                        id
-                        displayName
-                        isShared
-                        values {
-                          id
-                          label
-                          isDefault
-                        }
-                        ${localeOptionQueries}
-                      }
-                    }
-                  }
-                  ${localeQueries}
-                }
-              }
-            }
-          }
-        }
-      `,
-      variables: {}
-    };
-
-    const gqlData = await graphQLClient.request(graphql.query, graphql.variables);
 
     if (!gqlData?.data?.store?.products?.edges?.[0]?.node) {
       debugLog(gqlData, 'GET-error-response-');
@@ -278,86 +207,18 @@ export async function PUT(
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     if (body["locale"] && body.locale !== defaultLocale) {
-      const selectedLocale = body.locale;
-
-      const mutationQuery = `
-        mutation (
-          $channelId: ID!,
-          $locale: String!,
-          $input: SetProductBasicInformationInput!,
-          $seoInput: SetProductSeoInformationInput!
-          $optionsInput: SetProductOptionsInformationInput!
-        ) {
-          product {
-            setProductBasicInformation(input: $input) {
-              product {
-                id
-                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
-                  basicInformation {
-                    name
-                    description
-                  }
-                }
-              }
-            }
-            setProductSeoInformation(input: $seoInput) {
-              product {
-                id
-                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
-                  seoInformation {
-                    pageTitle
-                    metaDescription
-                  }
-                }
-              }
-            }
-            setProductOptionsInformation (input: $optionsInput) {
-              product {
-                id
-                options {
-                  edges {
-                    node {
-                      id
-                      overridesForLocale(
-                        localeContext: {
-                          channelId: $channelId,
-                          locale: $locale
-                        }
-                      ) {
-                        displayName
-                        values {
-                          id
-                          label
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
-
-      const productGraphData = createGraphFieldsFromPostData(
-        body,
-        "basicInformation"
-      );
-      const seoGraphData = createGraphFieldsFromPostData(
-        body,
-        "seoInformation"
-      );
-
+      const productGraphData = createGraphFieldsFromPostData(body, "basicInformation");
+      const seoGraphData = createGraphFieldsFromPostData(body, "seoInformation");
       const optionData = createGraphFieldsFromPostData(body, "options");
 
       const graphVariables = {
         channelId: `bc/store/channel/${channelId}`,
-        locale: selectedLocale,
+        locale: body.locale,
         input: {
           productId: `bc/store/product/${pid}`,
           localeContext: {
             channelId: `bc/store/channel/${channelId}`,
-            locale: selectedLocale,
+            locale: body.locale,
           },
           data: productGraphData,
         },
@@ -365,7 +226,7 @@ export async function PUT(
           productId: `bc/store/product/${pid}`,
           localeContext: {
             channelId: `bc/store/channel/${channelId}`,
-            locale: selectedLocale,
+            locale: body.locale,
           },
           data: seoGraphData,
         },
@@ -373,7 +234,7 @@ export async function PUT(
           productId: `bc/store/product/${pid}`,
           localeContext: {
             channelId: `bc/store/channel/${channelId}`,
-            locale: selectedLocale,
+            locale: body.locale,
           },
           data: {
             options: transformPostedOptionDataToGraphQLSchema(optionData)
@@ -381,7 +242,11 @@ export async function PUT(
         }
       };
 
-      const gqlData = await graphQLClient.request(mutationQuery, graphVariables);
+      const gqlData = await graphQLClient.updateProductLocaleData({
+        pid,
+        channelId,
+        locale: body.locale
+      }, graphVariables);
 
       result = {
         ...gqlData?.data?.product?.setProductBasicInformation?.product

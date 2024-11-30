@@ -3,6 +3,19 @@ interface GraphQLClientConfig {
   storeHash: string;
 }
 
+export interface ProductLocaleQueryOptions {
+  pid: string;
+  channelId: string;
+  availableLocales: Array<{ code: string }>;
+  defaultLocale: string;
+}
+
+export interface ProductLocaleMutationOptions {
+  pid: string;
+  channelId: string;
+  locale: string;
+}
+
 export class GraphQLClient {
   private baseUrl: string;
   private headers: Headers;
@@ -32,6 +45,147 @@ export class GraphQLClient {
     }
 
     return data as T;
+  }
+
+  async getProductLocaleData({
+    pid,
+    channelId,
+    availableLocales,
+    defaultLocale
+  }: ProductLocaleQueryOptions) {
+    const localeQueries = availableLocales.map((locale) => 
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        basicInformation {
+          name
+          description
+        }
+        seoInformation {
+          pageTitle
+          metaDescription
+        }
+      }
+      `
+    );
+
+    const localeOptionQueries = availableLocales.map((locale) => 
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+        values {
+          id
+          label
+        }
+      }
+      `
+    );
+
+    const query = `
+      query {
+        store {
+          products (filters: {ids: ["bc/store/product/${pid}"]}) {
+            edges {
+              node {
+                id
+                basicInformation {
+                  name
+                  description
+                }
+                seoInformation {
+                  pageTitle
+                  metaDescription
+                }
+                options {
+                  edges {
+                    node {
+                      id
+                      displayName
+                      isShared
+                      values {
+                        id
+                        label
+                        isDefault
+                      }
+                      ${localeOptionQueries}
+                    }
+                  }
+                }
+                ${localeQueries}
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    return this.request(query);
+  }
+
+  async updateProductLocaleData({
+    pid,
+    channelId,
+    locale
+  }: ProductLocaleMutationOptions, variables: any) {
+    const mutation = `
+      mutation (
+        $channelId: ID!,
+        $locale: String!,
+        $input: SetProductBasicInformationInput!,
+        $seoInput: SetProductSeoInformationInput!
+        $optionsInput: SetProductOptionsInformationInput!
+      ) {
+        product {
+          setProductBasicInformation(input: $input) {
+            product {
+              id
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                basicInformation {
+                  name
+                  description
+                }
+              }
+            }
+          }
+          setProductSeoInformation(input: $seoInput) {
+            product {
+              id
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                seoInformation {
+                  pageTitle
+                  metaDescription
+                }
+              }
+            }
+          }
+          setProductOptionsInformation (input: $optionsInput) {
+            product {
+              id
+              options {
+                edges {
+                  node {
+                    id
+                    overridesForLocale(
+                      localeContext: {
+                        channelId: $channelId,
+                        locale: $locale
+                      }
+                    ) {
+                      displayName
+                      values {
+                        id
+                        label
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    return this.request(mutation, variables);
   }
 }
 
