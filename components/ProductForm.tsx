@@ -19,6 +19,7 @@ import {
   Form as StyledForm,
   FlexItem,
   FormGroup,
+  H4,
 } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { alertsManager } from "@/pages/_app";
@@ -40,6 +41,12 @@ interface Channel {
     is_default: boolean;
     title: string;
   }[];
+}
+
+interface CustomField {
+  id: string;
+  name: string;
+  value: string;
 }
 
 interface ProductFormProps {
@@ -77,6 +84,11 @@ interface ProductData {
       node: ProductOption;
     }>;
   };
+  customFields?: {
+    edges: Array<{
+      node: CustomField;
+    }>;
+  };
 }
 
 interface FormOptionValue {
@@ -91,6 +103,12 @@ interface FormOption {
 interface FormFields extends ProductFields {
   options?: {
     [optionId: string]: FormOption;
+  };
+  customFields?: {
+    [fieldId: string]: {
+      name: string;
+      value: string;
+    };
   };
 }
 
@@ -174,6 +192,8 @@ const getFormObjectForLocale = (
     metaDescription: "",
     options: {}
   };
+
+  console.log('localeData', localeData);
 
   return {
     ...localeData,
@@ -314,8 +334,26 @@ function ProductForm({ channels }: ProductFormProps) {
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target;
       
-      // Handle option and value changes
-      if (name.startsWith('option_') || name.startsWith('value_')) {
+      if (name.startsWith('customField_') || name.startsWith('customFieldName_')) {
+        const [_, fieldId] = name.split('_');
+        const newForm = { ...form };
+        
+        if (!newForm.customFields) {
+          newForm.customFields = {};
+        }
+
+        if (!newForm.customFields[fieldId]) {
+          newForm.customFields[fieldId] = { name: '', value: '' };
+        }
+        
+        if (name.startsWith('customFieldName_')) {
+          newForm.customFields[fieldId].name = value;
+        } else {
+          newForm.customFields[fieldId].value = value;
+        }
+
+        dispatch({ type: "SET_FORM", payload: newForm });
+      } else if (name.startsWith('option_') || name.startsWith('value_')) {
         const [type, id] = name.split('_');
         const newForm = { ...form };
         
@@ -500,9 +538,11 @@ function ProductForm({ channels }: ProductFormProps) {
                   )}
                 </Grid>
               )}
-              {field.type === "optionsList" && (
+              {field.type === "optionsList" && productData?.options?.edges && productData?.options?.edges.length > 0 && (
                 <Box>
-                  {productData.options?.edges.map((option) => (
+                  <H4>Options</H4>
+                  <HR/>
+                  {productData.options.edges.map((option) => (
                     <Box key={option.node.id} marginBottom="medium">
                       <Grid
                         gridColumns={{
@@ -575,6 +615,73 @@ function ProductForm({ channels }: ProductFormProps) {
                           )}
                         </Grid>
                       ))}
+                    </Box>
+                  ))}
+                </Box>
+              )}
+              {field.type === "customFieldsList" && productData?.customFields?.edges && productData?.customFields?.edges.length > 0 && (
+                <Box>
+                  <H4>Custom Fields</H4>
+                  <HR/>
+                  {productData.customFields.edges.map((field) => (
+                    <Box key={field.node.id} marginBottom="medium">
+                      <Grid
+                        gridColumns={{
+                          mobile: "repeat(1, 1fr)",
+                          tablet: "repeat(2, 1fr)",
+                        }}
+                        paddingBottom="small"
+                      >
+                        <GridItem>
+                          <FormGroup>
+                            <Input
+                              label={`Name (${defaultLocale})`}
+                              name={`defaultLocale_customFieldName_${field.node.id}`}
+                              defaultValue={field.node.name}
+                              readOnly={true}
+                              disabled={true}
+                            />
+                          </FormGroup>
+                        </GridItem>
+
+                        {currentLocale !== defaultLocale && (
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`Name (${currentLocale})`}
+                                name={`customFieldName_${field.node.id}`}
+                                value={form.customFields?.[field.node.id]?.name || ''}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </GridItem>
+                        )}
+
+                        <GridItem>
+                          <FormGroup>
+                            <Input
+                              label={`Value (${defaultLocale})`}
+                              name={`defaultLocale_customField_${field.node.id}`}
+                              defaultValue={field.node.value}
+                              readOnly={true}
+                              disabled={true}
+                            />
+                          </FormGroup>
+                        </GridItem>
+
+                        {currentLocale !== defaultLocale && (
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`Value (${currentLocale})`}
+                                name={`customField_${field.node.id}`}
+                                value={form.customFields?.[field.node.id]?.value || ''}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </GridItem>
+                        )}
+                      </Grid>
                     </Box>
                   ))}
                 </Box>

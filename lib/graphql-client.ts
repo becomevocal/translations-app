@@ -95,6 +95,29 @@ export class GraphQLClient {
                   pageTitle
                   metaDescription
                 }
+                customFields {
+                  edges {
+                    node {
+                      id
+                      name
+                      value
+                      ${availableLocales.map(locale => 
+                        locale.code === defaultLocale ? "" : `
+                        ${locale.code}: overrides (context: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+                          edges {
+                            node {
+                              ... on ProductCustomFieldOverridesForChannelLocale {
+                                name
+                                value
+                              }
+                            }
+                          }
+                        }
+                        `
+                      ).join('')}
+                    }
+                  }
+                }
                 options {
                   edges {
                     node {
@@ -131,8 +154,9 @@ export class GraphQLClient {
         $channelId: ID!,
         $locale: String!,
         $input: SetProductBasicInformationInput!,
-        $seoInput: SetProductSeoInformationInput!
-        $optionsInput: SetProductOptionsInformationInput!
+        $seoInput: SetProductSeoInformationInput!,
+        $optionsInput: SetProductOptionsInformationInput!,
+        $customFieldsInput: UpdateProductCustomFieldsInput!
       ) {
         product {
           setProductBasicInformation(input: $input) {
@@ -174,6 +198,29 @@ export class GraphQLClient {
                       values {
                         id
                         label
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          updateProductCustomFields(input: $customFieldsInput) {
+            product {
+              customFields {
+                edges {
+                  node {
+                    id
+                    name
+                    value
+                    overrides(context: { channelId: $channelId, locale: $locale }) {
+                      edges {
+                        node {
+                          ... on ProductCustomFieldOverridesForChannelLocale {
+                            name
+                            value
+                          }
+                        }
                       }
                     }
                   }

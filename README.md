@@ -12,7 +12,24 @@ Using the GraphQL Admin API with support for multiple locales.
 
 
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https://developers.cloudflare.com/pages/get-started/c3).
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https://developers.cloudflare.com/pages/get-started/c3), but it's deployed on Vercel.
+
+# Todo
+
+- [x] Ability to translate product name and description
+- [x] Ability to translate SEO page title and meta description
+- [x] Ability to translate dropdown variant option labels
+- [x] Ability to translate custom fields
+- [ ] Add check for multi-lang functionality and fail gracefully if it's not enabled
+- [ ] Ability to translate non-dropdown variant option labels
+- [ ] Improve UX of custom field editing (should use two column layout on mobile)
+- [ ] Ability to translate pre-order settings
+- [ ] Ability to translate storefront details
+- [ ] Ability to translate modifier option labels
+- [ ] Add Sentry error tracking
+- [ ] Simplify multiple database support & deployment docs
+- [ ] Pull out Admin GraphQL client into a separate package
+- [ ] Add import / export functionality
 
 ## Getting Started
 
