@@ -121,6 +121,7 @@ export class GraphQLClient {
                 options {
                   edges {
                     node {
+                      __typename
                       id
                       displayName
                       isShared
@@ -149,14 +150,23 @@ export class GraphQLClient {
     channelId,
     locale
   }: ProductLocaleMutationOptions, variables: any) {
-    const mutation = `
+    const hasCustomFields = variables.customFieldsInput && 
+      variables.customFieldsInput.data && 
+      variables.customFieldsInput.data.length > 0;
+
+    const hasOptions = variables.optionsInput && 
+      variables.optionsInput.data && 
+      variables.optionsInput.data.options && 
+      variables.optionsInput.data.options.length > 0;
+
+    const mutationQuery = `
       mutation (
         $channelId: ID!,
         $locale: String!,
         $input: SetProductBasicInformationInput!,
-        $seoInput: SetProductSeoInformationInput!,
-        $optionsInput: SetProductOptionsInformationInput!,
-        $customFieldsInput: UpdateProductCustomFieldsInput!
+        $seoInput: SetProductSeoInformationInput!
+        ${hasOptions ? '$optionsInput: SetProductOptionsInformationInput!,' : ''}
+        ${hasCustomFields ? '$customFieldsInput: UpdateProductCustomFieldsInput!' : ''}
       ) {
         product {
           setProductBasicInformation(input: $input) {
@@ -181,12 +191,14 @@ export class GraphQLClient {
               }
             }
           }
+          ${hasOptions ? `
           setProductOptionsInformation (input: $optionsInput) {
             product {
               id
               options {
                 edges {
                   node {
+                    __typename
                     id
                     overridesForLocale(
                       localeContext: {
@@ -205,6 +217,8 @@ export class GraphQLClient {
               }
             }
           }
+          ` : ''}
+          ${hasCustomFields ? `
           updateProductCustomFields(input: $customFieldsInput) {
             product {
               customFields {
@@ -228,11 +242,12 @@ export class GraphQLClient {
               }
             }
           }
+          ` : ''}
         }
       }
     `;
 
-    return this.request(mutation, variables);
+    return this.request(mutationQuery, variables);
   }
 }
 
