@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Flex, FormControlLabel } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
@@ -57,14 +59,12 @@ export default function Editor({
                 "preview",
                 "wordcount",
                 "codesample",
-                "backcolor",
                 "pagebreak",
-                "powerpaste",
               ],
               toolbar:
                 "blocks fontfamily fontsize bullist numlist fullscreen |" +
                 "outdent indent | alignleft aligncenter alignright alignjustify | bold italic underline |" +
-                "table link codesample forecolor backcolor removeformat",
+                "table link codesample forecolor removeformat",
               content_style: `body { font-family:Source Sans 3,latin; font-size:14px; background-color: ${
                 isDisabled ? theme.colors.secondary20 : "white"
               }}`,

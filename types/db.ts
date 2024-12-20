@@ -29,7 +29,7 @@ export interface Db {
   setUser(user: UserInfo): Promise<void>;
   setStore(session: SessionProps): Promise<void>;
   setStoreUser(session: SessionProps): Promise<void>;
-  getStoreToken(storeId: string): Promise<string> | null;
+  getStoreToken(storeHash: string | undefined): Promise<string> | null;
   deleteStore(session: SessionProps): Promise<void>;
   deleteUser(session: SessionProps): Promise<void>;
 }

@@ -206,10 +206,8 @@ function transformPostedCustomFieldDataToGraphQLSchema(
  * @param params - The request parameters containing the product ID.
  * @returns A response with the product locale data or an error message.
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { pid: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ pid: string }> }) {
+  const params = await props.params;
   const pid = params.pid;
   const searchParams = request.nextUrl.searchParams;
   const context = searchParams.get("context") ?? "";
@@ -313,10 +311,8 @@ export async function GET(
  * @param params - The request parameters containing the product ID.
  * @returns A response with the updated product data or an error message.
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { pid: string } }
-) {
+export async function PUT(request: NextRequest, props: { params: Promise<{ pid: string }> }) {
+  const params = await props.params;
   const body = (await request.json()) as any;
   const pid = params.pid;
   const searchParams = request.nextUrl.searchParams;

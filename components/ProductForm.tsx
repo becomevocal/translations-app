@@ -1,3 +1,5 @@
+'use client'
+
 import React, {
   useCallback,
   useMemo,
@@ -22,15 +24,16 @@ import {
   H4,
 } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
-import { alertsManager } from "@/pages/_app";
-import { useRouter } from "next/router";
 import { defaultLocale, translatableProductFields } from "@/lib/constants";
 import { ActionBar } from "bigcommerce-design-patterns";
 import ErrorMessage from "./ErrorMessage";
-import Loading from "./LoadingIndicator";
+import Loading, { LoadingScreen } from "./LoadingIndicator";
 import Editor from "./TinyEditor";
 import LocaleSelectorCallout from "./LocaleSelectorCallout";
 import ActionBarPaddingBox from "./ActionBarPaddingBox";
+import { addAlert } from "@/components/AlertsManager";
+import { useStoreInfo } from "@/components/StoreInfoProvider";
+import { TranslationsGetStarted } from "@/components/TranslationsGetStarted";
 
 interface Channel {
   channel_id: number;
@@ -51,6 +54,8 @@ interface CustomField {
 
 interface ProductFormProps {
   channels: Channel[];
+  productId: number;
+  context: string;
 }
 
 interface ProductFields {
@@ -193,15 +198,14 @@ const getFormObjectForLocale = (
     options: {}
   };
 
-  console.log('localeData', localeData);
-
   return {
     ...localeData,
     options: localeData.options || {}
   };
 };
 
-function ProductForm({ channels }: ProductFormProps) {
+function ProductForm({ channels, productId, context }: ProductFormProps) {
+  const { storeInformation, isLoading: isStoreInfoLoading } = useStoreInfo();
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     currentChannel: channels[0].channel_id,
@@ -218,29 +222,24 @@ function ProductForm({ channels }: ProductFormProps) {
     errors,
   } = state;
 
-  const router = useRouter();
-  const pid = Number(router.query?.pid);
-
   const fetchProductData = useCallback(async () => {
     dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: true });
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const context = urlParams.get("context");
       const res = await fetch(
-        `/api/product/${pid}?context=${context}&channel_id=${currentChannel}`
+        `/api/product/${productId}?context=${context}&channel_id=${currentChannel}`
       );
       const data: ProductData = await res.json();
       dispatch({ type: "SET_PRODUCT_DATA", payload: data });
     } catch (error) {
       dispatch({ type: "SET_PRODUCT_INFO_LOADING_ERROR", payload: true });
     }
-  }, [pid, currentChannel]);
+  }, [productId, currentChannel, context]);
 
   useEffect(() => {
-    if (pid && currentChannel) {
+    if (productId && currentChannel) {
       fetchProductData();
     }
-  }, [fetchProductData, pid, currentChannel]);
+  }, [fetchProductData, productId, currentChannel]);
 
   const handleSubmit = useCallback(
     async (
@@ -252,10 +251,8 @@ function ProductForm({ channels }: ProductFormProps) {
 
       try {
         dispatch({ type: "SET_PRODUCT_SAVING", payload: true });
-        const urlParams = new URLSearchParams(window.location.search);
-        const context = urlParams.get("context");
         const res = await fetch(
-          `/api/product/${pid}?context=${context}&channel_id=${currentChannel}`,
+          `/api/product/${productId}?context=${context}&channel_id=${currentChannel}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -274,22 +271,24 @@ function ProductForm({ channels }: ProductFormProps) {
             },
           },
         });
-        alertsManager.add({
+        addAlert({
+          type: "success",
+          header: "Update succeeded",
           autoDismiss: true,
           messages: [{ text: "Product translations have been saved." }],
-          type: "success",
         });
       } catch (error) {
         console.error("Error updating the product: ", error);
-        alertsManager.add({
+        addAlert({
+          type: "error",
+          header: "Update failed",
           autoDismiss: true,
           messages: [{ text: "Error updating the product translations." }],
-          type: "error",
         });
         dispatch({ type: "SET_PRODUCT_SAVING", payload: false });
       }
     },
-    [currentChannel, currentLocale, form, errors, pid, productData]
+    [currentChannel, currentLocale, form, errors, productId, productData, context]
   );
 
   const handleLocaleChange = useCallback(
@@ -308,7 +307,6 @@ function ProductForm({ channels }: ProductFormProps) {
       );
       if (selectedChannel) {
         dispatch({ type: "SET_CHANNEL", payload: selectedChannelId });
-        // Select second locale, if available, when switching channels, since the default locale can't be edited
         dispatch({
           type: "SET_LOCALE",
           payload:
@@ -376,7 +374,6 @@ function ProductForm({ channels }: ProductFormProps) {
 
         dispatch({ type: "SET_FORM", payload: newForm });
       } else {
-        // Handle regular field changes
         dispatch({ type: "SET_FORM", payload: { ...form, [name]: value } });
       }
     },
@@ -421,12 +418,19 @@ function ProductForm({ channels }: ProductFormProps) {
     [handleSubmit, isProductSaving]
   );
 
+  if (isStoreInfoLoading) return <LoadingScreen />;
+
+  if (!storeInformation.multi_language_enabled) {
+    return <TranslationsGetStarted isActive={false} isLoading={false} />;
+  }
+
   if (hasProductInfoLoadingError) return <ErrorMessage />;
+
+  if (isProductInfoLoading) return <LoadingScreen />;
 
   return (
     <Loading isLoading={isProductInfoLoading}>
       <ActionBarPaddingBox>
-        {/* Channel and Locale selectors */}
         <Box marginBottom="xxLarge">
           <Flex flexDirection="column" flexGap={theme.spacing.xLarge}>
             <FlexItem flexGrow={0}>
@@ -461,7 +465,6 @@ function ProductForm({ channels }: ProductFormProps) {
           <HR color="secondary30" />
         </Box>
 
-        {/* Product fields */}
         <StyledForm fullWidth={true} onSubmit={handleSubmit}>
           {translatableProductFields.map((field) => (
             <Box key={`${field.key}_${currentLocale}`}>

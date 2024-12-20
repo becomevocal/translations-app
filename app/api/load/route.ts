@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { encodePayload } from "@/lib/auth";
 import { createSession, setSession } from "@/lib/session";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
+import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
 
 const queryParamSchema = z.object({
   code: z.string(),
@@ -97,7 +98,10 @@ export async function GET(req: NextRequest) {
   newSearchParams.delete("signed_payload_jwt");
   newSearchParams.delete("signed_payload");
 
-  await setSession(clientToken, storeHash);
+  // await setSession(clientToken, storeHash);
+  const { name, value, config } = await createSession(clientToken, storeHash);
+  const cookieStore = await cookies()
+  cookieStore.set(name, value, config)
 
   const encodedContext = encodePayload({
     context: parsedJwt.data.sub,
@@ -105,10 +109,14 @@ export async function GET(req: NextRequest) {
     owner: parsedJwt.data.owner,
   });
 
-  return NextResponse.redirect(
+  const response = NextResponse.redirect(
     `${process.env.APP_ORIGIN}${buildRedirectUrl(parsedJwt.data.url ?? '/', `${encodedContext}&${newSearchParams.toString()}`)}`,
     {
       status: 307,
     }
   );
+
+  response.cookies.set(name, value, config);
+
+  return response;
 }

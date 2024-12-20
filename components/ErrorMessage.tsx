@@ -1,3 +1,5 @@
+"use client";
+
 import { H3, Panel } from '@bigcommerce/big-design';
 
 interface ErrorMessageProps {

@@ -20,7 +20,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https:
 - [x] Ability to translate SEO page title and meta description
 - [x] Ability to translate dropdown variant option labels
 - [x] Ability to translate custom fields
-- [ ] Add check for multi-lang functionality and fail gracefully if it's not enabled
+- [x] Add check for multi-lang functionality and fail gracefully if it's not enabled
 - [ ] Ability to translate non-dropdown variant option labels
 - [ ] Improve UX of custom field editing (should use two column layout on mobile)
 - [ ] Ability to translate pre-order settings

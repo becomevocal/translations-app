@@ -1,28 +1,37 @@
 import "server-only";
 import { cookies } from "next/headers";
 
-const COOKIE_NAME = "catalyst-app-token";
+const COOKIE_NAME = process.env.COOKIE_NAME;
 
 export async function createSession(clientToken: string, storeHash: string) {
+  if (!COOKIE_NAME) {
+    throw new Error("COOKIE_NAME env var is not set");
+  }
+
   return {
     name: COOKIE_NAME,
     value: clientToken,
     config: {
       httpOnly: true,
-      secure: true,
-      sameSite: "none" as const,
+      secure: true, // Change to false when localhost
+      sameSite: "none" as const, // Change to "lax" when localhost
       maxAge: 3600,
-      partitioned: true,
     },
   };
 }
 
 export async function setSession(clientToken: string, storeHash: string) {
   const { name, value, config } = await createSession(clientToken, storeHash);
-  cookies().set(name, value, config);
+  (await cookies()).set(name, value, config);
 }
 
-export function getSessionToken() {
-  const tokenCookie = cookies().get(COOKIE_NAME);
+export async function getSessionToken() {
+  if (!COOKIE_NAME) {
+    throw new Error("COOKIE_NAME env var is not set");
+  }
+
+  const cookieStore = await cookies();
+  const tokenCookie = cookieStore.get(COOKIE_NAME);
+
   return tokenCookie?.value;
 }

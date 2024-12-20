@@ -3,7 +3,7 @@ import { z } from "zod";
 import db from "@/lib/db";
 import { createAppExtension } from "@/lib/appExtensions";
 import { encodePayload } from "@/lib/auth";
-import { setSession } from "@/lib/session";
+import { setSession, createSession } from "@/lib/session";
 import { SignJWT } from "jose";
 
 const queryParamSchema = z.object({
@@ -118,12 +118,17 @@ export async function GET(req: NextRequest) {
   .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
   .sign(new TextEncoder().encode(process.env.JWT_KEY));
 
-  await setSession(clientToken, storeHash);
+  // await setSession(clientToken, storeHash);
+  const { name, value, config } = await createSession(clientToken, storeHash);
 
   const encodedContext = encodePayload({ context, user: oauthUser, owner: authOwner });
 
-  return NextResponse.redirect(`${process.env.APP_ORIGIN}/?context=${encodedContext}`, {
+  const response = NextResponse.redirect(`${process.env.APP_ORIGIN}/?context=${encodedContext}`, {
     status: 302,
     statusText: "Found",
   });
+
+  response.cookies.set(name, value, config);
+
+  return response;
 }

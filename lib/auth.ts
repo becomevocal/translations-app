@@ -1,6 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import { NextApiRequest } from 'next';
-import * as BigCommerce from 'node-bigcommerce';
+import BigCommerce from 'node-bigcommerce';
 import { ApiConfig, QueryParams, SessionContextProps, SessionProps } from '../types';
 import db from './db';
 
@@ -49,7 +48,6 @@ export function bigcommerceClient(accessToken: string, storeHash: string, apiVer
 
 // Authorizes app on install
 export function getBCAuth(query: QueryParams) {
-    console.log('getbcauth', query)
     return bigcommerce.authorize(query);
 }
 // Verifies app on load/ uninstall
@@ -59,16 +57,6 @@ export function getBCVerify({ signed_payload_jwt }: QueryParams) {
         CLIENT_SECRET ?? ""
     ) as SessionProps;
 }
-
-// export function setSession(session: SessionProps) {
-//     console.log('set session', session)
-//     db.setUser(session);
-//     console.log('after setUser')
-//     db.setStore(session);
-//     console.log('after setStore')
-//     db.setStoreUser(session);
-//     console.log('after setStoreUser')
-// }
 
 export async function getSession({ query: { context = '' } }) {
     if (typeof context !== 'string') return;
