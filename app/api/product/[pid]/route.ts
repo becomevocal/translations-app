@@ -63,29 +63,42 @@ function transformGraphQLOptionsDataToLocaleData(
 }
 
 /**
- * Transforms posted option data to match the GraphQL schema.
- * @param optionData - The posted option data.
- * @returns An array of transformed option data.
+ * Transforms posted option data to match the GraphQL schema and tracks removed values.
+ * @param optionData - The posted option data containing options with their display names and values
+ * @returns {Object} An object containing:
+ *   - options: Array of transformed options with their IDs, display names, and non-empty values
+ *   - removedValueIds: Array of value IDs that were empty or whitespace-only
  */
 function transformPostedOptionDataToGraphQLSchema(optionData: any) {
-  if (!optionData.options) return [];
+  if (!optionData.options) return { options: [], removedValueIds: [] };
 
-  return Object.entries(optionData.options).map(
-    ([optionId, optionDetails]: [string, any]) => ({
-      optionId,
-      data: {
-        dropdown: {
-          displayName: optionDetails.displayName,
-          values: Object.entries(optionDetails.values).map(
-            ([valueId, label]) => ({
-              valueId,
-              label,
-            })
-          ),
+  const removedValueIds: string[] = [];
+
+  const options = Object.entries(optionData.options).map(
+    ([optionId, optionDetails]: [string, any]) => {
+      // Track and filter values simultaneously
+      const nonEmptyValues = Object.entries(optionDetails.values).reduce((acc: any[], [valueId, label]) => {
+        if (!label || (label as string).trim() === '') {
+          removedValueIds.push(valueId);
+          return acc;
+        }
+        acc.push({ valueId, label });
+        return acc;
+      }, []);
+
+      return {
+        optionId,
+        data: {
+          dropdown: {
+            displayName: optionDetails.displayName,
+            values: nonEmptyValues,
+          },
         },
-      },
-    })
+      };
+    }
   );
+
+  return { options, removedValueIds };
 }
 
 /**
@@ -371,7 +384,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
             locale: body.locale,
           },
           data: {
-            options: transformPostedOptionDataToGraphQLSchema(optionData),
+            options: transformPostedOptionDataToGraphQLSchema(optionData).options,
           },
         },
         customFieldsInput: {
