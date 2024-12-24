@@ -159,12 +159,18 @@ export class GraphQLClient {
       variables.optionsInput.data.options && 
       variables.optionsInput.data.options.length > 0;
 
+    const hasRemovedOptions = variables.removedOptionsInput &&
+      variables.removedOptionsInput.data &&
+      variables.removedOptionsInput.data.options &&
+      variables.removedOptionsInput.data.options.length > 0;
+
     const mutationQuery = `
       mutation (
         $channelId: ID!,
         $locale: String!,
         $input: SetProductBasicInformationInput!,
         $seoInput: SetProductSeoInformationInput!
+        ${hasRemovedOptions ? '$removedOptionsInput: RemoveProductOptionsOverridesInput!,' : ''}
         ${hasOptions ? '$optionsInput: SetProductOptionsInformationInput!,' : ''}
         ${hasCustomFields ? '$customFieldsInput: UpdateProductCustomFieldsInput!' : ''}
       ) {
@@ -191,6 +197,38 @@ export class GraphQLClient {
               }
             }
           }
+          ${hasRemovedOptions ? `
+          removeProductOptionsOverrides (input: $removedOptionsInput) {
+            product {
+              id
+              options {
+                __typename
+                edges {
+                  node {
+                    id
+                    displayName
+                    values {
+                      id
+                      label
+                    }
+                    overridesForLocale(
+                      localeContext: {
+                        channelId: $channelId,
+                        locale: $locale
+                      }
+                    ) {
+                      displayName
+                      values {
+                        id
+                        label
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          ` : ''}
           ${hasOptions ? `
           setProductOptionsInformation (input: $optionsInput) {
             product {

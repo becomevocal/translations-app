@@ -63,42 +63,69 @@ function transformGraphQLOptionsDataToLocaleData(
 }
 
 /**
- * Transforms posted option data to match the GraphQL schema and tracks removed values.
+ * Transforms posted option data to match the GraphQL schema.
  * @param optionData - The posted option data containing options with their display names and values
  * @returns {Object} An object containing:
  *   - options: Array of transformed options with their IDs, display names, and non-empty values
- *   - removedValueIds: Array of value IDs that were empty or whitespace-only
+ *   - removedValues: Array of options and values to remove from overrides
  */
 function transformPostedOptionDataToGraphQLSchema(optionData: any) {
-  if (!optionData.options) return { options: [], removedValueIds: [] };
+  if (!optionData.options) return { options: [], removedValues: [] };
 
-  const removedValueIds: string[] = [];
+  const removedValues: any[] = [];
+  
+  const options = Object.entries(optionData.options)
+    .map(([optionId, optionDetails]: [string, any]) => {
+      // Track empty values
+      const emptyValueIds: string[] = [];
+      Object.entries(optionDetails.values).forEach(([valueId, label]) => {
+        if (!label || (label as string).trim() === '') {
+          emptyValueIds.push(valueId);
+        }
+      });
 
-  const options = Object.entries(optionData.options).map(
-    ([optionId, optionDetails]: [string, any]) => {
-      // Track and filter values simultaneously
+      if (emptyValueIds.length > 0) {
+        removedValues.push({
+          optionId,
+          data: {
+            dropdown: {
+              ...((!optionDetails.displayName || optionDetails.displayName.trim() === '') && {
+                fields: ["DROPDOWN_PRODUCT_OPTION_DISPLAY_NAME_FIELD"]
+              }),
+              values: {
+                ids: emptyValueIds
+              }
+            }
+          }
+        });
+      }
+
       const nonEmptyValues = Object.entries(optionDetails.values).reduce((acc: any[], [valueId, label]) => {
         if (!label || (label as string).trim() === '') {
-          removedValueIds.push(valueId);
           return acc;
         }
         acc.push({ valueId, label });
         return acc;
       }, []);
 
-      return {
-        optionId,
-        data: {
-          dropdown: {
-            displayName: optionDetails.displayName,
-            values: nonEmptyValues,
+      // Only return the option if it has a non-empty display name or non-empty values
+      const displayName = optionDetails.displayName?.trim();
+      if (displayName || nonEmptyValues.length > 0) {
+        return {
+          optionId,
+          data: {
+            dropdown: {
+              ...(displayName && { displayName }),
+              ...(nonEmptyValues.length > 0 && { values: nonEmptyValues }),
+            },
           },
-        },
-      };
-    }
-  );
+        };
+      }
+      return null;
+    })
+    .filter(Boolean); // Remove null entries
 
-  return { options, removedValueIds };
+  return { options, removedValues };
 }
 
 /**
@@ -387,6 +414,16 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
             options: transformPostedOptionDataToGraphQLSchema(optionData).options,
           },
         },
+        removedOptionsInput: {
+          productId: `bc/store/product/${pid}`,
+          localeContext: {
+            channelId: `bc/store/channel/${channelId}`,
+            locale: body.locale,
+          },
+          data: {
+            options: transformPostedOptionDataToGraphQLSchema(optionData).removedValues
+          }
+        },
         customFieldsInput: {
           productId: `bc/store/product/${pid}`,
           data: transformPostedCustomFieldDataToGraphQLSchema(
@@ -440,3 +477,4 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
 }
 
 // export const runtime = 'edge';
+
