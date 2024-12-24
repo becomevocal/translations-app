@@ -284,6 +284,10 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
       description: productNode.basicInformation?.description,
       pageTitle: productNode.seoInformation?.pageTitle,
       metaDescription: productNode.seoInformation?.metaDescription,
+      preOrderMessage: productNode.preOrderSettings?.message,
+      warranty: productNode.storefrontDetails?.warranty,
+      availabilityDescription: productNode.storefrontDetails?.availabilityDescription,
+      searchKeywords: productNode.storefrontDetails?.searchKeywords,
       options: {
         edges: (productNode.options?.edges || []).map((edge: any) => ({
           node: {
@@ -323,6 +327,10 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
           description: localeNode?.basicInformation?.description ?? null,
           pageTitle: localeNode?.seoInformation?.pageTitle ?? null,
           metaDescription: localeNode?.seoInformation?.metaDescription ?? null,
+          preOrderMessage: localeNode?.preOrderSettings?.message ?? null,
+          warranty: localeNode?.storefrontDetails?.warranty ?? null,
+          availabilityDescription: localeNode?.storefrontDetails?.availabilityDescription ?? null,
+          searchKeywords: localeNode?.storefrontDetails?.searchKeywords ?? null,
           options: transformGraphQLOptionsDataToLocaleData(
             options,
             locale.code
@@ -385,6 +393,16 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
         "customFields"
       );
 
+      const preOrderGraphData = createGraphFieldsFromPostData(
+        body,
+        "preOrderSettings"
+      );
+
+      const storefrontGraphData = createGraphFieldsFromPostData(
+        body,
+        "storefrontDetails"
+      );
+
       const graphVariables = {
         channelId: `bc/store/channel/${channelId}`,
         locale: body.locale,
@@ -404,15 +422,27 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
           },
           data: seoGraphData,
         },
-        optionsInput: {
+        preOrderInput: {
           productId: `bc/store/product/${pid}`,
           localeContext: {
             channelId: `bc/store/channel/${channelId}`,
             locale: body.locale,
           },
           data: {
-            options: transformPostedOptionDataToGraphQLSchema(optionData).options,
+            message: preOrderGraphData.preOrderMessage
+          }
+        },
+        storefrontInput: {
+          productId: `bc/store/product/${pid}`,
+          localeContext: {
+            channelId: `bc/store/channel/${channelId}`,
+            locale: body.locale,
           },
+          data: {
+            warranty: storefrontGraphData.warranty,
+            availabilityDescription: storefrontGraphData.availabilityDescription,
+            searchKeywords: storefrontGraphData.searchKeywords
+          }
         },
         removedOptionsInput: {
           productId: `bc/store/product/${pid}`,
@@ -423,6 +453,16 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
           data: {
             options: transformPostedOptionDataToGraphQLSchema(optionData).removedValues
           }
+        },
+        optionsInput: {
+          productId: `bc/store/product/${pid}`,
+          localeContext: {
+            channelId: `bc/store/channel/${channelId}`,
+            locale: body.locale,
+          },
+          data: {
+            options: transformPostedOptionDataToGraphQLSchema(optionData).options,
+          },
         },
         customFieldsInput: {
           productId: `bc/store/product/${pid}`,
@@ -448,6 +488,10 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
           ?.overridesForLocale?.basicInformation,
         ...gqlData?.data?.product?.setProductSeoInformation?.product
           ?.overridesForLocale?.seoInformation,
+        preOrderMessage: gqlData?.data?.product?.setProductPreOrderSettings?.product
+          ?.overridesForLocale?.preOrderSettings?.message,
+        ...gqlData?.data?.product?.setProductStorefrontDetails?.product
+          ?.overridesForLocale?.storefrontDetails,
         options: transformGraphQLOptionsResponse(
           gqlData?.data?.product?.setProductOptionsInformation?.product?.options
         ),

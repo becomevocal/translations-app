@@ -55,6 +55,34 @@ export const translatableProductFields:Array<{key:string, label: string, type: "
     type: 'customFieldsList',
     graphqlParentObject: "customFields",
     required: false,
+  },
+  {
+    key: "preOrderMessage",
+    label: "Pre-Order Message",
+    type: "input",
+    required: false,
+    graphqlParentObject: "preOrderSettings"
+  },
+  {
+    key: "warranty",
+    label: "Warranty",
+    type: "input", 
+    required: false,
+    graphqlParentObject: "storefrontDetails"
+  },
+  {
+    key: "availabilityDescription",
+    label: "Availability Description",
+    type: "input",
+    required: false,
+    graphqlParentObject: "storefrontDetails"
+  },
+  {
+    key: "searchKeywords",
+    label: "Search Keywords",
+    type: "input",
+    required: false,
+    graphqlParentObject: "storefrontDetails"
   }
 ];
 

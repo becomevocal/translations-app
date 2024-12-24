@@ -64,6 +64,14 @@ export class GraphQLClient {
           pageTitle
           metaDescription
         }
+        preOrderSettings {
+          message
+        }
+        storefrontDetails {
+          warranty
+          availabilityDescription
+          searchKeywords
+        }
       }
       `
     );
@@ -94,6 +102,14 @@ export class GraphQLClient {
                 seoInformation {
                   pageTitle
                   metaDescription
+                }
+                preOrderSettings {
+                  message
+                }
+                storefrontDetails {
+                  warranty
+                  availabilityDescription
+                  searchKeywords
                 }
                 customFields {
                   edges {
@@ -169,7 +185,9 @@ export class GraphQLClient {
         $channelId: ID!,
         $locale: String!,
         $input: SetProductBasicInformationInput!,
-        $seoInput: SetProductSeoInformationInput!
+        $seoInput: SetProductSeoInformationInput!,
+        $preOrderInput: SetProductPreOrderSettingsInput!,
+        $storefrontInput: SetProductStorefrontDetailsInput!
         ${hasRemovedOptions ? '$removedOptionsInput: RemoveProductOptionsOverridesInput!,' : ''}
         ${hasOptions ? '$optionsInput: SetProductOptionsInformationInput!,' : ''}
         ${hasCustomFields ? '$customFieldsInput: UpdateProductCustomFieldsInput!' : ''}
@@ -193,6 +211,26 @@ export class GraphQLClient {
                 seoInformation {
                   pageTitle
                   metaDescription
+                }
+              }
+            }
+          }
+          setProductPreOrderSettings(input: $preOrderInput) {
+            product {
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                preOrderSettings {
+                  message
+                }
+              }
+            }
+          }
+          setProductStorefrontDetails(input: $storefrontInput) {
+            product {
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                storefrontDetails {
+                  warranty
+                  availabilityDescription
+                  searchKeywords
                 }
               }
             }
