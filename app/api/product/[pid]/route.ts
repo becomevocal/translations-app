@@ -115,6 +115,7 @@ function transformPostedOptionDataToGraphQLSchema(optionData: any) {
           optionId,
           data: {
             dropdown: {
+              // An empty or null displayName will throw an error, so remove it if it's empty
               ...(displayName && { displayName }),
               ...(nonEmptyValues.length > 0 && { values: nonEmptyValues }),
             },
@@ -241,6 +242,472 @@ function transformPostedCustomFieldDataToGraphQLSchema(
 }
 
 /**
+ * Transforms GraphQL modifiers data to locale-specific data.
+ * @param modifiersData - The GraphQL modifiers data.
+ * @param localeCode - The locale code to transform data for.
+ * @returns Transformed locale-specific modifiers data.
+ */
+function transformGraphQLModifiersDataToLocaleData(
+  modifiersData: any,
+  localeCode: string
+) {
+  // Ensure we're working with an array of edges
+  const modifiers = modifiersData?.edges || modifiersData || [];
+
+  return modifiers.reduce((acc: any, edge: any) => {
+    const modifierId = edge.node.id;
+    const localeModifier = edge.node[localeCode];
+    const modifierType = edge.node.__typename;
+
+    acc[modifierId] = {
+      __typename: modifierType,
+      displayName: localeModifier?.displayName || "",
+    };
+
+    // Handle type-specific fields
+    switch (modifierType) {
+      case 'CheckboxProductModifier':
+        acc[modifierId].fieldValue = localeModifier?.fieldValue || "";
+        break;
+      case 'TextFieldProductModifier':
+      case 'MultilineTextFieldProductModifier':
+        acc[modifierId].defaultValue = localeModifier?.defaultValue || "";
+        break;
+      case 'NumbersOnlyTextFieldProductModifier':
+        acc[modifierId].defaultValue = localeModifier?.defaultValueFloat || null;
+        break;
+      case 'DropdownProductModifier':
+      case 'RadioButtonsProductModifier':
+      case 'RectangleListProductModifier':
+      case 'SwatchProductModifier':
+      case 'PickListProductModifier':
+        acc[modifierId].values = {};
+        // Handle modifiers with values
+        if (edge.node.values) {
+          edge.node.values.forEach((value: any) => {
+            const localeValue = localeModifier?.values?.find(
+              (v: any) => v.id === value.id
+            );
+            acc[modifierId].values[value.id] = localeValue?.label || "";
+          });
+        }
+        break;
+      // FileUpload and DateField only need displayName, which is already set
+    }
+
+    return acc;
+  }, {});
+}
+
+/**
+ * Transforms posted modifier data to match the GraphQL schema.
+ * @param modifierData - The posted modifier data containing modifiers with their display names and values
+ * @returns {Object} An object containing:
+ *   - modifiers: Array of transformed modifiers with their IDs, display names, and non-empty values
+ *   - removedValues: Array of modifiers and values to remove from overrides
+ */
+function transformPostedModifierDataToGraphQLSchema(modifierData: any) {
+  if (!modifierData.modifiers) return { modifiers: [], removedValues: [] };
+
+  const removedValues: any[] = [];
+  
+  const modifiers = Object.entries(modifierData.modifiers)
+    .map(([modifierId, modifierDetails]: [string, any]) => {
+      // Track empty values
+      const emptyValueIds: string[] = [];
+      if (modifierDetails.values) {
+        Object.entries(modifierDetails.values).forEach(([valueId, label]) => {
+          if (!label || (label as string).trim() === '') {
+            emptyValueIds.push(valueId);
+          }
+        });
+      }
+
+      if (emptyValueIds.length > 0 || (!modifierDetails.displayName || modifierDetails.displayName.trim() === '')) {
+        const modifierType = modifierDetails.__typename;
+        let data: any = {};
+
+        // Handle different modifier types for removal
+        switch (modifierType) {
+          case 'CheckboxProductModifier':
+            data = {
+              checkbox: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.checkbox.fields.push("CHECKBOX_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (modifierDetails.fieldValue === '') {
+              data.checkbox.fields.push("CHECKBOX_PRODUCT_MODIFIER_VALUE_FIELD");
+            }
+            break;
+          case 'TextFieldProductModifier':
+            data = {
+              textField: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.textField.fields.push("TEXT_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (modifierDetails.defaultValue === '') {
+              data.textField.fields.push("TEXT_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD");
+            }
+            break;
+          case 'MultilineTextFieldProductModifier':
+            data = {
+              multiLineTextField: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.multiLineTextField.fields.push("MULTILINE_TEXT_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (modifierDetails.defaultValue === '') {
+              data.multiLineTextField.fields.push("MULTILINE_TEXT_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD");
+            }
+            break;
+          case 'NumbersOnlyTextFieldProductModifier':
+            data = {
+              numberField: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.numberField.fields.push("NUMBER_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (modifierDetails.defaultValue === '') {
+              data.numberField.fields.push("NUMBER_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD");
+            }
+            break;
+          case 'DateFieldProductModifier':
+            data = {
+              dateField: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.dateField.fields.push("DATE_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            break;
+          case 'FileUploadProductModifier':
+            data = {
+              fileUpload: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.fileUpload.fields.push("FILE_UPLOAD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            break;
+          case 'DropdownProductModifier':
+            data = {
+              dropdown: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.dropdown.fields.push("DROPDOWN_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (emptyValueIds.length > 0) {
+              data.dropdown.values = {
+                ids: emptyValueIds
+              };
+            }
+            break;
+          case 'RadioButtonsProductModifier':
+            data = {
+              radioButtons: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.radioButtons.fields.push("RADIO_BUTTONS_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (emptyValueIds.length > 0) {
+              data.radioButtons.values = {
+                ids: emptyValueIds
+              };
+            }
+            break;
+          case 'RectangleListProductModifier':
+            data = {
+              rectangleList: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.rectangleList.fields.push("RECTANGLE_LIST_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (emptyValueIds.length > 0) {
+              data.rectangleList.values = {
+                ids: emptyValueIds
+              };
+            }
+            break;
+          case 'SwatchProductModifier':
+            data = {
+              swatch: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.swatch.fields.push("SWATCH_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (emptyValueIds.length > 0) {
+              data.swatch.values = {
+                ids: emptyValueIds
+              };
+            }
+            break;
+          case 'PickListProductModifier':
+            data = {
+              pickList: {
+                fields: []
+              }
+            };
+            if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+              data.pickList.fields.push("PICK_LIST_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+            }
+            if (emptyValueIds.length > 0) {
+              data.pickList.values = {
+                ids: emptyValueIds
+              };
+            }
+            break;
+          default:
+            // If we don't know the type, try to infer it based on the data
+            if (modifierDetails.values) {
+              data = {
+                dropdown: {
+                  fields: []
+                }
+              };
+              if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+                data.dropdown.fields.push("DROPDOWN_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+              }
+              if (emptyValueIds.length > 0) {
+                data.dropdown.values = {
+                  ids: emptyValueIds
+                };
+              }
+            } else {
+              data = {
+                textField: {
+                  fields: []
+                }
+              };
+              if (!modifierDetails.displayName || modifierDetails.displayName.trim() === '') {
+                data.textField.fields.push("TEXT_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD");
+              }
+            }
+        }
+
+        // Only add to removedValues if we have fields or values to remove
+        const dataType = Object.keys(data)[0];
+        if (data[dataType].fields?.length > 0 || data[dataType].values?.ids?.length > 0) {
+          removedValues.push({
+            modifierId,
+            data
+          });
+        }
+      }
+
+      // Only return the modifier if it has a non-empty display name or non-empty values
+      const displayName = modifierDetails.displayName?.trim();
+      if (displayName || (modifierDetails.values && Object.values(modifierDetails.values).some(v => v))) {
+        const modifierType = modifierDetails.__typename;
+        let data: any = {};
+
+        // Handle different modifier types
+        switch (modifierType) {
+          case 'CheckboxProductModifier':
+            data = {
+              checkbox: {
+                ...(displayName && { displayName }),
+                // The GraphQL API returns an error if "value" field is not provided
+                value: modifierDetails.fieldValue || ''
+              }
+            };
+            break;
+          case 'TextFieldProductModifier':
+            data = {
+              textField: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.defaultValue && { defaultValue: modifierDetails.defaultValue })
+              }
+            };
+            break;
+          case 'MultilineTextFieldProductModifier':
+            data = {
+              multiLineTextField: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.defaultValue && { defaultValue: modifierDetails.defaultValue })
+              }
+            };
+            break;
+          case 'NumbersOnlyTextFieldProductModifier':
+            data = {
+              numberField: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.defaultValue && { defaultValue: parseFloat(modifierDetails.defaultValue) })
+              }
+            };
+            break;
+          case 'DateFieldProductModifier':
+            data = {
+              dateField: {
+                displayName
+              }
+            };
+            break;
+          case 'FileUploadProductModifier':
+            data = {
+              fileUpload: {
+                displayName
+              }
+            };
+            break;
+          case 'DropdownProductModifier':
+            data = {
+              dropdown: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.values && { values: Object.entries(modifierDetails.values)
+                  .filter(([_, label]) => label && (label as string).trim())
+                  .map(([valueId, label]) => ({ valueId, label }))
+                })
+              }
+            };
+            break;
+          case 'RadioButtonsProductModifier':
+            data = {
+              radioButtons: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.values && { values: Object.entries(modifierDetails.values)
+                  .filter(([_, label]) => label && (label as string).trim())
+                  .map(([valueId, label]) => ({ valueId, label }))
+                })
+              }
+            };
+            break;
+          case 'RectangleListProductModifier':
+            data = {
+              rectangleList: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.values && { values: Object.entries(modifierDetails.values)
+                  .filter(([_, label]) => label && (label as string).trim())
+                  .map(([valueId, label]) => ({ valueId, label }))
+                })
+              }
+            };
+            break;
+          case 'SwatchProductModifier':
+            data = {
+              swatch: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.values && { values: Object.entries(modifierDetails.values)
+                  .filter(([_, label]) => label && (label as string).trim())
+                  .map(([valueId, label]) => ({ valueId, label }))
+                })
+              }
+            };
+            break;
+          case 'PickListProductModifier':
+            data = {
+              pickList: {
+                ...(displayName && { displayName }),
+                ...(modifierDetails.values && { values: Object.entries(modifierDetails.values)
+                  .filter(([_, label]) => label && (label as string).trim())
+                  .map(([valueId, label]) => ({ valueId, label }))
+                })
+              }
+            };
+            break;
+          default:
+            // If we don't know the type, try to infer it based on the data
+            if (modifierDetails.values) {
+              data = {
+                dropdown: {
+                  ...(displayName && { displayName }),
+                  ...(modifierDetails.values && { values: Object.entries(modifierDetails.values)
+                    .filter(([_, label]) => label && (label as string).trim())
+                    .map(([valueId, label]) => ({ valueId, label }))
+                  })
+                }
+              };
+            } else {
+              data = {
+                textField: {
+                  displayName
+                }
+              };
+            }
+        }
+
+        return {
+          modifierId,
+          data
+        };
+      }
+      return null;
+    })
+    .filter(Boolean); // Remove null entries
+
+  return { modifiers, removedValues };
+}
+
+/**
+ * Transforms GraphQL modifiers response to a simplified object.
+ * @param modifiersData - The GraphQL modifiers response data.
+ * @returns A simplified object of modifiers data.
+ */
+function transformGraphQLModifiersResponse(modifiersData: any) {
+  if (!modifiersData?.edges) return {};
+
+  return modifiersData.edges.reduce((acc: any, edge: any) => {
+    const modifierId = edge.node.id;
+    const localeData = edge.node.overridesForLocale;
+    const modifierType = edge.node.__typename;
+
+    acc[modifierId] = {
+      __typename: modifierType,
+      displayName: localeData?.displayName || "",
+    };
+
+    // Handle type-specific fields
+    switch (modifierType) {
+      case 'CheckboxProductModifier':
+        acc[modifierId].fieldValue = localeData?.fieldValue || "";
+        break;
+      case 'TextFieldProductModifier':
+      case 'MultilineTextFieldProductModifier':
+        acc[modifierId].defaultValue = localeData?.defaultValue || "";
+        break;
+      case 'NumbersOnlyTextFieldProductModifier':
+        acc[modifierId].defaultValue = localeData?.defaultValueFloat || null;
+        break;
+      case 'DropdownProductModifier':
+      case 'RadioButtonsProductModifier':
+      case 'RectangleListProductModifier':
+      case 'SwatchProductModifier':
+      case 'PickListProductModifier':
+        acc[modifierId].values = {};
+        // Transform values array into object with id as key
+        if (localeData?.values) {
+          localeData.values.forEach((value: any) => {
+            acc[modifierId].values[value.id] = value.label;
+          });
+        }
+        break;
+      // FileUpload and DateField only need displayName, which is already set
+    }
+
+    return acc;
+  }, {});
+}
+
+/**
  * Handles GET requests to retrieve product locale data.
  * @param request - The incoming request object.
  * @param params - The request parameters containing the product ID.
@@ -300,6 +767,18 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
           },
         })),
       },
+      modifiers: {
+        edges: (productNode.modifiers?.edges || []).map((edge: any) => ({
+          node: {
+            id: edge.node?.id,
+            displayName: edge.node?.displayName,
+            values: (edge.node?.values || []).map((value: any) => ({
+              id: value?.id,
+              label: value?.label,
+            })),
+          },
+        })),
+      },
       customFields: {
         edges: (productNode.customFields?.edges || []).map((edge: any) => ({
           node: {
@@ -319,7 +798,9 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
           gqlData.data.store.products.edges[0].node[locale.code];
         const options =
           gqlData.data.store.products.edges[0].node?.options?.edges;
-          const customFields =
+        const modifiers =
+          gqlData.data.store.products.edges[0].node?.modifiers?.edges;
+        const customFields =
           gqlData.data.store.products.edges[0].node?.customFields?.edges;
 
         normalizedProductData.localeData[locale.code] = {
@@ -333,6 +814,10 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
           searchKeywords: localeNode?.storefrontDetails?.searchKeywords ?? null,
           options: transformGraphQLOptionsDataToLocaleData(
             options,
+            locale.code
+          ),
+          modifiers: transformGraphQLModifiersDataToLocaleData(
+            modifiers,
             locale.code
           ),
           customFields: transformGraphQLCustomFieldsDataToLocaleData(
@@ -388,6 +873,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
         "seoInformation"
       );
       const optionData = createGraphFieldsFromPostData(body, "options");
+      const modifierData = createGraphFieldsFromPostData(body, "modifiers");
       const customFieldData = createGraphFieldsFromPostData(
         body,
         "customFields"
@@ -464,6 +950,26 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
             options: transformPostedOptionDataToGraphQLSchema(optionData).options,
           },
         },
+        removedModifiersInput: {
+          productId: `bc/store/product/${pid}`,
+          localeContext: {
+            channelId: `bc/store/channel/${channelId}`,
+            locale: body.locale,
+          },
+          data: {
+            modifiers: transformPostedModifierDataToGraphQLSchema(modifierData).removedValues
+          }
+        },
+        modifiersInput: {
+          productId: `bc/store/product/${pid}`,
+          localeContext: {
+            channelId: `bc/store/channel/${channelId}`,
+            locale: body.locale,
+          },
+          data: {
+            modifiers: transformPostedModifierDataToGraphQLSchema(modifierData).modifiers,
+          },
+        },
         customFieldsInput: {
           productId: `bc/store/product/${pid}`,
           data: transformPostedCustomFieldDataToGraphQLSchema(
@@ -494,6 +1000,9 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
           ?.overridesForLocale?.storefrontDetails,
         options: transformGraphQLOptionsResponse(
           gqlData?.data?.product?.setProductOptionsInformation?.product?.options
+        ),
+        modifiers: transformGraphQLModifiersResponse(
+          gqlData?.data?.product?.setProductModifiersInformation?.product?.modifiers
         ),
         customFields: transformGraphQLCustomFieldsResponse(
           gqlData?.data?.product?.updateProductCustomFields?.product

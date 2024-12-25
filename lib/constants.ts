@@ -13,7 +13,7 @@ export const availableLocales:Array<{code:string, label: string}> = [
   },
 ];
 
-export const translatableProductFields:Array<{key:string, label: string, type: "input" | "textarea" | "optionsList" | "customFieldsList", graphqlParentObject: string, required: boolean}> = [
+export const translatableProductFields:Array<{key:string, label: string, type: "input" | "textarea" | "optionsList" | "customFieldsList" | "modifiersList", graphqlParentObject: string, required: boolean}> = [
   {
     key: 'name',
     label: 'Name',
@@ -47,6 +47,13 @@ export const translatableProductFields:Array<{key:string, label: string, type: "
     label: 'Options',
     type: 'optionsList',
     graphqlParentObject: "options",
+    required: false,
+  },
+  {
+    key: 'modifiers',
+    label: 'Modifiers',
+    type: 'modifiersList',
+    graphqlParentObject: "modifiers",
     required: false,
   },
   {

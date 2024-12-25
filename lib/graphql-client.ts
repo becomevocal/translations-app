@@ -37,10 +37,30 @@ export class GraphQLClient {
       redirect: 'follow' as RequestRedirect,
     };
 
+    // console.log("\n\nGraphQL Query:\n", query);
+    // console.log("\n\nGraphQL Variables:\n", JSON.stringify(variables, null, 2));
+
     const response = await fetch(this.baseUrl, requestOptions);
     const data = await response.json();
 
     if (typeof data === 'object' && data && 'errors' in data) {
+      // TODO: Log the GraphQL error message including the schema details
+      // Sample error response:
+      // [
+      //   {
+      //       "message": "Internal server error",
+      //       "path": [
+      //           "product",
+      //           "setProductModifiersInformation"
+      //       ],
+      //       "locations": [
+      //           {
+      //               "line": 7,
+      //               "column": 9
+      //           }
+      //       ]
+      //   }
+      // ]
       throw new Error((data.errors as any[])[0].message);
     }
 
@@ -76,7 +96,27 @@ export class GraphQLClient {
       `
     );
 
-    const localeOptionQueries = availableLocales.map((locale) => 
+    const localeOptionQueries = availableLocales.map((locale) =>
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+        values {
+          id
+          label
+        }
+      }
+      `
+    );
+
+    const localeModifierQueries = availableLocales.map((locale) =>
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+      }
+      `
+    );
+
+    const localeModifierValueQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
       ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
         displayName
@@ -137,16 +177,88 @@ export class GraphQLClient {
                 options {
                   edges {
                     node {
-                      __typename
                       id
                       displayName
-                      isShared
                       values {
                         id
                         label
                         isDefault
                       }
                       ${localeOptionQueries}
+                    }
+                  }
+                }
+                modifiers {
+                  edges {
+                    node {
+                      __typename
+                      id
+                      displayName
+                      isShared
+                      isRequired
+                      ... on CheckboxProductModifier {
+                        checkedByDefault
+                        fieldValue
+                        ${localeModifierQueries}
+                      }
+                      ... on TextFieldProductModifier {
+                        defaultValue
+                        ${localeModifierQueries}
+                      }
+                      ... on MultilineTextFieldProductModifier {
+                        defaultValue
+                        ${localeModifierQueries}
+                      }
+                      ... on NumbersOnlyTextFieldProductModifier {
+                        defaultValueFloat: defaultValue
+                        ${localeModifierQueries}
+                      }
+                      ... on DropdownProductModifier {
+                        values {
+                          id
+                          label
+                          isDefault
+                        }
+                        ${localeModifierValueQueries}
+                      }
+                      ... on RadioButtonsProductModifier {
+                        values {
+                          id
+                          label
+                          isDefault
+                        }
+                        ${localeModifierValueQueries}
+                      }
+                      ... on RectangleListProductModifier {
+                        values {
+                          id
+                          label
+                          isDefault
+                        }
+                        ${localeModifierValueQueries}
+                      }
+                      ... on SwatchProductModifier {
+                        values {
+                          id
+                          label
+                          isDefault
+                        }
+                        ${localeModifierValueQueries}
+                      }
+                      ... on PickListProductModifier {
+                        values {
+                          id
+                          label
+                          isDefault
+                        }
+                        ${localeModifierValueQueries}
+                      }
+                      ... on FileUploadProductModifier {
+                        ${localeModifierQueries}
+                      }
+                      ... on DateFieldProductModifier {
+                        ${localeModifierQueries}
+                      }
                     }
                   }
                 }
@@ -180,6 +292,16 @@ export class GraphQLClient {
       variables.removedOptionsInput.data.options &&
       variables.removedOptionsInput.data.options.length > 0;
 
+    const hasModifiers = variables.modifiersInput && 
+      variables.modifiersInput.data && 
+      variables.modifiersInput.data.modifiers && 
+      variables.modifiersInput.data.modifiers.length > 0;
+
+    const hasRemovedModifiers = variables.removedModifiersInput &&
+      variables.removedModifiersInput.data &&
+      variables.removedModifiersInput.data.modifiers &&
+      variables.removedModifiersInput.data.modifiers.length > 0;
+
     const mutationQuery = `
       mutation (
         $channelId: ID!,
@@ -190,6 +312,8 @@ export class GraphQLClient {
         $storefrontInput: SetProductStorefrontDetailsInput!
         ${hasRemovedOptions ? '$removedOptionsInput: RemoveProductOptionsOverridesInput!,' : ''}
         ${hasOptions ? '$optionsInput: SetProductOptionsInformationInput!,' : ''}
+        ${hasRemovedModifiers ? '$removedModifiersInput: RemoveProductModifiersOverridesInput!,' : ''}
+        ${hasModifiers ? '$modifiersInput: SetProductModifiersInformationInput!,' : ''}
         ${hasCustomFields ? '$customFieldsInput: UpdateProductCustomFieldsInput!' : ''}
       ) {
         product {
@@ -240,7 +364,6 @@ export class GraphQLClient {
             product {
               id
               options {
-                __typename
                 edges {
                   node {
                     id
@@ -274,7 +397,6 @@ export class GraphQLClient {
               options {
                 edges {
                   node {
-                    __typename
                     id
                     overridesForLocale(
                       localeContext: {
@@ -286,6 +408,305 @@ export class GraphQLClient {
                       values {
                         id
                         label
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          ` : ''}
+          ${hasRemovedModifiers ? `
+          removeProductModifiersOverrides (input: $removedModifiersInput) {
+            product {
+              id
+              modifiers {
+                edges {
+                  node {
+                    __typename
+                    id
+                    displayName
+                    ... on CheckboxProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        fieldValue
+                      }
+                    }
+                    ... on TextFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        defaultValue
+                      }
+                    }
+                    ... on MultilineTextFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        defaultValue
+                      }
+                    }
+                    ... on NumbersOnlyTextFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        defaultValueFloat: defaultValue
+                      }
+                    }
+                    ... on DropdownProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on RadioButtonsProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on RectangleListProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on SwatchProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on PickListProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on FileUploadProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                      }
+                    }
+                    ... on DateFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          ` : ''}
+          ${hasModifiers ? `
+          setProductModifiersInformation (input: $modifiersInput) {
+            product {
+              id
+              modifiers {
+                edges {
+                  node {
+                    __typename
+                    id
+                    ... on CheckboxProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        fieldValue
+                      }
+                    }
+                    ... on TextFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        defaultValue
+                      }
+                    }
+                    ... on MultilineTextFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        defaultValue
+                      }
+                    }
+                    ... on NumbersOnlyTextFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        defaultValueFloat: defaultValue
+                      }
+                    }
+                    ... on DropdownProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on RadioButtonsProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on RectangleListProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on SwatchProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on PickListProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                    ... on FileUploadProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                      }
+                    }
+                    ... on DateFieldProductModifier {
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
                       }
                     }
                   }

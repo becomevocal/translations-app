@@ -76,6 +76,22 @@ interface ProductOption {
   values: ProductOptionValue[];
 }
 
+interface ProductModifierValue {
+  id: string;
+  label: string;
+}
+
+interface ProductModifier {
+  id: string;
+  displayName: string;
+  values?: ProductModifierValue[];
+  isRequired?: boolean;
+  checkedByDefault?: boolean;
+  fieldValue?: string;
+  defaultValue?: string;
+  defaultValueFloat?: number;
+}
+
 interface ProductData {
   name: string;
   description: string;
@@ -87,6 +103,11 @@ interface ProductData {
   options?: {
     edges: Array<{
       node: ProductOption;
+    }>;
+  };
+  modifiers?: {
+    edges: Array<{
+      node: ProductModifier;
     }>;
   };
   customFields?: {
@@ -105,9 +126,23 @@ interface FormOption {
   values: FormOptionValue;
 }
 
+interface FormModifierValue {
+  [valueId: string]: string;
+}
+
+interface FormModifier {
+  displayName: string;
+  values?: FormModifierValue;
+  fieldValue?: string;
+  defaultValue?: string;
+}
+
 interface FormFields extends ProductFields {
   options?: {
     [optionId: string]: FormOption;
+  };
+  modifiers?: {
+    [modifierId: string]: FormModifier;
   };
   customFields?: {
     [fieldId: string]: {
@@ -195,12 +230,14 @@ const getFormObjectForLocale = (
     description: "",
     pageTitle: "",
     metaDescription: "",
-    options: {}
+    options: {},
+    modifiers: {}
   };
 
   return {
     ...localeData,
-    options: localeData.options || {}
+    options: localeData.options || {},
+    modifiers: localeData.modifiers || {}
   };
 };
 
@@ -351,7 +388,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         }
 
         dispatch({ type: "SET_FORM", payload: newForm });
-      } else if (name.startsWith('option_') || name.startsWith('value_')) {
+      } else if (name.startsWith('option_') || name.startsWith('optionValue_')) {
         const [type, id] = name.split('_');
         const newForm = { ...form };
         
@@ -364,12 +401,42 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
             newForm.options[id] = { displayName: '', values: {} };
           }
           newForm.options[id].displayName = value;
-        } else if (type === 'value') {
+        } else if (type === 'optionValue') {
           const [optionId, valueId] = id.split(':');
           if (!newForm.options[optionId]) {
             newForm.options[optionId] = { displayName: '', values: {} };
           }
           newForm.options[optionId].values[valueId] = value;
+        }
+
+        dispatch({ type: "SET_FORM", payload: newForm });
+      } else if (name.startsWith('modifier_') || name.startsWith('value_') || name.startsWith('field_')) {
+        const [type, id] = name.split('_');
+        const newForm = { ...form };
+        
+        if (!newForm.modifiers) {
+          newForm.modifiers = {};
+        }
+
+        if (type === 'modifier') {
+          if (!newForm.modifiers[id]) {
+            newForm.modifiers[id] = { displayName: '', values: {} };
+          }
+          newForm.modifiers[id].displayName = value;
+        } else if (type === 'value') {
+          const [modifierId, valueId] = id.split(':');
+          if (!newForm.modifiers[modifierId]) {
+            newForm.modifiers[modifierId] = { displayName: '', values: {} };
+          }
+          if (!newForm.modifiers[modifierId].values) {
+            newForm.modifiers[modifierId].values = {};
+          }
+          newForm.modifiers[modifierId].values[valueId] = value;
+        } else if (type === 'field') {
+          if (!newForm.modifiers[id]) {
+            newForm.modifiers[id] = { displayName: '', fieldValue: '' };
+          }
+          newForm.modifiers[id].fieldValue = value;
         }
 
         dispatch({ type: "SET_FORM", payload: newForm });
@@ -574,7 +641,6 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                                 name={`option_${option.node.id}`}
                                 value={form.options?.[option.node.id]?.displayName || ''}
                                 onChange={handleChange}
-                                required={field.required}
                               />
                             </FormGroup>
                           </GridItem>
@@ -582,6 +648,85 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                       </Grid>
 
                       {option.node.values.map((value) => (
+                        <Grid
+                          key={value.id}
+                          gridColumns={{
+                            mobile: "repeat(1, 1fr)",
+                            tablet: "repeat(2, 1fr)",
+                          }}
+                          paddingBottom="small"
+                          paddingLeft="medium"
+                        >
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`${value.label} (${defaultLocale})`}
+                                name={`defaultLocale_optionValue_${value.id}`}
+                                defaultValue={value.label}
+                                readOnly={true}
+                                disabled={true}
+                              />
+                            </FormGroup>
+                          </GridItem>
+
+                          {currentLocale !== defaultLocale && (
+                            <GridItem>
+                              <FormGroup>
+                                <Input
+                                  label={`${value.label} (${currentLocale})`}
+                                  name={`optionValue_${option.node.id}:${value.id}`}
+                                  value={form.options?.[option.node.id]?.values?.[value.id] || ''}
+                                  onChange={handleChange}
+                                />
+                              </FormGroup>
+                            </GridItem>
+                          )}
+                        </Grid>
+                      ))}
+                    </Box>
+                  ))}
+                </Box>
+              )}
+              {field.type === "modifiersList" && productData?.modifiers?.edges && productData?.modifiers?.edges.length > 0 && (
+                <Box>
+                  <H4>Modifiers</H4>
+                  <HR/>
+                  {productData.modifiers.edges.map((modifier) => (
+                    <Box key={modifier.node.id} marginBottom="medium">
+                      <Grid
+                        gridColumns={{
+                          mobile: "repeat(1, 1fr)",
+                          tablet: "repeat(2, 1fr)",
+                        }}
+                        paddingBottom="small"
+                      >
+                        <GridItem>
+                          <FormGroup>
+                            <Input
+                              label={`${modifier.node.displayName} (${defaultLocale})`}
+                              name={`defaultLocale_modifier_${modifier.node.id}`}
+                              defaultValue={modifier.node.displayName}
+                              readOnly={true}
+                              disabled={true}
+                            />
+                          </FormGroup>
+                        </GridItem>
+
+                        {currentLocale !== defaultLocale && (
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`${modifier.node.displayName} (${currentLocale})`}
+                                name={`modifier_${modifier.node.id}`}
+                                value={form.modifiers?.[modifier.node.id]?.displayName || ''}
+                                onChange={handleChange}
+                              />
+                            </FormGroup>
+                          </GridItem>
+                        )}
+                      </Grid>
+
+                      {modifier.node.values && modifier.node.values.map((value) => (
                         <Grid
                           key={value.id}
                           gridColumns={{
@@ -608,16 +753,51 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                               <FormGroup>
                                 <Input
                                   label={`${value.label} (${currentLocale})`}
-                                  name={`value_${option.node.id}:${value.id}`}
-                                  value={form.options?.[option.node.id]?.values?.[value.id] || ''}
+                                  name={`value_${modifier.node.id}:${value.id}`}
+                                  value={form.modifiers?.[modifier.node.id]?.values?.[value.id] || ''}
                                   onChange={handleChange}
-                                  required={field.required}
                                 />
                               </FormGroup>
                             </GridItem>
                           )}
                         </Grid>
                       ))}
+
+                      {(modifier.node.fieldValue !== undefined || modifier.node.defaultValue !== undefined) && (
+                        <Grid
+                          gridColumns={{
+                            mobile: "repeat(1, 1fr)",
+                            tablet: "repeat(2, 1fr)",
+                          }}
+                          paddingBottom="small"
+                          paddingLeft="medium"
+                        >
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`Field Value (${defaultLocale})`}
+                                name={`defaultLocale_field_${modifier.node.id}`}
+                                defaultValue={modifier.node.fieldValue || modifier.node.defaultValue}
+                                readOnly={true}
+                                disabled={true}
+                              />
+                            </FormGroup>
+                          </GridItem>
+
+                          {currentLocale !== defaultLocale && (
+                            <GridItem>
+                              <FormGroup>
+                                <Input
+                                  label={`Field Value (${currentLocale})`}
+                                  name={`field_${modifier.node.id}`}
+                                  value={form.modifiers?.[modifier.node.id]?.fieldValue || ''}
+                                  onChange={handleChange}
+                                />
+                              </FormGroup>
+                            </GridItem>
+                          )}
+                        </Grid>
+                      )}
                     </Box>
                   ))}
                 </Box>
