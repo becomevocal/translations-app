@@ -410,7 +410,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         }
 
         dispatch({ type: "SET_FORM", payload: newForm });
-      } else if (name.startsWith('modifier_') || name.startsWith('value_') || name.startsWith('field_')) {
+      } else if (name.startsWith('modifier_') || name.startsWith('modifierValue_') || name.startsWith('modifierField_')) {
         const [type, id] = name.split('_');
         const newForm = { ...form };
         
@@ -423,7 +423,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
             newForm.modifiers[id] = { displayName: '', values: {} };
           }
           newForm.modifiers[id].displayName = value;
-        } else if (type === 'value') {
+        } else if (type === 'modifierValue') {
           const [modifierId, valueId] = id.split(':');
           if (!newForm.modifiers[modifierId]) {
             newForm.modifiers[modifierId] = { displayName: '', values: {} };
@@ -432,7 +432,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
             newForm.modifiers[modifierId].values = {};
           }
           newForm.modifiers[modifierId].values[valueId] = value;
-        } else if (type === 'field') {
+        } else if (type === 'modifierField') {
           if (!newForm.modifiers[id]) {
             newForm.modifiers[id] = { displayName: '', fieldValue: '' };
           }
@@ -740,7 +740,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                             <FormGroup>
                               <Input
                                 label={`${value.label} (${defaultLocale})`}
-                                name={`defaultLocale_value_${value.id}`}
+                                name={`defaultLocale_modifierValue_${value.id}`}
                                 defaultValue={value.label}
                                 readOnly={true}
                                 disabled={true}
@@ -753,7 +753,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                               <FormGroup>
                                 <Input
                                   label={`${value.label} (${currentLocale})`}
-                                  name={`value_${modifier.node.id}:${value.id}`}
+                                  name={`modifierValue_${modifier.node.id}:${value.id}`}
                                   value={form.modifiers?.[modifier.node.id]?.values?.[value.id] || ''}
                                   onChange={handleChange}
                                 />
@@ -776,7 +776,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                             <FormGroup>
                               <Input
                                 label={`Field Value (${defaultLocale})`}
-                                name={`defaultLocale_field_${modifier.node.id}`}
+                                name={`defaultLocale_modifierField_${modifier.node.id}`}
                                 defaultValue={modifier.node.fieldValue || modifier.node.defaultValue}
                                 readOnly={true}
                                 disabled={true}
@@ -789,7 +789,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                               <FormGroup>
                                 <Input
                                   label={`Field Value (${currentLocale})`}
-                                  name={`field_${modifier.node.id}`}
+                                  name={`modifierField_${modifier.node.id}`}
                                   value={form.modifiers?.[modifier.node.id]?.fieldValue || ''}
                                   onChange={handleChange}
                                 />
