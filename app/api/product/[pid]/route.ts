@@ -274,7 +274,7 @@ function transformGraphQLModifiersDataToLocaleData(
         acc[modifierId].defaultValue = localeModifier?.defaultValue || "";
         break;
       case 'NumbersOnlyTextFieldProductModifier':
-        acc[modifierId].defaultValue = localeModifier?.defaultValueFloat || null;
+        acc[modifierId].defaultValueFloat = localeModifier?.defaultValueFloat || null;
         break;
       case 'DropdownProductModifier':
       case 'RadioButtonsProductModifier':
@@ -551,7 +551,7 @@ function transformPostedModifierDataToGraphQLSchema(modifierData: any) {
             data = {
               numberField: {
                 ...(displayName && { displayName }),
-                ...(modifierDetails.defaultValue && { defaultValue: parseFloat(modifierDetails.defaultValue) })
+                ...(modifierDetails.defaultValueFloat && { defaultValue: parseFloat(modifierDetails.defaultValueFloat) })
               }
             };
             break;
@@ -685,7 +685,7 @@ function transformGraphQLModifiersResponse(modifiersData: any) {
         acc[modifierId].defaultValue = localeData?.defaultValue || "";
         break;
       case 'NumbersOnlyTextFieldProductModifier':
-        acc[modifierId].defaultValue = localeData?.defaultValueFloat || null;
+        acc[modifierId].defaultValueFloat = localeData?.defaultValueFloat || null;
         break;
       case 'DropdownProductModifier':
       case 'RadioButtonsProductModifier':
@@ -768,16 +768,46 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
         })),
       },
       modifiers: {
-        edges: (productNode.modifiers?.edges || []).map((edge: any) => ({
-          node: {
+        edges: (productNode.modifiers?.edges || []).map((edge: any) => {
+          const baseNode = {
             id: edge.node?.id,
+            __typename: edge.node?.__typename,
             displayName: edge.node?.displayName,
             values: (edge.node?.values || []).map((value: any) => ({
               id: value?.id,
               label: value?.label,
             })),
-          },
-        })),
+          };
+
+          // Handle type-specific fields
+          switch (edge.node?.__typename) {
+            case 'CheckboxProductModifier':
+              return {
+                node: {
+                  ...baseNode,
+                  fieldValue: edge.node?.fieldValue || '',
+                  checkedByDefault: edge.node?.checkedByDefault || false,
+                },
+              };
+            case 'TextFieldProductModifier':
+            case 'MultilineTextFieldProductModifier':
+              return {
+                node: {
+                  ...baseNode,
+                  defaultValue: edge.node?.defaultValue || '',
+                },
+              };
+            case 'NumbersOnlyTextFieldProductModifier':
+              return {
+                node: {
+                  ...baseNode,
+                  defaultValueFloat: edge.node?.defaultValueFloat || null,
+                },
+              };
+            default:
+              return { node: baseNode };
+          }
+        }),
       },
       customFields: {
         edges: (productNode.customFields?.edges || []).map((edge: any) => ({

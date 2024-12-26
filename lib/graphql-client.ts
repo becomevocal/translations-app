@@ -43,6 +43,8 @@ export class GraphQLClient {
     const response = await fetch(this.baseUrl, requestOptions);
     const data = await response.json();
 
+    // console.log("\n\nGraphQL Response:\n", JSON.stringify(data, null, 2));
+
     if (typeof data === 'object' && data && 'errors' in data) {
       // TODO: Log the GraphQL error message including the schema details
       // Sample error response:
@@ -108,7 +110,51 @@ export class GraphQLClient {
       `
     );
 
-    const localeModifierQueries = availableLocales.map((locale) =>
+    const localeCheckboxModifierQueries = availableLocales.map((locale) =>
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+        ... on CheckboxProductModifierForLocale {
+          fieldValue
+        }
+      }
+      `
+    );
+
+    const localeTextFieldModifierQueries = availableLocales.map((locale) =>
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+        ... on TextFieldProductModifierForLocale {
+          defaultValue
+        }
+      }
+      `
+    );
+
+    const localeMultilineTextFieldModifierQueries = availableLocales.map((locale) =>
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+        ... on MultilineTextFieldProductModifierForLocale {
+          defaultValue
+        }
+      }
+      `
+    );
+
+    const localeNumbersOnlyTextFieldModifierQueries = availableLocales.map((locale) =>
+      locale.code === defaultLocale ? "" : `
+      ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
+        displayName
+        ... on NumbersOnlyTextFieldProductModifierForLocale {
+          defaultValueFloat: defaultValue
+        }
+      }
+      `
+    );
+
+    const localeBasicModifierQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
       ${locale.code}: overridesForLocale (localeContext: { channelId: "bc/store/channel/${channelId}", locale: "${locale.code}" }) {
         displayName
@@ -199,19 +245,19 @@ export class GraphQLClient {
                       ... on CheckboxProductModifier {
                         checkedByDefault
                         fieldValue
-                        ${localeModifierQueries}
+                        ${localeCheckboxModifierQueries}
                       }
                       ... on TextFieldProductModifier {
                         defaultValue
-                        ${localeModifierQueries}
+                        ${localeTextFieldModifierQueries}
                       }
                       ... on MultilineTextFieldProductModifier {
                         defaultValue
-                        ${localeModifierQueries}
+                        ${localeMultilineTextFieldModifierQueries}
                       }
                       ... on NumbersOnlyTextFieldProductModifier {
                         defaultValueFloat: defaultValue
-                        ${localeModifierQueries}
+                        ${localeNumbersOnlyTextFieldModifierQueries}
                       }
                       ... on DropdownProductModifier {
                         values {
@@ -254,10 +300,10 @@ export class GraphQLClient {
                         ${localeModifierValueQueries}
                       }
                       ... on FileUploadProductModifier {
-                        ${localeModifierQueries}
+                        ${localeBasicModifierQueries}
                       }
                       ... on DateFieldProductModifier {
-                        ${localeModifierQueries}
+                        ${localeBasicModifierQueries}
                       }
                     }
                   }
