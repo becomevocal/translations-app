@@ -26,7 +26,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https:
 - [x] Ability to translate storefront details
 - [x] Ability to translate modifier option labels
 - [x] Ability to translate modifier initial / default values
-- [ ] Add remove mutations for all nodes
+- [x] Add remove mutations for all nodes
 - [ ] Improve UX of custom field editing (should use two column layout on mobile)
 - [ ] Add Sentry error tracking
 - [ ] Simplify multiple database support & deployment docs
