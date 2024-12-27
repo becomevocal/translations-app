@@ -1,5 +1,7 @@
 "use server";
 
+import { Analytics } from '@vercel/analytics/next';
+
 import Alerts from "@/components/AlertsManager";
 import {
   BigDesignTheme,
@@ -27,6 +29,7 @@ export default async function RootLayout({
           <StoreInfoProvider initialStoreInformation={initialStoreInformation}>
             {children}
           </StoreInfoProvider>
+          <Analytics />
         </body>
       </BigDesignTheme>
     </html>
