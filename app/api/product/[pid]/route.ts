@@ -708,6 +708,83 @@ function transformGraphQLModifiersResponse(modifiersData: any) {
 }
 
 /**
+ * Identifies which basic information fields should be removed based on empty values
+ */
+function getBasicInformationFieldsToRemove(data: any): string[] {
+  const fieldsToRemove: string[] = [];
+  if (!data.name || data.name.trim() === '') {
+    fieldsToRemove.push('PRODUCT_NAME_FIELD');
+  }
+  if (!data.description || data.description.trim() === '') {
+    fieldsToRemove.push('PRODUCT_DESCRIPTION_FIELD');
+  }
+  return fieldsToRemove;
+}
+
+/**
+ * Identifies which SEO information fields should be removed based on empty values
+ */
+function getSeoInformationFieldsToRemove(data: any): string[] {
+  const fieldsToRemove: string[] = [];
+  if (!data.pageTitle || data.pageTitle.trim() === '') {
+    fieldsToRemove.push('PRODUCT_PAGE_TITLE_FIELD');
+  }
+  if (!data.metaDescription || data.metaDescription.trim() === '') {
+    fieldsToRemove.push('PRODUCT_META_DESCRIPTION_FIELD');
+  }
+  return fieldsToRemove;
+}
+
+/**
+ * Identifies which storefront details fields should be removed based on empty values
+ */
+function getStorefrontDetailsFieldsToRemove(data: any): string[] {
+  const fieldsToRemove: string[] = [];
+  if (!data.warranty || data.warranty.trim() === '') {
+    fieldsToRemove.push('PRODUCT_WARRANTY');
+  }
+  if (!data.availabilityDescription || data.availabilityDescription.trim() === '') {
+    fieldsToRemove.push('PRODUCT_AVAILABILITY_DESCRIPTION_FIELD');
+  }
+  if (!data.searchKeywords || data.searchKeywords.trim() === '') {
+    fieldsToRemove.push('PRODUCT_SEARCH_KEYWORDS');
+  }
+  return fieldsToRemove;
+}
+
+/**
+ * Identifies which pre-order settings fields should be removed based on empty values
+ */
+function getPreOrderSettingsFieldsToRemove(data: any): string[] {
+  const fieldsToRemove: string[] = [];
+  if (!data.preOrderMessage || data.preOrderMessage.trim() === '') {
+    fieldsToRemove.push('PRODUCT_PRE_ORDER_MESSAGE');
+  }
+  return fieldsToRemove;
+}
+
+/**
+ * Identifies which custom fields should be removed based on empty values
+ */
+function getCustomFieldsToRemove(data: any): { customFieldId: string, fields: string[] }[] {
+  if (!data.customFields) return [];
+
+  return Object.entries(data.customFields).map(([fieldId, fieldDetails]: [string, any]) => {
+    const fields: string[] = [];
+    if (!fieldDetails.name || fieldDetails.name.trim() === '') {
+      fields.push('NAME');
+    }
+    if (!fieldDetails.value || fieldDetails.value.trim() === '') {
+      fields.push('VALUE');
+    }
+    return {
+      customFieldId: fieldId,
+      fields: fields
+    };
+  }).filter(item => item.fields.length > 0);
+}
+
+/**
  * Handles GET requests to retrieve product locale data.
  * @param request - The incoming request object.
  * @param params - The request parameters containing the product ID.
@@ -919,6 +996,13 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
         "storefrontDetails"
       );
 
+      // Get fields to remove for each section
+      const basicInfoFieldsToRemove = getBasicInformationFieldsToRemove(productGraphData);
+      const seoFieldsToRemove = getSeoInformationFieldsToRemove(seoGraphData);
+      const storefrontFieldsToRemove = getStorefrontDetailsFieldsToRemove(storefrontGraphData);
+      const preOrderFieldsToRemove = getPreOrderSettingsFieldsToRemove(preOrderGraphData);
+      const customFieldsToRemove = getCustomFieldsToRemove(customFieldData);
+
       const graphVariables = {
         channelId: `bc/store/channel/${channelId}`,
         locale: body.locale,
@@ -960,6 +1044,61 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
             searchKeywords: storefrontGraphData.searchKeywords
           }
         },
+        ...(basicInfoFieldsToRemove.length > 0 && {
+          removedBasicInfoInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            overridesToRemove: basicInfoFieldsToRemove
+          }
+        }),
+        ...(seoFieldsToRemove.length > 0 && {
+          removedSeoInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            overridesToRemove: seoFieldsToRemove
+          }
+        }),
+        ...(storefrontFieldsToRemove.length > 0 && {
+          removedStorefrontDetailsInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            overridesToRemove: storefrontFieldsToRemove
+          }
+        }),
+        ...(preOrderFieldsToRemove.length > 0 && {
+          removedPreOrderInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            overridesToRemove: preOrderFieldsToRemove
+          }
+        }),
+        ...(customFieldsToRemove.length > 0 && {
+          removedCustomFieldsInput: {
+            productId: `bc/store/product/${pid}`,
+            data: customFieldsToRemove.map(field => ({
+              customFieldId: field.customFieldId,
+              channelLocaleContextData: {
+                context: {
+                  channelId: `bc/store/channel/${channelId}`,
+                  locale: body.locale
+                },
+                attributes: field.fields
+              }
+            }))
+          }
+        }),
         removedOptionsInput: {
           productId: `bc/store/product/${pid}`,
           localeContext: {

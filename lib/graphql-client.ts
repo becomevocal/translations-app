@@ -348,22 +348,48 @@ export class GraphQLClient {
       variables.removedModifiersInput.data.modifiers &&
       variables.removedModifiersInput.data.modifiers.length > 0;
 
+    const hasRemovedBasicInfo = variables.removedBasicInfoInput &&
+      variables.removedBasicInfoInput.overridesToRemove &&
+      variables.removedBasicInfoInput.overridesToRemove.length > 0;
+
+    const hasRemovedSeo = variables.removedSeoInput &&
+      variables.removedSeoInput.overridesToRemove &&
+      variables.removedSeoInput.overridesToRemove.length > 0;
+
+    const hasRemovedStorefrontDetails = variables.removedStorefrontDetailsInput &&
+      variables.removedStorefrontDetailsInput.overridesToRemove &&
+      variables.removedStorefrontDetailsInput.overridesToRemove.length > 0;
+
+    const hasRemovedPreOrder = variables.removedPreOrderInput &&
+      variables.removedPreOrderInput.overridesToRemove &&
+      variables.removedPreOrderInput.overridesToRemove.length > 0;
+
+    const hasRemovedCustomFields = variables.removedCustomFieldsInput &&
+      variables.removedCustomFieldsInput.data &&
+      variables.removedCustomFieldsInput.data.length > 0;
+
     const mutationQuery = `
       mutation (
         $channelId: ID!,
         $locale: String!,
+        ${hasRemovedBasicInfo ? '$removedBasicInfoInput: RemoveProductBasicInformationOverridesInput!,' : ''}
+        ${hasRemovedSeo ? '$removedSeoInput: RemoveProductSeoInformationOverridesInput!,' : ''}
+        ${hasRemovedStorefrontDetails ? '$removedStorefrontDetailsInput: RemoveProductStorefrontDetailsOverridesInput!,' : ''}
+        ${hasRemovedPreOrder ? '$removedPreOrderInput: RemoveProductPreOrderSettingsOverridesInput!,' : ''}
+        ${hasRemovedOptions ? '$removedOptionsInput: RemoveProductOptionsOverridesInput!,' : ''}
+        ${hasRemovedModifiers ? '$removedModifiersInput: RemoveProductModifiersOverridesInput!,' : ''}
+        ${hasRemovedCustomFields ? '$removedCustomFieldsInput: RemoveProductCustomFieldsOverridesInput!,' : ''}
         $input: SetProductBasicInformationInput!,
         $seoInput: SetProductSeoInformationInput!,
         $preOrderInput: SetProductPreOrderSettingsInput!,
         $storefrontInput: SetProductStorefrontDetailsInput!
-        ${hasRemovedOptions ? '$removedOptionsInput: RemoveProductOptionsOverridesInput!,' : ''}
         ${hasOptions ? '$optionsInput: SetProductOptionsInformationInput!,' : ''}
-        ${hasRemovedModifiers ? '$removedModifiersInput: RemoveProductModifiersOverridesInput!,' : ''}
         ${hasModifiers ? '$modifiersInput: SetProductModifiersInformationInput!,' : ''}
         ${hasCustomFields ? '$customFieldsInput: UpdateProductCustomFieldsInput!' : ''}
       ) {
         product {
-          setProductBasicInformation(input: $input) {
+          ${hasRemovedBasicInfo ? `
+          removeProductBasicInformationOverrides(input: $removedBasicInfoInput) {
             product {
               id
               overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
@@ -374,7 +400,9 @@ export class GraphQLClient {
               }
             }
           }
-          setProductSeoInformation(input: $seoInput) {
+          ` : ''}
+          ${hasRemovedSeo ? `
+          removeProductSeoInformationOverrides(input: $removedSeoInput) {
             product {
               id
               overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
@@ -385,16 +413,9 @@ export class GraphQLClient {
               }
             }
           }
-          setProductPreOrderSettings(input: $preOrderInput) {
-            product {
-              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
-                preOrderSettings {
-                  message
-                }
-              }
-            }
-          }
-          setProductStorefrontDetails(input: $storefrontInput) {
+          ` : ''}
+          ${hasRemovedStorefrontDetails ? `
+          removeProductStorefrontDetailsOverrides(input: $removedStorefrontDetailsInput) {
             product {
               overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
                 storefrontDetails {
@@ -405,6 +426,43 @@ export class GraphQLClient {
               }
             }
           }
+          ` : ''}
+          ${hasRemovedPreOrder ? `
+          removeProductPreOrderSettingsOverrides(input: $removedPreOrderInput) {
+            product {
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                preOrderSettings {
+                  message
+                }
+              }
+            }
+          }
+          ` : ''}
+          ${hasRemovedCustomFields ? `
+          removeProductCustomFieldsOverrides(input: $removedCustomFieldsInput) {
+            product {
+              customFields {
+                edges {
+                  node {
+                    id
+                    name
+                    value
+                    overrides(context: { channelId: $channelId, locale: $locale }) {
+                      edges {
+                        node {
+                          ... on ProductCustomFieldOverridesForChannelLocale {
+                            name
+                            value
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          ` : ''}
           ${hasRemovedOptions ? `
           removeProductOptionsOverrides (input: $removedOptionsInput) {
             product {
@@ -418,32 +476,6 @@ export class GraphQLClient {
                       id
                       label
                     }
-                    overridesForLocale(
-                      localeContext: {
-                        channelId: $channelId,
-                        locale: $locale
-                      }
-                    ) {
-                      displayName
-                      values {
-                        id
-                        label
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          ` : ''}
-          ${hasOptions ? `
-          setProductOptionsInformation (input: $optionsInput) {
-            product {
-              id
-              options {
-                edges {
-                  node {
-                    id
                     overridesForLocale(
                       localeContext: {
                         channelId: $channelId,
@@ -604,6 +636,74 @@ export class GraphQLClient {
                         }
                       ) {
                         displayName
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          ` : ''}
+          setProductBasicInformation(input: $input) {
+            product {
+              id
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                basicInformation {
+                  name
+                  description
+                }
+              }
+            }
+          }
+          setProductSeoInformation(input: $seoInput) {
+            product {
+              id
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                seoInformation {
+                  pageTitle
+                  metaDescription
+                }
+              }
+            }
+          }
+          setProductPreOrderSettings(input: $preOrderInput) {
+            product {
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                preOrderSettings {
+                  message
+                }
+              }
+            }
+          }
+          setProductStorefrontDetails(input: $storefrontInput) {
+            product {
+              overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                storefrontDetails {
+                  warranty
+                  availabilityDescription
+                  searchKeywords
+                }
+              }
+            }
+          }
+          ${hasOptions ? `
+          setProductOptionsInformation (input: $optionsInput) {
+            product {
+              id
+              options {
+                edges {
+                  node {
+                    id
+                    overridesForLocale(
+                      localeContext: {
+                        channelId: $channelId,
+                        locale: $locale
+                      }
+                    ) {
+                      displayName
+                      values {
+                        id
+                        label
                       }
                     }
                   }
