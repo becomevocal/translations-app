@@ -43,27 +43,6 @@ export const translatableProductFields:Array<{key:string, label: string, type: "
     required: false,
   },
   {
-    key: 'options',
-    label: 'Options',
-    type: 'optionsList',
-    graphqlParentObject: "options",
-    required: false,
-  },
-  {
-    key: 'modifiers',
-    label: 'Modifiers',
-    type: 'modifiersList',
-    graphqlParentObject: "modifiers",
-    required: false,
-  },
-  {
-    key: 'customFields',
-    label: 'Custom Fields',
-    type: 'customFieldsList',
-    graphqlParentObject: "customFields",
-    required: false,
-  },
-  {
     key: "preOrderMessage",
     label: "Pre-Order Message",
     type: "input",
@@ -90,7 +69,28 @@ export const translatableProductFields:Array<{key:string, label: string, type: "
     type: "input",
     required: false,
     graphqlParentObject: "storefrontDetails"
-  }
+  },
+  {
+    key: 'options',
+    label: 'Options',
+    type: 'optionsList',
+    graphqlParentObject: "options",
+    required: false,
+  },
+  {
+    key: 'modifiers',
+    label: 'Modifiers',
+    type: 'modifiersList',
+    graphqlParentObject: "modifiers",
+    required: false,
+  },
+  {
+    key: 'customFields',
+    label: 'Custom Fields',
+    type: 'customFieldsList',
+    graphqlParentObject: "customFields",
+    required: false,
+  },
 ];
 
 export const hardcodedAvailableLocales = [

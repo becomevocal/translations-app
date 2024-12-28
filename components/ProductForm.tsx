@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, {
   useCallback,
@@ -21,9 +21,10 @@ import {
   Form as StyledForm,
   FlexItem,
   FormGroup,
-  H4,
   Textarea,
+  H3,
 } from "@bigcommerce/big-design";
+import { ReceiptIcon } from "@bigcommerce/big-design-icons";
 import { theme } from "@bigcommerce/big-design-theme";
 import { defaultLocale, translatableProductFields } from "@/lib/constants";
 import { ActionBar } from "bigcommerce-design-patterns";
@@ -234,13 +235,13 @@ const getFormObjectForLocale = (
     pageTitle: "",
     metaDescription: "",
     options: {},
-    modifiers: {}
+    modifiers: {},
   };
 
   return {
     ...localeData,
     options: localeData.options || {},
-    modifiers: localeData.modifiers || {}
+    modifiers: localeData.modifiers || {},
   };
 };
 
@@ -300,7 +301,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
           }
         );
         const updatedProductLocaleData: FormFields = await res.json();
-        
+
         dispatch({
           type: "SET_PRODUCT_DATA",
           payload: {
@@ -328,7 +329,15 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         dispatch({ type: "SET_PRODUCT_SAVING", payload: false });
       }
     },
-    [currentChannel, currentLocale, form, errors, productId, productData, context]
+    [
+      currentChannel,
+      currentLocale,
+      form,
+      errors,
+      productId,
+      productData,
+      context,
+    ]
   );
 
   const handleLocaleChange = useCallback(
@@ -371,83 +380,95 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = event.target;
-      
-      if (name.startsWith('customField_') || name.startsWith('customFieldName_')) {
-        const [_, fieldId] = name.split('_');
+
+      if (
+        name.startsWith("customField_") ||
+        name.startsWith("customFieldName_")
+      ) {
+        const [_, fieldId] = name.split("_");
         const newForm = { ...form };
-        
+
         if (!newForm.customFields) {
           newForm.customFields = {};
         }
 
         if (!newForm.customFields[fieldId]) {
-          newForm.customFields[fieldId] = { name: '', value: '' };
+          newForm.customFields[fieldId] = { name: "", value: "" };
         }
-        
-        if (name.startsWith('customFieldName_')) {
+
+        if (name.startsWith("customFieldName_")) {
           newForm.customFields[fieldId].name = value;
         } else {
           newForm.customFields[fieldId].value = value;
         }
 
         dispatch({ type: "SET_FORM", payload: newForm });
-      } else if (name.startsWith('option_') || name.startsWith('optionValue_')) {
-        const [type, id] = name.split('_');
+      } else if (
+        name.startsWith("option_") ||
+        name.startsWith("optionValue_")
+      ) {
+        const [type, id] = name.split("_");
         const newForm = { ...form };
-        
+
         if (!newForm.options) {
           newForm.options = {};
         }
 
-        if (type === 'option') {
+        if (type === "option") {
           if (!newForm.options[id]) {
-            newForm.options[id] = { displayName: '', values: {} };
+            newForm.options[id] = { displayName: "", values: {} };
           }
           newForm.options[id].displayName = value;
-        } else if (type === 'optionValue') {
-          const [optionId, valueId] = id.split(':');
+        } else if (type === "optionValue") {
+          const [optionId, valueId] = id.split(":");
           if (!newForm.options[optionId]) {
-            newForm.options[optionId] = { displayName: '', values: {} };
+            newForm.options[optionId] = { displayName: "", values: {} };
           }
           newForm.options[optionId].values[valueId] = value;
         }
 
         dispatch({ type: "SET_FORM", payload: newForm });
-      } else if (name.startsWith('modifier_') || name.startsWith('modifierValue_') || name.startsWith('modifierField_') || name.startsWith('modifierDefaultValue_') || name.startsWith('modifierDefaultValueFloat_')) {
-        const [type, id] = name.split('_');
+      } else if (
+        name.startsWith("modifier_") ||
+        name.startsWith("modifierValue_") ||
+        name.startsWith("modifierField_") ||
+        name.startsWith("modifierDefaultValue_") ||
+        name.startsWith("modifierDefaultValueFloat_")
+      ) {
+        const [type, id] = name.split("_");
         const newForm = { ...form };
-        
+
         if (!newForm.modifiers) {
           newForm.modifiers = {};
         }
 
-        if (type === 'modifier') {
+        if (type === "modifier") {
           if (!newForm.modifiers[id]) {
-            newForm.modifiers[id] = { displayName: '', values: {} };
+            newForm.modifiers[id] = { displayName: "", values: {} };
           }
           newForm.modifiers[id].displayName = value;
-        } else if (type === 'modifierValue') {
-          const [modifierId, valueId] = id.split(':');
+        } else if (type === "modifierValue") {
+          const [modifierId, valueId] = id.split(":");
           if (!newForm.modifiers[modifierId]) {
-            newForm.modifiers[modifierId] = { displayName: '', values: {} };
+            newForm.modifiers[modifierId] = { displayName: "", values: {} };
           }
           if (!newForm.modifiers[modifierId].values) {
             newForm.modifiers[modifierId].values = {};
           }
           newForm.modifiers[modifierId].values[valueId] = value;
-        } else if (type === 'modifierField') {
+        } else if (type === "modifierField") {
           if (!newForm.modifiers[id]) {
-            newForm.modifiers[id] = { displayName: '', fieldValue: '' };
+            newForm.modifiers[id] = { displayName: "", fieldValue: "" };
           }
           newForm.modifiers[id].fieldValue = value;
-        } else if (type === 'modifierDefaultValue') {
+        } else if (type === "modifierDefaultValue") {
           if (!newForm.modifiers[id]) {
-            newForm.modifiers[id] = { displayName: '', defaultValue: '' };
+            newForm.modifiers[id] = { displayName: "", defaultValue: "" };
           }
           newForm.modifiers[id].defaultValue = value;
-        } else if (type === 'modifierDefaultValueFloat') {
+        } else if (type === "modifierDefaultValueFloat") {
           if (!newForm.modifiers[id]) {
-            newForm.modifiers[id] = { displayName: '', defaultValueFloat: '' };
+            newForm.modifiers[id] = { displayName: "", defaultValueFloat: "" };
           }
           newForm.modifiers[id].defaultValueFloat = value;
         }
@@ -559,9 +580,9 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                   <GridItem>
                     <Editor
                       label={`${field.label} (${defaultLocale})`}
-                      initialValue={
-                        String(productData[field.key as keyof FormFields] || '')
-                      }
+                      initialValue={String(
+                        productData[field.key as keyof FormFields] || ""
+                      )}
                       isDisabled={true}
                     />
                   </GridItem>
@@ -570,7 +591,9 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                     <GridItem>
                       <Editor
                         label={`${field.label} (${currentLocale})`}
-                        initialValue={String(form[field.key as keyof FormFields] || '')}
+                        initialValue={String(
+                          form[field.key as keyof FormFields] || ""
+                        )}
                         onChange={(content: string) =>
                           handleEditorChange(
                             content,
@@ -595,9 +618,9 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                       <Input
                         label={`${field.label} (${defaultLocale})`}
                         name={`defaultLocale_${field.key}`}
-                        defaultValue={
-                          String(productData[field.key as keyof FormFields] || '')
-                        }
+                        defaultValue={String(
+                          productData[field.key as keyof FormFields] || ""
+                        )}
                         readOnly={true}
                         required={field.required}
                         disabled={true}
@@ -611,7 +634,9 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                         <Input
                           label={`${field.label} (${currentLocale})`}
                           name={field.key}
-                          value={String(form[field.key as keyof FormFields] ?? '')}
+                          value={String(
+                            form[field.key as keyof FormFields] ?? ""
+                          )}
                           onChange={handleChange}
                           required={field.required}
                           minLength={4}
@@ -621,140 +646,45 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                   )}
                 </Grid>
               )}
-              {field.type === "optionsList" && productData?.options?.edges && productData?.options?.edges.length > 0 && (
-                <Box>
-                  <H4>Options</H4>
-                  <HR/>
-                  {productData.options.edges.map((option) => (
-                    <Box key={option.node.id} marginBottom="medium">
-                      <Grid
-                        gridColumns={{
-                          mobile: "repeat(1, 1fr)",
-                          tablet: "repeat(2, 1fr)",
-                        }}
-                        paddingBottom="small"
+              {field.type === "optionsList" &&
+                productData?.options?.edges &&
+                productData?.options?.edges.length > 0 && (
+                  <Box paddingBottom="xSmall">
+                    <H3 color="secondary70">
+                      <Flex
+                        flexDirection="row"
+                        flexGap="xSmall"
+                        alignItems="center"
+                        alignContent="center"
                       >
-                        <GridItem>
-                          <FormGroup>
-                            <Input
-                              label={`${option.node.displayName} (${defaultLocale})`}
-                              name={`defaultLocale_option_${option.node.id}`}
-                              defaultValue={option.node.displayName}
-                              readOnly={true}
-                              disabled={true}
-                            />
-                          </FormGroup>
-                        </GridItem>
-
-                        {currentLocale !== defaultLocale && (
-                          <GridItem>
-                            <FormGroup>
-                              <Input
-                                label={`${option.node.displayName} (${currentLocale})`}
-                                name={`option_${option.node.id}`}
-                                value={form.options?.[option.node.id]?.displayName || ''}
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </GridItem>
-                        )}
-                      </Grid>
-
-                      {option.node.values.map((value) => (
-                        <Grid
-                          key={value.id}
-                          gridColumns={{
-                            mobile: "repeat(1, 1fr)",
-                            tablet: "repeat(2, 1fr)",
-                          }}
-                          paddingBottom="small"
-                          paddingLeft="medium"
-                        >
-                          <GridItem>
-                            <FormGroup>
-                              <Input
-                                label={`${value.label} (${defaultLocale})`}
-                                name={`defaultLocale_optionValue_${value.id}`}
-                                defaultValue={value.label}
-                                readOnly={true}
-                                disabled={true}
-                              />
-                            </FormGroup>
-                          </GridItem>
-
-                          {currentLocale !== defaultLocale && (
-                            <GridItem>
-                              <FormGroup>
-                                <Input
-                                  label={`${value.label} (${currentLocale})`}
-                                  name={`optionValue_${option.node.id}:${value.id}`}
-                                  value={form.options?.[option.node.id]?.values?.[value.id] || ''}
-                                  onChange={handleChange}
-                                />
-                              </FormGroup>
-                            </GridItem>
-                          )}
-                        </Grid>
-                      ))}
-                    </Box>
-                  ))}
-                </Box>
-              )}
-              {field.type === "modifiersList" && productData?.modifiers?.edges && productData?.modifiers?.edges.length > 0 && (
-                <Box>
-                  <H4>Modifiers</H4>
-                  <HR/>
-                  {productData.modifiers.edges.map((modifier) => (
-                    <Box key={modifier.node.id} marginBottom="medium">
-                      <Grid
-                        gridColumns={{
-                          mobile: "repeat(1, 1fr)",
-                          tablet: "repeat(2, 1fr)",
-                        }}
-                        paddingBottom="small"
+                        <FlexItem>
+                          <ReceiptIcon />
+                        </FlexItem>
+                        <FlexItem paddingLeft="xxSmall" paddingTop="xxSmall">
+                          Options
+                        </FlexItem>
+                      </Flex>
+                    </H3>
+                    {productData.options.edges.map((option) => (
+                      <Box
+                        key={option.node.id}
+                        marginBottom="medium"
+                        borderLeft="box"
+                        paddingLeft="small"
                       >
-                        <GridItem>
-                          <FormGroup>
-                            <Input
-                              label={`${modifier.node.displayName} (${defaultLocale})`}
-                              name={`defaultLocale_modifier_${modifier.node.id}`}
-                              defaultValue={modifier.node.displayName}
-                              readOnly={true}
-                              disabled={true}
-                            />
-                          </FormGroup>
-                        </GridItem>
-
-                        {currentLocale !== defaultLocale && (
-                          <GridItem>
-                            <FormGroup>
-                              <Input
-                                label={`${modifier.node.displayName} (${currentLocale})`}
-                                name={`modifier_${modifier.node.id}`}
-                                value={form.modifiers?.[modifier.node.id]?.displayName || ''}
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </GridItem>
-                        )}
-                      </Grid>
-
-                      {modifier.node.values && modifier.node.values.map((value) => (
                         <Grid
-                          key={value.id}
                           gridColumns={{
                             mobile: "repeat(1, 1fr)",
                             tablet: "repeat(2, 1fr)",
                           }}
                           paddingBottom="small"
-                          paddingLeft="medium"
                         >
                           <GridItem>
                             <FormGroup>
                               <Input
-                                label={`${value.label} (${defaultLocale})`}
-                                name={`defaultLocale_modifierValue_${value.id}`}
-                                defaultValue={value.label}
+                                label={`${option.node.displayName} (${defaultLocale})`}
+                                name={`defaultLocale_option_${option.node.id}`}
+                                defaultValue={option.node.displayName}
                                 readOnly={true}
                                 disabled={true}
                               />
@@ -765,129 +695,354 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                             <GridItem>
                               <FormGroup>
                                 <Input
-                                  label={`${value.label} (${currentLocale})`}
-                                  name={`modifierValue_${modifier.node.id}:${value.id}`}
-                                  value={form.modifiers?.[modifier.node.id]?.values?.[value.id] || ''}
+                                  label={`${option.node.displayName} (${currentLocale})`}
+                                  name={`option_${option.node.id}`}
+                                  value={
+                                    form.options?.[option.node.id]
+                                      ?.displayName || ""
+                                  }
                                   onChange={handleChange}
                                 />
                               </FormGroup>
                             </GridItem>
                           )}
                         </Grid>
-                      ))}
 
-                      {/* Handles "checked" value for Checkbox modifier type */}
-                      {(modifier.node.fieldValue !== undefined) && (
-                        <Grid
-                          gridColumns={{
-                            mobile: "repeat(1, 1fr)",
-                            tablet: "repeat(2, 1fr)",
-                          }}
-                          paddingBottom="small"
-                          paddingLeft="medium"
-                        >
-                          <GridItem>
-                            <FormGroup>
-                              <Input
-                                label={`Field Value (${defaultLocale})`}
-                                name={`defaultLocale_modifierField_${modifier.node.id}`}
-                                defaultValue={modifier.node.fieldValue}
-                                readOnly={true}
-                                disabled={true}
-                              />
-                            </FormGroup>
-                          </GridItem>
-
-                          {currentLocale !== defaultLocale && (
-                            <GridItem>
+                        {option.node.values.map((value) => (
+                          <Grid
+                            key={value.id}
+                            gridColumns={{
+                              mobile: "repeat(1, 1fr)",
+                              tablet: "repeat(2, 1fr)",
+                            }}
+                            paddingBottom="small"
+                          >
+                            <GridItem paddingLeft="large">
                               <FormGroup>
                                 <Input
-                                  label={`Field Value (${currentLocale})`}
-                                  name={`modifierField_${modifier.node.id}`}
-                                  value={form.modifiers?.[modifier.node.id]?.fieldValue || ''}
-                                  onChange={handleChange}
-                                />
-                              </FormGroup>
-                            </GridItem>
-                          )}
-                        </Grid>
-                      )}
-
-                      {/* Handles default values for Text (single and multiline) modifiers */}
-                      {(modifier.node.defaultValue !== undefined) && (
-                        <Grid
-                          gridColumns={{
-                            mobile: "repeat(1, 1fr)",
-                            tablet: "repeat(2, 1fr)",
-                          }}
-                          paddingBottom="small"
-                          paddingLeft="medium"
-                        >
-                          <GridItem>
-                            <FormGroup>
-                              {modifier.node.__typename === 'MultilineTextFieldProductModifier' ? (
-                                <Textarea
-                                  label={`Default Value (${defaultLocale})`}
-                                  name={`defaultLocale_modifierDefaultValue_${modifier.node.id}`}
-                                  defaultValue={modifier.node.defaultValue}
-                                  readOnly={true}
-                                  disabled={true}
-                                  rows={3}
-                                />
-                              ) : (
-                                <Input
-                                  label={`Default Value (${defaultLocale})`}
-                                  name={`defaultLocale_modifierDefaultValue_${modifier.node.id}`}
-                                  defaultValue={modifier.node.defaultValue}
+                                  label={`${value.label} (${defaultLocale})`}
+                                  name={`defaultLocale_optionValue_${value.id}`}
+                                  defaultValue={value.label}
                                   readOnly={true}
                                   disabled={true}
                                 />
-                              )}
-                            </FormGroup>
-                          </GridItem>
+                              </FormGroup>
+                            </GridItem>
 
-                          {currentLocale !== defaultLocale && (
-                            <GridItem>
-                              <FormGroup>
-                                {modifier.node.__typename === 'MultilineTextFieldProductModifier' ? (
-                                  <Textarea
-                                    label={`Default Value (${currentLocale})`}
-                                    name={`modifierDefaultValue_${modifier.node.id}`}
-                                    value={form.modifiers?.[modifier.node.id]?.defaultValue || ''}
+                            {currentLocale !== defaultLocale && (
+                              <GridItem paddingLeft="large">
+                                <FormGroup>
+                                  <Input
+                                    label={`${value.label} (${currentLocale})`}
+                                    name={`optionValue_${option.node.id}:${value.id}`}
+                                    value={
+                                      form.options?.[option.node.id]?.values?.[
+                                        value.id
+                                      ] || ""
+                                    }
                                     onChange={handleChange}
+                                  />
+                                </FormGroup>
+                              </GridItem>
+                            )}
+                          </Grid>
+                        ))}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              {field.type === "modifiersList" &&
+                productData?.modifiers?.edges &&
+                productData?.modifiers?.edges.length > 0 && (
+                  <Box paddingBottom="xSmall">
+                    <H3 color="secondary70">
+                      <Flex
+                        flexDirection="row"
+                        flexGap="xSmall"
+                        alignItems="center"
+                        alignContent="center"
+                      >
+                        <FlexItem>
+                          <ReceiptIcon />
+                        </FlexItem>
+                        <FlexItem paddingLeft="xxSmall" paddingTop="xxSmall">
+                          Modifiers
+                        </FlexItem>
+                      </Flex>
+                    </H3>
+                    {productData.modifiers.edges.map((modifier) => (
+                      <Box
+                        key={modifier.node.id}
+                        marginBottom="medium"
+                        borderLeft="box"
+                        paddingLeft="small"
+                      >
+                        <Grid
+                          gridColumns={{
+                            mobile: "repeat(1, 1fr)",
+                            tablet: "repeat(2, 1fr)",
+                          }}
+                          paddingBottom="small"
+                        >
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`${modifier.node.displayName} (${defaultLocale})`}
+                                name={`defaultLocale_modifier_${modifier.node.id}`}
+                                defaultValue={modifier.node.displayName}
+                                readOnly={true}
+                                disabled={true}
+                              />
+                            </FormGroup>
+                          </GridItem>
+
+                          {currentLocale !== defaultLocale && (
+                            <GridItem>
+                              <FormGroup>
+                                <Input
+                                  label={`${modifier.node.displayName} (${currentLocale})`}
+                                  name={`modifier_${modifier.node.id}`}
+                                  value={
+                                    form.modifiers?.[modifier.node.id]
+                                      ?.displayName || ""
+                                  }
+                                  onChange={handleChange}
+                                />
+                              </FormGroup>
+                            </GridItem>
+                          )}
+                        </Grid>
+
+                        {modifier.node.values &&
+                          modifier.node.values.map((value) => (
+                            <Grid
+                              key={value.id}
+                              gridColumns={{
+                                mobile: "repeat(1, 1fr)",
+                                tablet: "repeat(2, 1fr)",
+                              }}
+                              paddingBottom="small"
+                            >
+                              <GridItem paddingLeft="large">
+                                <FormGroup>
+                                  <Input
+                                    label={`${value.label} (${defaultLocale})`}
+                                    name={`defaultLocale_modifierValue_${value.id}`}
+                                    defaultValue={value.label}
+                                    readOnly={true}
+                                    disabled={true}
+                                  />
+                                </FormGroup>
+                              </GridItem>
+
+                              {currentLocale !== defaultLocale && (
+                                <GridItem paddingLeft="large">
+                                  <FormGroup>
+                                    <Input
+                                      label={`${value.label} (${currentLocale})`}
+                                      name={`modifierValue_${modifier.node.id}:${value.id}`}
+                                      value={
+                                        form.modifiers?.[modifier.node.id]
+                                          ?.values?.[value.id] || ""
+                                      }
+                                      onChange={handleChange}
+                                    />
+                                  </FormGroup>
+                                </GridItem>
+                              )}
+                            </Grid>
+                          ))}
+
+                        {/* Handles "checked" value for Checkbox modifier type */}
+                        {modifier.node.fieldValue !== undefined && (
+                          <Grid
+                            gridColumns={{
+                              mobile: "repeat(1, 1fr)",
+                              tablet: "repeat(2, 1fr)",
+                            }}
+                            paddingBottom="small"
+                            paddingLeft="medium"
+                          >
+                            <GridItem>
+                              <FormGroup>
+                                <Input
+                                  label={`Field Value (${defaultLocale})`}
+                                  name={`defaultLocale_modifierField_${modifier.node.id}`}
+                                  defaultValue={modifier.node.fieldValue}
+                                  readOnly={true}
+                                  disabled={true}
+                                />
+                              </FormGroup>
+                            </GridItem>
+
+                            {currentLocale !== defaultLocale && (
+                              <GridItem>
+                                <FormGroup>
+                                  <Input
+                                    label={`Field Value (${currentLocale})`}
+                                    name={`modifierField_${modifier.node.id}`}
+                                    value={
+                                      form.modifiers?.[modifier.node.id]
+                                        ?.fieldValue || ""
+                                    }
+                                    onChange={handleChange}
+                                  />
+                                </FormGroup>
+                              </GridItem>
+                            )}
+                          </Grid>
+                        )}
+
+                        {/* Handles default values for Text (single and multiline) modifiers */}
+                        {modifier.node.defaultValue !== undefined && (
+                          <Grid
+                            gridColumns={{
+                              mobile: "repeat(1, 1fr)",
+                              tablet: "repeat(2, 1fr)",
+                            }}
+                            paddingBottom="small"
+                            paddingLeft="medium"
+                          >
+                            <GridItem>
+                              <FormGroup>
+                                {modifier.node.__typename ===
+                                "MultilineTextFieldProductModifier" ? (
+                                  <Textarea
+                                    label={`Default Value (${defaultLocale})`}
+                                    name={`defaultLocale_modifierDefaultValue_${modifier.node.id}`}
+                                    defaultValue={modifier.node.defaultValue}
+                                    readOnly={true}
+                                    disabled={true}
                                     rows={3}
                                   />
                                 ) : (
                                   <Input
-                                    label={`Default Value (${currentLocale})`}
-                                    name={`modifierDefaultValue_${modifier.node.id}`}
-                                    value={form.modifiers?.[modifier.node.id]?.defaultValue || ''}
-                                    onChange={handleChange}
+                                    label={`Default Value (${defaultLocale})`}
+                                    name={`defaultLocale_modifierDefaultValue_${modifier.node.id}`}
+                                    defaultValue={modifier.node.defaultValue}
+                                    readOnly={true}
+                                    disabled={true}
                                   />
                                 )}
                               </FormGroup>
                             </GridItem>
-                          )}
-                        </Grid>
-                      )}
 
-                      {/* Handles default values for Text Number modifiers */}
-                      {(modifier.node.defaultValueFloat !== undefined) && (
+                            {currentLocale !== defaultLocale && (
+                              <GridItem>
+                                <FormGroup>
+                                  {modifier.node.__typename ===
+                                  "MultilineTextFieldProductModifier" ? (
+                                    <Textarea
+                                      label={`Default Value (${currentLocale})`}
+                                      name={`modifierDefaultValue_${modifier.node.id}`}
+                                      value={
+                                        form.modifiers?.[modifier.node.id]
+                                          ?.defaultValue || ""
+                                      }
+                                      onChange={handleChange}
+                                      rows={3}
+                                    />
+                                  ) : (
+                                    <Input
+                                      label={`Default Value (${currentLocale})`}
+                                      name={`modifierDefaultValue_${modifier.node.id}`}
+                                      value={
+                                        form.modifiers?.[modifier.node.id]
+                                          ?.defaultValue || ""
+                                      }
+                                      onChange={handleChange}
+                                    />
+                                  )}
+                                </FormGroup>
+                              </GridItem>
+                            )}
+                          </Grid>
+                        )}
+
+                        {/* Handles default values for Text Number modifiers */}
+                        {modifier.node.defaultValueFloat !== undefined && (
+                          <Grid
+                            gridColumns={{
+                              mobile: "repeat(1, 1fr)",
+                              tablet: "repeat(2, 1fr)",
+                            }}
+                            paddingBottom="small"
+                            paddingLeft="medium"
+                          >
+                            <GridItem>
+                              <FormGroup>
+                                <Input
+                                  type="number"
+                                  label={`Default Value (${defaultLocale})`}
+                                  name={`defaultLocale_modifierDefaultValueFloat_${modifier.node.id}`}
+                                  defaultValue={modifier.node.defaultValueFloat}
+                                  readOnly={true}
+                                  disabled={true}
+                                />
+                              </FormGroup>
+                            </GridItem>
+
+                            {currentLocale !== defaultLocale && (
+                              <GridItem>
+                                <FormGroup>
+                                  <Input
+                                    type="number"
+                                    label={`Default Value (${currentLocale})`}
+                                    name={`modifierDefaultValueFloat_${modifier.node.id}`}
+                                    value={
+                                      form.modifiers?.[modifier.node.id]
+                                        ?.defaultValueFloat || ""
+                                    }
+                                    onChange={handleChange}
+                                  />
+                                </FormGroup>
+                              </GridItem>
+                            )}
+                          </Grid>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              {field.type === "customFieldsList" &&
+                productData?.customFields?.edges &&
+                productData?.customFields?.edges.length > 0 && (
+                  <Box paddingBottom="xSmall">
+                    <H3 color="secondary70">
+                      <Flex
+                        flexDirection="row"
+                        flexGap="xSmall"
+                        alignItems="center"
+                        alignContent="center"
+                      >
+                        <FlexItem>
+                          <ReceiptIcon />
+                        </FlexItem>
+                        <FlexItem paddingLeft="xxSmall" paddingTop="xxSmall">
+                          Custom Fields
+                        </FlexItem>
+                      </Flex>
+                    </H3>
+                    {productData.customFields.edges.map((field) => (
+                      <Box
+                        key={field.node.id}
+                        marginBottom="medium"
+                        borderLeft="box"
+                        paddingLeft="small"
+                      >
                         <Grid
                           gridColumns={{
-                            mobile: "repeat(1, 1fr)",
+                            mobile: "repeat(2, 1fr)",
                             tablet: "repeat(2, 1fr)",
                           }}
                           paddingBottom="small"
-                          paddingLeft="medium"
                         >
                           <GridItem>
                             <FormGroup>
                               <Input
-                                type="number"
-                                label={`Default Value (${defaultLocale})`}
-                                name={`defaultLocale_modifierDefaultValueFloat_${modifier.node.id}`}
-                                defaultValue={modifier.node.defaultValueFloat}
+                                label={`Name (${defaultLocale})`}
+                                name={`defaultLocale_customFieldName_${field.node.id}`}
+                                defaultValue={field.node.name}
                                 readOnly={true}
                                 disabled={true}
                               />
@@ -898,88 +1053,50 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                             <GridItem>
                               <FormGroup>
                                 <Input
-                                  type="number"
-                                  label={`Default Value (${currentLocale})`}
-                                  name={`modifierDefaultValueFloat_${modifier.node.id}`}
-                                  value={form.modifiers?.[modifier.node.id]?.defaultValueFloat || ''}
+                                  label={`Name (${currentLocale})`}
+                                  name={`customFieldName_${field.node.id}`}
+                                  value={
+                                    form.customFields?.[field.node.id]?.name ||
+                                    ""
+                                  }
+                                  onChange={handleChange}
+                                />
+                              </FormGroup>
+                            </GridItem>
+                          )}
+
+                          <GridItem>
+                            <FormGroup>
+                              <Input
+                                label={`Value (${defaultLocale})`}
+                                name={`defaultLocale_customField_${field.node.id}`}
+                                defaultValue={field.node.value}
+                                readOnly={true}
+                                disabled={true}
+                              />
+                            </FormGroup>
+                          </GridItem>
+
+                          {currentLocale !== defaultLocale && (
+                            <GridItem>
+                              <FormGroup>
+                                <Input
+                                  label={`Value (${currentLocale})`}
+                                  name={`customField_${field.node.id}`}
+                                  value={
+                                    form.customFields?.[field.node.id]?.value ||
+                                    ""
+                                  }
                                   onChange={handleChange}
                                 />
                               </FormGroup>
                             </GridItem>
                           )}
                         </Grid>
-                      )}
-                    </Box>
-                  ))}
-                </Box>
-              )}
-              {field.type === "customFieldsList" && productData?.customFields?.edges && productData?.customFields?.edges.length > 0 && (
-                <Box>
-                  <H4>Custom Fields</H4>
-                  <HR/>
-                  {productData.customFields.edges.map((field) => (
-                    <Box key={field.node.id} marginBottom="medium">
-                      <Grid
-                        gridColumns={{
-                          mobile: "repeat(1, 1fr)",
-                          tablet: "repeat(2, 1fr)",
-                        }}
-                        paddingBottom="small"
-                      >
-                        <GridItem>
-                          <FormGroup>
-                            <Input
-                              label={`Name (${defaultLocale})`}
-                              name={`defaultLocale_customFieldName_${field.node.id}`}
-                              defaultValue={field.node.name}
-                              readOnly={true}
-                              disabled={true}
-                            />
-                          </FormGroup>
-                        </GridItem>
-
-                        {currentLocale !== defaultLocale && (
-                          <GridItem>
-                            <FormGroup>
-                              <Input
-                                label={`Name (${currentLocale})`}
-                                name={`customFieldName_${field.node.id}`}
-                                value={form.customFields?.[field.node.id]?.name || ''}
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </GridItem>
-                        )}
-
-                        <GridItem>
-                          <FormGroup>
-                            <Input
-                              label={`Value (${defaultLocale})`}
-                              name={`defaultLocale_customField_${field.node.id}`}
-                              defaultValue={field.node.value}
-                              readOnly={true}
-                              disabled={true}
-                            />
-                          </FormGroup>
-                        </GridItem>
-
-                        {currentLocale !== defaultLocale && (
-                          <GridItem>
-                            <FormGroup>
-                              <Input
-                                label={`Value (${currentLocale})`}
-                                name={`customField_${field.node.id}`}
-                                value={form.customFields?.[field.node.id]?.value || ''}
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </GridItem>
-                        )}
-                      </Grid>
-                    </Box>
-                  ))}
-                </Box>
-              )}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
             </Box>
           ))}
 
