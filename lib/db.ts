@@ -5,9 +5,6 @@ const { DB_TYPE } = process.env;
 let db: Db;
 
 switch (DB_TYPE) {
-  // case 'd1':
-  //     db = require('./dbs/d1');
-  //     break;
   case "hardcoded":
     db = require("./dbs/hardcoded");
     break;
