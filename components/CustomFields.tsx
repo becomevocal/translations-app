@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useTranslations } from 'next-intl';
 import { Box, Grid, GridItem, FormGroup, Input } from "@bigcommerce/big-design";
 import { ReceiptIcon } from "@bigcommerce/big-design-icons";
 import SectionHeader from "./SectionHeader";
@@ -33,11 +36,13 @@ const CustomFields: React.FC<CustomFieldsProps> = ({
   currentLocale,
   onChange,
 }) => {
+  const t = useTranslations('app');
+
   if (!customFields || customFields.length === 0) return null;
 
   return (
     <Box paddingBottom="xSmall">
-      <SectionHeader icon={ReceiptIcon} title="Custom Fields" />
+      <SectionHeader icon={ReceiptIcon} title={t('customFields.title')} />
       {customFields.map((field) => (
         <Box
           key={field.node.id}
@@ -55,7 +60,7 @@ const CustomFields: React.FC<CustomFieldsProps> = ({
             <GridItem>
               <FormGroup>
                 <Input
-                  label={`Name (${defaultLocale})`}
+                  label={`${t('customFields.name')} (${defaultLocale})`}
                   name={`defaultLocale_customFieldName_${field.node.id}`}
                   defaultValue={field.node.name}
                   readOnly={true}
@@ -68,7 +73,7 @@ const CustomFields: React.FC<CustomFieldsProps> = ({
               <GridItem>
                 <FormGroup>
                   <Input
-                    label={`Name (${currentLocale})`}
+                    label={`${t('customFields.name')} (${currentLocale})`}
                     name={`customFieldName_${field.node.id}`}
                     value={formCustomFields?.[field.node.id]?.name || ""}
                     onChange={onChange}
@@ -80,7 +85,7 @@ const CustomFields: React.FC<CustomFieldsProps> = ({
             <GridItem>
               <FormGroup>
                 <Input
-                  label={`Value (${defaultLocale})`}
+                  label={`${t('customFields.value')} (${defaultLocale})`}
                   name={`defaultLocale_customField_${field.node.id}`}
                   defaultValue={field.node.value}
                   readOnly={true}
@@ -93,7 +98,7 @@ const CustomFields: React.FC<CustomFieldsProps> = ({
               <GridItem>
                 <FormGroup>
                   <Input
-                    label={`Value (${currentLocale})`}
+                    label={`${t('customFields.value')} (${currentLocale})`}
                     name={`customField_${field.node.id}`}
                     value={formCustomFields?.[field.node.id]?.value || ""}
                     onChange={onChange}

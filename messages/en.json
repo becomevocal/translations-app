@@ -1,0 +1,127 @@
+{
+  "app": {
+    "title": "Multi-lang Translations",
+    "getStarted": {
+      "title": "Get Started",
+      "description": "Select a channel and locale to begin translating your products.",
+      "selectChannel": "Select Channel",
+      "selectLocale": "Select Locale",
+      "checking": "Checking for multi-language functionality...",
+      "active": "Multi-language functionality is active!",
+      "inactive": "Multi-language functionality is not available.",
+      "checkingDescription": "Please wait while we check your store's configuration.",
+      "activeDescription": "Your store is ready to use multiple languages.",
+      "inactiveDescription": "Your current plan doesn't support multiple languages.",
+      "startWorkflow": "Start translation workflow",
+      "contactSupport": "Contact support"
+    },
+    "home": {
+      "welcome": "Welcome to the Translation Center!",
+      "description": "This is where you can learn about the management of multiple languages on your Catalyst storefront."
+    },
+    "resources": {
+      "title": "Resources",
+      "translationGuide": {
+        "title": "Translation Guidelines",
+        "description": "Learn best practices for translating your store's catalog content",
+        "links": {
+          "bestPractices": "Translation Best Practices",
+          "managing": "Managing Multi-Language Content"
+        }
+      },
+      "support": {
+        "title": "Translation Support",
+        "description": "Get help with managing translations and localization settings",
+        "links": {
+          "faq": "Translation FAQ",
+          "settings": "Localization Settings"
+        }
+      }
+    },
+    "products": {
+      "title": "Products",
+      "name": "Product Name",
+      "description": "Description",
+      "seo": {
+        "title": "SEO Title",
+        "description": "SEO Description"
+      },
+      "form": {
+        "loading": "Loading product information...",
+        "loadingError": "Error loading product information",
+        "savingError": "Error saving product information",
+        "saveSuccess": "Product information saved successfully",
+        "unsavedChanges": "You have unsaved changes",
+        "channelSelector": {
+          "label": "Select Channel",
+          "placeholder": "Choose a channel..."
+        },
+        "localeSelector": {
+          "label": "Select Language",
+          "placeholder": "Choose a language..."
+        },
+        "fields": {
+          "name": "Product Name",
+          "description": "Description",
+          "pageTitle": "Page Title",
+          "metaDescription": "Meta Description",
+          "preOrderMessage": "Pre-Order Message",
+          "warranty": "Warranty",
+          "availabilityDescription": "Availability Description",
+          "searchKeywords": "Search Keywords",
+          "options": "Options",
+          "modifiers": "Modifiers",
+          "customFields": "Custom Fields"
+        }
+      }
+    },
+    "variants": {
+      "title": "Variants",
+      "optionLabel": "Option Label",
+      "form": {
+        "addOption": "Add Option",
+        "removeOption": "Remove Option",
+        "optionName": "Option Name",
+        "optionValue": "Option Value"
+      }
+    },
+    "customFields": {
+      "title": "Custom Fields",
+      "name": "Field Name",
+      "value": "Field Value",
+      "form": {
+        "addField": "Add Custom Field",
+        "removeField": "Remove Field"
+      }
+    },
+    "modifiers": {
+      "title": "Modifiers",
+      "name": "Modifier Name",
+      "optionLabel": "Option Label",
+      "defaultValue": "Default Value",
+      "form": {
+        "addModifier": "Add Modifier",
+        "removeModifier": "Remove Modifier",
+        "required": "Required",
+        "checkedByDefault": "Checked by Default",
+        "defaultValue": "Default Value"
+      }
+    },
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "success": "Changes saved successfully",
+      "required": "Required",
+      "optional": "Optional",
+      "actions": {
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    }
+  }
+} 

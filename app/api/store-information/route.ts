@@ -20,6 +20,7 @@ async function getStoreData(
       storeSettings?.features?.multi_language_enabled ?? false,
     multi_storefront_enabled:
       storeSettings?.features?.multi_storefront_enabled ?? false,
+    language: storeSettings?.language ?? "en",
   };
 }
 

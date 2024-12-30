@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import BCDevLogo from "@/icons/bc-dev-logo.svg";
 import BCLogo from "@/icons/bc-logo.svg";
 import {
@@ -20,39 +21,6 @@ interface ResourceItemProps {
   description: string;
   links: { text: string; href: string }[];
 }
-
-const resources = [
-  {
-    icon: <Image src={BCDevLogo} alt="BigCommerce" />,
-    title: "Translation Guidelines",
-    description: "Learn best practices for translating your store's catalog content",
-    links: [
-      {
-        text: "Translation Best Practices",
-        href: "https://developer.bigcommerce.com/docs/storefront-translation",
-      },
-      {
-        text: "Managing Multi-Language Content",
-        href: "https://developer.bigcommerce.com/docs/multi-language",
-      },
-    ],
-  },
-  {
-    icon: <Image src={BCLogo} alt="BigCommerce" />,
-    title: "Translation Support",
-    description: "Get help with managing translations and localization settings",
-    links: [
-      {
-        text: "Translation FAQ",
-        href: "https://support.bigcommerce.com/s/article/translation-guide",
-      },
-      {
-        text: "Localization Settings",
-        href: "https://support.bigcommerce.com/s/article/localization-settings",
-      },
-    ],
-  },
-];
 
 const ResourceItem = ({ title, description, links }: ResourceItemProps) => {
   return (
@@ -91,8 +59,43 @@ export const ResourceGroup = ({
 }: {
   fullWidth?: boolean;
 }) => {
+  const t = useTranslations('app.resources');
+
+  const resources = [
+    {
+      icon: <Image src={BCDevLogo} alt="BigCommerce" />,
+      title: t('translationGuide.title'),
+      description: t('translationGuide.description'),
+      links: [
+        {
+          text: t('translationGuide.links.bestPractices'),
+          href: "https://developer.bigcommerce.com/docs/storefront-translation",
+        },
+        {
+          text: t('translationGuide.links.managing'),
+          href: "https://developer.bigcommerce.com/docs/multi-language",
+        },
+      ],
+    },
+    {
+      icon: <Image src={BCLogo} alt="BigCommerce" />,
+      title: t('support.title'),
+      description: t('support.description'),
+      links: [
+        {
+          text: t('support.links.faq'),
+          href: "https://support.bigcommerce.com/s/article/translation-guide",
+        },
+        {
+          text: t('support.links.settings'),
+          href: "https://support.bigcommerce.com/s/article/localization-settings",
+        },
+      ],
+    },
+  ];
+
   return (
-    <Panel header="Resources">
+    <Panel header={t('title')}>
       <Grid
         gridColumns={{
           mobile: "1fr",

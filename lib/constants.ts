@@ -13,80 +13,80 @@ export const availableLocales:Array<{code:string, label: string}> = [
   },
 ];
 
-export const translatableProductFields:Array<{key:string, label: string, type: "input" | "textarea" | "optionsList" | "customFieldsList" | "modifiersList", graphqlParentObject: string, required: boolean}> = [
+export const translatableProductFields:Array<{key:string, labelKey: string, type: "input" | "textarea" | "optionsList" | "customFieldsList" | "modifiersList", graphqlParentObject: string, required: boolean}> = [
   {
     key: 'name',
-    label: 'Name',
+    labelKey: 'products.form.fields.name',
     type: 'input',
     graphqlParentObject: "basicInformation",
     required: true,
   },
   {
     key: 'description',
-    label: 'Description',
+    labelKey: 'products.form.fields.description',
     type: 'textarea',
     graphqlParentObject: "basicInformation",
     required: true,
   },
   {
     key: 'pageTitle',
-    label: 'Page Title',
+    labelKey: 'products.form.fields.pageTitle',
     type: 'input',
     graphqlParentObject: "seoInformation",
     required: false,
   },
   {
     key: 'metaDescription',
-    label: 'Meta Description',
+    labelKey: 'products.form.fields.metaDescription',
     type: 'input',
     graphqlParentObject: "seoInformation",
     required: false,
   },
   {
     key: "preOrderMessage",
-    label: "Pre-Order Message",
+    labelKey: "products.form.fields.preOrderMessage",
     type: "input",
     required: false,
     graphqlParentObject: "preOrderSettings"
   },
   {
     key: "warranty",
-    label: "Warranty",
+    labelKey: "products.form.fields.warranty",
     type: "input", 
     required: false,
     graphqlParentObject: "storefrontDetails"
   },
   {
     key: "availabilityDescription",
-    label: "Availability Description",
+    labelKey: "products.form.fields.availabilityDescription",
     type: "input",
     required: false,
     graphqlParentObject: "storefrontDetails"
   },
   {
     key: "searchKeywords",
-    label: "Search Keywords",
+    labelKey: "products.form.fields.searchKeywords",
     type: "input",
     required: false,
     graphqlParentObject: "storefrontDetails"
   },
   {
     key: 'options',
-    label: 'Options',
+    labelKey: 'products.form.fields.options',
     type: 'optionsList',
     graphqlParentObject: "options",
     required: false,
   },
   {
     key: 'modifiers',
-    label: 'Modifiers',
+    labelKey: 'products.form.fields.modifiers',
     type: 'modifiersList',
     graphqlParentObject: "modifiers",
     required: false,
   },
   {
     key: 'customFields',
-    label: 'Custom Fields',
+    labelKey: 'products.form.fields.customFields',
     type: 'customFieldsList',
     graphqlParentObject: "customFields",
     required: false,

@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useTranslations } from 'next-intl';
 import { Box, Grid, GridItem, FormGroup, Input, Textarea } from "@bigcommerce/big-design";
 import { ReceiptIcon } from "@bigcommerce/big-design-icons";
 import SectionHeader from "./SectionHeader";
@@ -51,11 +54,13 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
   currentLocale,
   onChange,
 }) => {
+  const t = useTranslations('app');
+
   if (!modifiers || modifiers.length === 0) return null;
 
   return (
     <Box paddingBottom="xSmall">
-      <SectionHeader icon={ReceiptIcon} title="Modifiers" />
+      <SectionHeader icon={ReceiptIcon} title={t('modifiers.title')} />
       {modifiers.map((modifier) => (
         <Box
           key={modifier.node.id}
@@ -144,7 +149,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
               <GridItem>
                 <FormGroup>
                   <Input
-                    label={`Field Value (${defaultLocale})`}
+                    label={`${t('modifiers.form.defaultValue')} (${defaultLocale})`}
                     name={`defaultLocale_modifierField_${modifier.node.id}`}
                     defaultValue={modifier.node.fieldValue}
                     readOnly={true}
@@ -157,7 +162,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
                 <GridItem>
                   <FormGroup>
                     <Input
-                      label={`Field Value (${currentLocale})`}
+                      label={`${t('modifiers.form.defaultValue')} (${currentLocale})`}
                       name={`modifierField_${modifier.node.id}`}
                       value={formModifiers?.[modifier.node.id]?.fieldValue || ""}
                       onChange={onChange}
@@ -181,7 +186,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
                 <FormGroup>
                   {modifier.node.__typename === "MultilineTextFieldProductModifier" ? (
                     <Textarea
-                      label={`Default Value (${defaultLocale})`}
+                      label={`${t('modifiers.form.defaultValue')} (${defaultLocale})`}
                       name={`defaultLocale_modifierDefaultValue_${modifier.node.id}`}
                       defaultValue={modifier.node.defaultValue}
                       readOnly={true}
@@ -190,7 +195,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
                     />
                   ) : (
                     <Input
-                      label={`Default Value (${defaultLocale})`}
+                      label={`${t('modifiers.form.defaultValue')} (${defaultLocale})`}
                       name={`defaultLocale_modifierDefaultValue_${modifier.node.id}`}
                       defaultValue={modifier.node.defaultValue}
                       readOnly={true}
@@ -205,7 +210,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
                   <FormGroup>
                     {modifier.node.__typename === "MultilineTextFieldProductModifier" ? (
                       <Textarea
-                        label={`Default Value (${currentLocale})`}
+                        label={`${t('modifiers.form.defaultValue')} (${currentLocale})`}
                         name={`modifierDefaultValue_${modifier.node.id}`}
                         value={formModifiers?.[modifier.node.id]?.defaultValue || ""}
                         onChange={onChange}
@@ -213,7 +218,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
                       />
                     ) : (
                       <Input
-                        label={`Default Value (${currentLocale})`}
+                        label={`${t('modifiers.form.defaultValue')} (${currentLocale})`}
                         name={`modifierDefaultValue_${modifier.node.id}`}
                         value={formModifiers?.[modifier.node.id]?.defaultValue || ""}
                         onChange={onChange}
@@ -238,7 +243,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
                 <FormGroup>
                   <Input
                     type="number"
-                    label={`Default Value (${defaultLocale})`}
+                    label={`${t('modifiers.form.defaultValue')} (${defaultLocale})`}
                     name={`defaultLocale_modifierDefaultValueFloat_${modifier.node.id}`}
                     defaultValue={modifier.node.defaultValueFloat}
                     readOnly={true}
@@ -252,7 +257,7 @@ const ProductModifiers: React.FC<ProductModifiersProps> = ({
                   <FormGroup>
                     <Input
                       type="number"
-                      label={`Default Value (${currentLocale})`}
+                      label={`${t('modifiers.form.defaultValue')} (${currentLocale})`}
                       name={`modifierDefaultValueFloat_${modifier.node.id}`}
                       value={formModifiers?.[modifier.node.id]?.defaultValueFloat || ""}
                       onChange={onChange}

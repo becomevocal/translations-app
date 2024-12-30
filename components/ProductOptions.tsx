@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useTranslations } from 'next-intl';
 import { Box, Grid, GridItem, FormGroup, Input } from "@bigcommerce/big-design";
 import { ReceiptIcon } from "@bigcommerce/big-design-icons";
 import SectionHeader from "./SectionHeader";
@@ -40,11 +43,13 @@ const ProductOptions: React.FC<ProductOptionsProps> = ({
   currentLocale,
   onChange,
 }) => {
+  const t = useTranslations('app');
+
   if (!options || options.length === 0) return null;
 
   return (
     <Box paddingBottom="xSmall">
-      <SectionHeader icon={ReceiptIcon} title="Options" />
+      <SectionHeader icon={ReceiptIcon} title={t('variants.title')} />
       {options.map((option) => (
         <Box
           key={option.node.id}

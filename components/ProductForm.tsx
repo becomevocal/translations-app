@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useReducer, useEffect, FormEvent, MouseEvent, useMemo } from "react";
+import { useTranslations } from 'next-intl';
 import { Button, Box, Flex, HR, Form as StyledForm } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { defaultLocale, translatableProductFields } from "@/lib/constants";
@@ -226,6 +227,7 @@ const getFormObjectForLocale = (
 };
 
 function ProductForm({ channels, productId, context }: ProductFormProps) {
+  const t = useTranslations('app');
   const { storeInformation, isLoading: isStoreInfoLoading } = useStoreInfo();
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
@@ -243,18 +245,30 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
     errors,
   } = state;
 
+  const defaultLocale = useMemo(() => {
+    const currentChannelData = channels.find(c => c.channel_id === currentChannel);
+    return currentChannelData?.locales.find(l => l.is_default)?.code || currentChannelData?.locales[0].code || storeInformation.language;
+  }, [channels, currentChannel, storeInformation.language]);
+
   const fetchProductData = useCallback(async () => {
     dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: true });
     try {
       const res = await fetch(
         `/api/product/${productId}?context=${context}&channel_id=${currentChannel}`
       );
-      const data: ProductData = await res.json();
+      if (!res.ok) throw new Error("Failed to fetch product data");
+      const data = await res.json();
       dispatch({ type: "SET_PRODUCT_DATA", payload: data });
     } catch (error) {
+      console.error("Error fetching product data:", error);
       dispatch({ type: "SET_PRODUCT_INFO_LOADING_ERROR", payload: true });
+      addAlert({
+        type: "error",
+        header: t('common.error'),
+        messages: [{ text: t('products.form.loadingError') }],
+      });
     }
-  }, [productId, currentChannel, context]);
+  }, [productId, context, currentChannel, t]);
 
   useEffect(() => {
     if (productId && currentChannel) {
@@ -439,21 +453,6 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
     [form]
   );
 
-  const ActionBarButtons = useMemo(
-    () => (
-      <Button
-        mobileWidth="auto"
-        variant="primary"
-        onClick={handleSubmit}
-        disabled={isProductSaving}
-        isLoading={isProductSaving}
-      >
-        Save
-      </Button>
-    ),
-    [handleSubmit, isProductSaving]
-  );
-
   if (isStoreInfoLoading) return <LoadingScreen />;
 
   if (!storeInformation.multi_language_enabled) {
@@ -488,7 +487,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                 <TranslatableField
                   key={`${field.key}_${currentLocale}`}
                   type={field.type}
-                  label={field.label}
+                  label={t(field.labelKey)}
                   name={field.key}
                   defaultValue={String(productData[field.key as keyof FormFields] || "")}
                   currentValue={String(form[field.key as keyof FormFields] || "")}
@@ -547,7 +546,17 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
           })}
 
           {currentLocale !== defaultLocale && (
-            <ActionBar>{ActionBarButtons}</ActionBar>
+            <ActionBar>
+              <Button
+                mobileWidth="auto"
+                variant="primary"
+                onClick={handleSubmit}
+                disabled={isProductSaving}
+                isLoading={isProductSaving}
+              >
+                {t('common.actions.save')}
+              </Button>
+            </ActionBar>
           )}
         </StyledForm>
       </ActionBarPaddingBox>

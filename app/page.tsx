@@ -1,17 +1,15 @@
 "use client";
 
 import { Flex, FlexItem, Panel } from "@bigcommerce/big-design";
+import { useTranslations } from 'next-intl';
 import { useStoreInfo } from "@/components/StoreInfoProvider";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Header, Page } from "@bigcommerce/big-design-patterns";
 import { TranslationsGetStarted } from "@/components/TranslationsGetStarted";
 import { ResourceGroup } from "@/components/ResourceGroup";
 
-const gettext = (inputString: string) => {
-  return inputString;
-};
-
 export default function Home() {
+  const t = useTranslations('app');
   const {
     storeInformation,
     isLoading: isStoreInformationLoading,
@@ -32,8 +30,8 @@ export default function Home() {
       <Flex flexDirection="column" flexGap="1.5rem">
         <FlexItem>
           <Header
-            title="Welcome to the Translation Center!"
-            description="This is where you can learn about the management of multiple languages on your Catalyst storefront."
+            title={t('home.welcome')}
+            description={t('home.description')}
           />
         </FlexItem>
         <FlexItem>

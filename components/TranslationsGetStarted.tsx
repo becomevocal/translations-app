@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
 import ActiveStateIcon from "@/icons/multi-lang-active-icon.svg";
 import InactiveStateIcon from "@/icons/multi-lang-inactive-icon.svg";
 import LoadingStateIcon from "@/icons/multi-lang-loading-icon.svg";
@@ -12,21 +13,23 @@ export const TranslationsGetStarted = ({
   isActive?: boolean;
   isLoading?: boolean;
 }) => {
+  const t = useTranslations('app.getStarted');
+
   const mainText = isLoading
-    ? "Checking for multi-language functionality..."
+    ? t('checking')
     : isActive
-    ? "Multi-language functionality is active!"
-    : "Multi-language functionality is not available.";
+    ? t('active')
+    : t('inactive');
 
   const secondaryText = isLoading
-    ? "Please wait while we check your store's configuration."
+    ? t('checkingDescription')
     : isActive
-    ? "Your store is ready to use multiple languages."
-    : "Your current plan doesn't support multiple languages.";
+    ? t('activeDescription')
+    : t('inactiveDescription');
 
-    const buttonText = isActive
-    ? "Start translation workflow"
-    : "Contact support";
+  const buttonText = isActive
+    ? t('startWorkflow')
+    : t('contactSupport');
 
   return (
     <Flex
@@ -44,13 +47,7 @@ export const TranslationsGetStarted = ({
               ? ActiveStateIcon
               : InactiveStateIcon
           }
-          alt={
-            isLoading
-              ? "Checking for multi-language functionality..."
-              : isActive
-              ? "Multi-lang functionality is active."
-              : "Multi-lang functionality not available on this store."
-          }
+          alt={mainText}
         />
       </FlexItem>
       <FlexItem>
