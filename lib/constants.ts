@@ -1,17 +1,4 @@
-export const defaultLocale:string = 'en';
-
-export const availableLocales:Array<{code:string, label: string}> = [
-  {
-    code: 'en',
-    label: 'English',
-  },{
-    code: 'es',
-    label: 'Spanish',
-  },{
-    code: 'fr',
-    label: 'French',
-  },
-];
+export const fallbackLocale = { code: 'en', status: 'active', is_default: true, title: 'English' };
 
 export const translatableProductFields:Array<{key:string, labelKey: string, type: "input" | "textarea" | "optionsList" | "customFieldsList" | "modifiersList", graphqlParentObject: string, required: boolean}> = [
   {
@@ -92,7 +79,6 @@ export const translatableProductFields:Array<{key:string, labelKey: string, type
     required: false,
   },
 ];
-
 export const hardcodedAvailableLocales = [
       {
           "id": "aa",

@@ -108,7 +108,7 @@ export class GraphQLClient {
         }
       }
       `
-    );
+    ).join('');
 
     const localeCheckboxModifierQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
@@ -119,7 +119,7 @@ export class GraphQLClient {
         }
       }
       `
-    );
+    ).join('');
 
     const localeTextFieldModifierQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
@@ -130,7 +130,7 @@ export class GraphQLClient {
         }
       }
       `
-    );
+    ).join('');
 
     const localeMultilineTextFieldModifierQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
@@ -141,7 +141,7 @@ export class GraphQLClient {
         }
       }
       `
-    );
+    ).join('');
 
     const localeNumbersOnlyTextFieldModifierQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
@@ -152,7 +152,7 @@ export class GraphQLClient {
         }
       }
       `
-    );
+    ).join('');
 
     const localeBasicModifierQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
@@ -160,7 +160,7 @@ export class GraphQLClient {
         displayName
       }
       `
-    );
+    ).join('');
 
     const localeModifierValueQueries = availableLocales.map((locale) =>
       locale.code === defaultLocale ? "" : `
@@ -172,7 +172,7 @@ export class GraphQLClient {
         }
       }
       `
-    );
+    ).join('');
 
     const query = `
       query {
@@ -299,12 +299,14 @@ export class GraphQLClient {
                         }
                         ${localeModifierValueQueries}
                       }
-                      ... on FileUploadProductModifier {
+                      ${localeBasicModifierQueries.length > 0 ? 
+                      `... on FileUploadProductModifier {
                         ${localeBasicModifierQueries}
                       }
                       ... on DateFieldProductModifier {
                         ${localeBasicModifierQueries}
                       }
+                      `: ''}
                     }
                   }
                 }

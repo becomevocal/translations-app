@@ -28,9 +28,8 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Add remove mutations for all nodes
 - [x] Improve UX of custom field editing (should use two column layout on mobile)
 - [x] Add Sentry error tracking
-- [ ] Translate app strings
-- [ ] Base default locale on channel locale settings instead of hardcoded constant
-- [ ] Use available locales from channels instead of hardcoded availableLocales
+- [x] Translate app strings (including API route responses and setting user locale via JWT)
+- [x] Use default locale and available locales from channel locale settings instead of constant
 - [ ] Simplify multiple database support, setup, and deployment docs
 - [ ] Pull out Admin GraphQL client into a separate package
 - [ ] Add import / export functionality

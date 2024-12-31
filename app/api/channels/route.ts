@@ -1,12 +1,26 @@
 import { type NextRequest } from 'next/server'
 import { bigcommerceClient, getSession } from "@/lib/auth";
-import { hardcodedAvailableLocales } from '@/lib/constants';
+import { fallbackLocale, hardcodedAvailableLocales } from '@/lib/constants';
 import { unstable_cache } from 'next/cache';
+
+type Locale = {
+  code: string;
+  status: string;
+  is_default: boolean;
+  title?: string;
+};
 
 type Channel = {
   id: number;
   name: string;
   [key: string]: any;
+};
+
+type ChannelResponse = {
+  channel_id: number;
+  channel_name: string;
+  default_locale: string;
+  locales: Locale[];
 };
 
 export async function GET(
@@ -19,32 +33,33 @@ export async function GET(
     const { accessToken, storeHash } = await getSession({ query: { context } });
     const bigcommerce = bigcommerceClient(accessToken, storeHash);
 
-    const getChannelsData = async () => {
+    const getChannelsData = async (): Promise<ChannelResponse[]> => {
       const { data: channelsData } = await bigcommerce.get('/channels?available=true');
 
       const result = await Promise.all(channelsData.map(async (channel: Channel) => {
         try {
           const { data: localesData } = await bigcommerce.get(`/settings/store/locales?channel_id=${channel.id}`);
+          const locales: Locale[] = localesData.map((locale: { code: string, status: string, is_default: boolean }) => ({
+            ...locale,
+            title: hardcodedAvailableLocales.find(({ id }) => id === locale.code)?.name,
+          }));
+          
+          const defaultLocale = locales.find(locale => locale.is_default)?.code || fallbackLocale.code;
+          
           return {
             channel_id: channel.id,
             channel_name: channel.name,
-            locales: localesData.map((locale: { code: string, status: string, is_default: boolean }) => ({
-              ...locale,
-              title: hardcodedAvailableLocales.find(({ id }) => id === locale.code)?.name,
-            }))
+            default_locale: defaultLocale,
+            locales
           };
         } catch (innerError) {
           console.error(`Failed to fetch locales for channel ${channel.id}:`, innerError);
           return {
             channel_id: channel.id,
             channel_name: channel.name,
+            default_locale: fallbackLocale.code,
             locales: [
-              {
-                code: "en",
-                status: "active",
-                is_default: true,
-                title: "English"
-              }
+              fallbackLocale
             ]
           };
         }

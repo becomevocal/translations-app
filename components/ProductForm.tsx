@@ -4,7 +4,7 @@ import React, { useCallback, useReducer, useEffect, FormEvent, MouseEvent, useMe
 import { useTranslations } from 'next-intl';
 import { Button, Box, Flex, HR, Form as StyledForm } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
-import { defaultLocale, translatableProductFields } from "@/lib/constants";
+import { translatableProductFields } from "@/lib/constants";
 import { ActionBar } from "bigcommerce-design-patterns";
 import ErrorMessage from "./ErrorMessage";
 import Loading, { LoadingScreen } from "./LoadingIndicator";
@@ -256,7 +256,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
       const res = await fetch(
         `/api/product/${productId}?context=${context}&channel_id=${currentChannel}`
       );
-      if (!res.ok) throw new Error("Failed to fetch product data");
+      if (!res.ok) throw new Error(t('products.form.loadingError'));
       const data = await res.json();
       dispatch({ type: "SET_PRODUCT_DATA", payload: data });
     } catch (error) {
@@ -306,17 +306,17 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         });
         addAlert({
           type: "success",
-          header: "Update succeeded",
+          header: t('common.success'),
           autoDismiss: true,
-          messages: [{ text: "Product translations have been saved." }],
+          messages: [{ text: t('products.form.saveSuccess') }],
         });
       } catch (error) {
         console.error("Error updating the product: ", error);
         addAlert({
           type: "error",
-          header: "Update failed",
+          header: t('common.error'),
           autoDismiss: true,
-          messages: [{ text: "Error updating the product translations." }],
+          messages: [{ text: t('products.form.savingError') }],
         });
         dispatch({ type: "SET_PRODUCT_SAVING", payload: false });
       }

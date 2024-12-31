@@ -1,13 +1,31 @@
 import { type NextRequest } from "next/server";
 import { bigcommerceClient, getSession } from "@/lib/auth";
 import {
-  availableLocales,
-  defaultLocale,
+  fallbackLocale,
   translatableProductFields,
 } from "@/lib/constants";
 import { debugLog } from "@/lib/debug";
 import { createGraphQLClient } from "@/lib/graphql-client";
 import { debuglog } from "util";
+
+type Locale = {
+  code: string;
+  status: string;
+  is_default: boolean;
+  title?: string;
+};
+
+type ChannelData = {
+  channel_id: number;
+  channel_name: string;
+  default_locale: string;
+  locales: Locale[];
+};
+
+type LocaleInfo = {
+  defaultLocale: string;
+  availableLocales: Locale[];
+};
 
 /**
  * Creates a mapping of GraphQL fields from the provided posted form data.
@@ -784,6 +802,28 @@ function getCustomFieldsToRemove(data: any): { customFieldId: string, fields: st
   }).filter(item => item.fields.length > 0);
 }
 
+async function getChannelLocales(context: string, channelId: string): Promise<LocaleInfo> {
+  const response = await fetch(`${process.env.APP_ORIGIN}/api/channels?context=${context}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch channel data');
+  }
+  
+  const channels: ChannelData[] = await response.json();
+  const channel = channels.find((c) => c.channel_id.toString() === channelId);
+  
+  if (!channel) {
+    return {
+      defaultLocale: fallbackLocale.code,
+      availableLocales: [fallbackLocale]
+    };
+  }
+
+  return {
+    defaultLocale: channel.default_locale,
+    availableLocales: channel.locales
+  };
+}
+
 /**
  * Handles GET requests to retrieve product locale data.
  * @param request - The incoming request object.
@@ -804,6 +844,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
   }
 
   try {
+    const { defaultLocale, availableLocales } = await getChannelLocales(context, channelId);
     const { accessToken, storeHash } = await getSession({ query: { context } });
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
@@ -966,6 +1007,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
   }
 
   try {
+    const { defaultLocale } = await getChannelLocales(context, channelId);
     let result: any;
     const { accessToken, storeHash } = await getSession({ query: { context } });
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
