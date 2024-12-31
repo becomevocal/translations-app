@@ -3,8 +3,8 @@ import { z } from "zod";
 import db from "@/lib/db";
 import { encodePayload } from "@/lib/auth";
 import { createSession, setSession } from "@/lib/session";
-import { SignJWT, jwtVerify, type JWTPayload } from "jose";
-import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
+import { SignJWT, jwtVerify } from "jose";
+import { cookies } from "next/headers";
 
 const queryParamSchema = z.object({
   code: z.string(),
@@ -89,6 +89,7 @@ export async function GET(req: NextRequest) {
     userId: user.id,
     channelId: payload.channel_id,
     storeHash,
+    locale: user.locale,
   })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .sign(new TextEncoder().encode(process.env.JWT_KEY));
