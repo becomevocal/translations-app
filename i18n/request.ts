@@ -3,7 +3,7 @@ import { decodePayload } from '@/lib/auth';
 import { getSessionToken } from '@/lib/session';
  
 export default getRequestConfig(async () => {
-  let locale = 'en'; // default fallback
+  let userLocale = 'en-US'; // default fallback
   
   try {
     const sessionToken = await getSessionToken();
@@ -15,15 +15,25 @@ export default getRequestConfig(async () => {
           'user' in payload && 
           typeof payload.user === 'object' && payload.user !== null &&
           'locale' in payload.user) {
-        locale = payload.user.locale;
+        userLocale = payload.user.locale;
       }
     }
   } catch (error) {
     // Silently fall back to default locale on error
   }
+
+  let messages;
+  try {
+    messages = (await import(`../messages/${userLocale}.json`)).default;
+  } catch (error) {
+    // Not all locales are translated, so fallback to a message file that exists 
+    // if the requested message file is not found
+    userLocale = 'en-US';
+    messages = (await import('../messages/en-US.json')).default;
+  }
  
   return {
-    locale,
-    messages: (await import(`../messages/${locale}.json`)).default
+    locale: userLocale,
+    messages
   };
 });
