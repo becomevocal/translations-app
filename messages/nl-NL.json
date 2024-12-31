@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Meertalige vertalingen",
+    "getStarted": {
+      "title": "Aan de slag",
+      "description": "Selecteer een kanaal en taal om te beginnen met het vertalen van uw producten.",
+      "selectChannel": "Selecteer kanaal",
+      "selectLocale": "Selecteer taal",
+      "checking": "Meertalige functionaliteit controleren...",
+      "active": "Meertalige functionaliteit is actief!",
+      "inactive": "Meertalige functionaliteit is niet beschikbaar.",
+      "checkingDescription": "Even geduld terwijl we de configuratie van uw winkel controleren.",
+      "activeDescription": "Uw winkel is klaar voor het gebruik van meerdere talen.",
+      "inactiveDescription": "Uw huidige abonnement ondersteunt geen meerdere talen.",
+      "startWorkflow": "Start vertaalworkflow",
+      "contactSupport": "Contact opnemen met support"
+    },
+    "home": {
+      "welcome": "Welkom bij het Vertaalcentrum!",
+      "description": "Hier leert u hoe u meerdere talen in uw Catalyst-winkel kunt beheren."
+    },
+    "resources": {
+      "title": "Bronnen",
+      "translationGuide": {
+        "title": "Vertaalhandleiding",
+        "description": "Leer de beste praktijken voor het vertalen van uw catalogusinhoud",
+        "links": {
+          "bestPractices": "Beste vertaalpraktijken",
+          "managing": "Meertalige inhoud beheren"
+        }
+      },
+      "support": {
+        "title": "Vertaalondersteuning",
+        "description": "Krijg hulp bij het beheren van vertalingen en lokalisatie-instellingen",
+        "links": {
+          "faq": "Vertaal FAQ",
+          "settings": "Lokalisatie-instellingen"
+        }
+      }
+    },
+    "products": {
+      "title": "Producten",
+      "name": "Productnaam",
+      "description": "Beschrijving",
+      "seo": {
+        "title": "SEO-titel",
+        "description": "SEO-beschrijving"
+      },
+      "form": {
+        "loading": "Productinformatie laden...",
+        "loadingError": "Fout bij laden van productinformatie",
+        "savingError": "Fout bij opslaan van productinformatie",
+        "saveSuccess": "Productinformatie succesvol opgeslagen",
+        "unsavedChanges": "U heeft niet-opgeslagen wijzigingen",
+        "channelSelector": {
+          "label": "Selecteer kanaal",
+          "placeholder": "Kies een kanaal..."
+        },
+        "localeSelector": {
+          "label": "Selecteer taal",
+          "placeholder": "Kies een taal...",
+          "callout": "Selecteer hierboven een taal om te beginnen met het bewerken van vertalingen voor dit product."
+        },
+        "fields": {
+          "name": "Productnaam",
+          "description": "Beschrijving",
+          "pageTitle": "Paginatitel",
+          "metaDescription": "Meta-beschrijving",
+          "preOrderMessage": "Voorbestelmelding",
+          "warranty": "Garantie",
+          "availabilityDescription": "Beschikbaarheidsbeschrijving",
+          "searchKeywords": "Zoekwoorden",
+          "options": "Opties",
+          "modifiers": "Aanpassingen",
+          "customFields": "Aangepaste velden"
+        }
+      }
+    },
+    "variants": {
+      "title": "Varianten",
+      "optionLabel": "Optielabel",
+      "form": {
+        "addOption": "Optie toevoegen",
+        "removeOption": "Optie verwijderen",
+        "optionName": "Optienaam",
+        "optionValue": "Optiewaarde"
+      }
+    },
+    "customFields": {
+      "title": "Aangepaste velden",
+      "name": "Veldnaam",
+      "value": "Veldwaarde",
+      "form": {
+        "addField": "Aangepast veld toevoegen",
+        "removeField": "Veld verwijderen"
+      }
+    },
+    "modifiers": {
+      "title": "Aanpassingen",
+      "name": "Aanpassingsnaam",
+      "optionLabel": "Optielabel",
+      "defaultValue": "Standaardwaarde",
+      "form": {
+        "addModifier": "Aanpassing toevoegen",
+        "removeModifier": "Aanpassing verwijderen",
+        "required": "Verplicht",
+        "checkedByDefault": "Standaard aangevinkt",
+        "defaultValue": "Standaardwaarde"
+      }
+    },
+    "common": {
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "loading": "Laden...",
+      "error": "Er is een fout opgetreden",
+      "success": "Wijzigingen succesvol opgeslagen",
+      "required": "Verplicht",
+      "optional": "Optioneel",
+      "actions": {
+        "save": "Wijzigingen opslaan",
+        "saving": "Opslaan...",
+        "cancel": "Annuleren",
+        "edit": "Bewerken",
+        "delete": "Verwijderen"
+      }
+    }
+  }
+} 

@@ -58,7 +58,8 @@
         },
         "localeSelector": {
           "label": "Select Language",
-          "placeholder": "Choose a language..."
+          "placeholder": "Choose a language...",
+          "callout": "Select a locale above to start editing translations for this product."
         },
         "fields": {
           "name": "Product Name",

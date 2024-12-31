@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Flerspråklige oversettelser",
+    "getStarted": {
+      "title": "Kom i gang",
+      "description": "Velg en kanal og et språk for å begynne å oversette produktene dine.",
+      "selectChannel": "Velg kanal",
+      "selectLocale": "Velg språk",
+      "checking": "Kontrollerer flerspråklig funksjonalitet...",
+      "active": "Flerspråklig funksjonalitet er aktiv!",
+      "inactive": "Flerspråklig funksjonalitet er ikke tilgjengelig.",
+      "checkingDescription": "Vennligst vent mens vi kontrollerer butikkonfigurasjonen din.",
+      "activeDescription": "Butikken din er klar til å bruke flere språk.",
+      "inactiveDescription": "Din nåværende plan støtter ikke flere språk.",
+      "startWorkflow": "Start oversettelsesarbeidsflyt",
+      "contactSupport": "Kontakt support"
+    },
+    "home": {
+      "welcome": "Velkommen til Oversettelsessenteret!",
+      "description": "Her kan du lære om håndtering av flere språk i din Catalyst-butikk."
+    },
+    "resources": {
+      "title": "Ressurser",
+      "translationGuide": {
+        "title": "Oversettelsesveiledning",
+        "description": "Lær beste praksis for oversettelse av kataloginnholdet ditt",
+        "links": {
+          "bestPractices": "Beste oversettelsespraksiser",
+          "managing": "Håndtering av flerspråklig innhold"
+        }
+      },
+      "support": {
+        "title": "Oversettelsesstøtte",
+        "description": "Få hjelp med håndtering av oversettelser og lokaliseringsinnstillinger",
+        "links": {
+          "faq": "Oversettelses-FAQ",
+          "settings": "Lokaliseringsinnstillinger"
+        }
+      }
+    },
+    "products": {
+      "title": "Produkter",
+      "name": "Produktnavn",
+      "description": "Beskrivelse",
+      "seo": {
+        "title": "SEO-tittel",
+        "description": "SEO-beskrivelse"
+      },
+      "form": {
+        "loading": "Laster produktinformasjon...",
+        "loadingError": "Feil ved lasting av produktinformasjon",
+        "savingError": "Feil ved lagring av produktinformasjon",
+        "saveSuccess": "Produktinformasjon lagret",
+        "unsavedChanges": "Du har ulagrede endringer",
+        "channelSelector": {
+          "label": "Velg kanal",
+          "placeholder": "Velg en kanal..."
+        },
+        "localeSelector": {
+          "label": "Velg språk",
+          "placeholder": "Velg et språk...",
+          "callout": "Velg et språk ovenfor for å begynne å redigere oversettelser for dette produktet."
+        },
+        "fields": {
+          "name": "Produktnavn",
+          "description": "Beskrivelse",
+          "pageTitle": "Sidetittel",
+          "metaDescription": "Metabeskrivelse",
+          "preOrderMessage": "Forhåndsbestillingsmelding",
+          "warranty": "Garanti",
+          "availabilityDescription": "Tilgjengelighetsbeskrivelse",
+          "searchKeywords": "Søkeord",
+          "options": "Alternativer",
+          "modifiers": "Modifikatorer",
+          "customFields": "Tilpassede felt"
+        }
+      }
+    },
+    "variants": {
+      "title": "Varianter",
+      "optionLabel": "Alternativetikett",
+      "form": {
+        "addOption": "Legg til alternativ",
+        "removeOption": "Fjern alternativ",
+        "optionName": "Alternativnavn",
+        "optionValue": "Alternativverdi"
+      }
+    },
+    "customFields": {
+      "title": "Tilpassede felt",
+      "name": "Feltnavn",
+      "value": "Feltverdi",
+      "form": {
+        "addField": "Legg til tilpasset felt",
+        "removeField": "Fjern felt"
+      }
+    },
+    "modifiers": {
+      "title": "Modifikatorer",
+      "name": "Modifikatornavn",
+      "optionLabel": "Alternativetikett",
+      "defaultValue": "Standardverdi",
+      "form": {
+        "addModifier": "Legg til modifikator",
+        "removeModifier": "Fjern modifikator",
+        "required": "Påkrevd",
+        "checkedByDefault": "Avkrysset som standard",
+        "defaultValue": "Standardverdi"
+      }
+    },
+    "common": {
+      "save": "Lagre",
+      "cancel": "Avbryt",
+      "loading": "Laster...",
+      "error": "En feil har oppstått",
+      "success": "Endringer lagret",
+      "required": "Påkrevd",
+      "optional": "Valgfritt",
+      "actions": {
+        "save": "Lagre endringer",
+        "saving": "Lagrer...",
+        "cancel": "Avbryt",
+        "edit": "Rediger",
+        "delete": "Slett"
+      }
+    }
+  }
+} 

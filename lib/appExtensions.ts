@@ -101,6 +101,62 @@ const createAppExtensionMutation = () => ({
           {
             "value": "Übersetzen",
             "localeCode": "de-DE"
+          },
+          {
+            "value": "Traduire",
+            "localeCode": "fr-FR"
+          },
+          {
+            "value": "Traducir",
+            "localeCode": "es-419"
+          },
+          {
+            "value": "Traduci",
+            "localeCode": "it-IT"
+          },
+          {
+            "value": "Перекласти",
+            "localeCode": "uk-UA"
+          },
+          {
+            "value": "翻译",
+            "localeCode": "zh-CN"
+          },
+          {
+            "value": "Vertalen",
+            "localeCode": "nl-NL"
+          },
+          {
+            "value": "Traduzir",
+            "localeCode": "pt-BR"
+          },
+          {
+            "value": "Översätt",
+            "localeCode": "sv-SE"
+          },
+          {
+            "value": "번역",
+            "localeCode": "ko-KR"
+          },
+          {
+            "value": "Oversæt",
+            "localeCode": "da-DK"
+          },
+          {
+            "value": "Oversett",
+            "localeCode": "no-NO"
+          },
+          {
+            "value": "Tłumacz",
+            "localeCode": "pl-PL"
+          },
+          {
+            "value": "翻訳",
+            "localeCode": "ja-JP"
+          },
+          {
+            "value": "Traducir",
+            "localeCode": "es-ES"
           }
         ]
       }

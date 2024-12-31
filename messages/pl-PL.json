@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Tłumaczenia wielojęzyczne",
+    "getStarted": {
+      "title": "Rozpocznij",
+      "description": "Wybierz kanał i język, aby rozpocząć tłumaczenie produktów.",
+      "selectChannel": "Wybierz kanał",
+      "selectLocale": "Wybierz język",
+      "checking": "Sprawdzanie funkcji wielojęzyczności...",
+      "active": "Funkcja wielojęzyczności jest aktywna!",
+      "inactive": "Funkcja wielojęzyczności jest niedostępna.",
+      "checkingDescription": "Proszę czekać, sprawdzamy konfigurację Twojego sklepu.",
+      "activeDescription": "Twój sklep jest gotowy do używania wielu języków.",
+      "inactiveDescription": "Twój obecny plan nie obsługuje wielu języków.",
+      "startWorkflow": "Rozpocznij proces tłumaczenia",
+      "contactSupport": "Skontaktuj się z pomocą techniczną"
+    },
+    "home": {
+      "welcome": "Witaj w Centrum Tłumaczeń!",
+      "description": "Tutaj dowiesz się, jak zarządzać wieloma językami w swoim sklepie Catalyst."
+    },
+    "resources": {
+      "title": "Zasoby",
+      "translationGuide": {
+        "title": "Przewodnik po tłumaczeniach",
+        "description": "Poznaj najlepsze praktyki tłumaczenia zawartości katalogu",
+        "links": {
+          "bestPractices": "Najlepsze praktyki tłumaczeniowe",
+          "managing": "Zarządzanie treścią wielojęzyczną"
+        }
+      },
+      "support": {
+        "title": "Wsparcie tłumaczeniowe",
+        "description": "Uzyskaj pomoc w zarządzaniu tłumaczeniami i ustawieniami lokalizacji",
+        "links": {
+          "faq": "FAQ dotyczące tłumaczeń",
+          "settings": "Ustawienia lokalizacji"
+        }
+      }
+    },
+    "products": {
+      "title": "Produkty",
+      "name": "Nazwa produktu",
+      "description": "Opis",
+      "seo": {
+        "title": "Tytuł SEO",
+        "description": "Opis SEO"
+      },
+      "form": {
+        "loading": "Ładowanie informacji o produkcie...",
+        "loadingError": "Błąd podczas ładowania informacji o produkcie",
+        "savingError": "Błąd podczas zapisywania informacji o produkcie",
+        "saveSuccess": "Informacje o produkcie zostały pomyślnie zapisane",
+        "unsavedChanges": "Masz niezapisane zmiany",
+        "channelSelector": {
+          "label": "Wybierz kanał",
+          "placeholder": "Wybierz kanał..."
+        },
+        "localeSelector": {
+          "label": "Wybierz język",
+          "placeholder": "Wybierz język...",
+          "callout": "Wybierz język powyżej, aby rozpocząć edycję tłumaczeń tego produktu."
+        },
+        "fields": {
+          "name": "Nazwa produktu",
+          "description": "Opis",
+          "pageTitle": "Tytuł strony",
+          "metaDescription": "Meta opis",
+          "preOrderMessage": "Wiadomość o przedsprzedaży",
+          "warranty": "Gwarancja",
+          "availabilityDescription": "Opis dostępności",
+          "searchKeywords": "Słowa kluczowe",
+          "options": "Opcje",
+          "modifiers": "Modyfikatory",
+          "customFields": "Pola niestandardowe"
+        }
+      }
+    },
+    "variants": {
+      "title": "Warianty",
+      "optionLabel": "Etykieta opcji",
+      "form": {
+        "addOption": "Dodaj opcję",
+        "removeOption": "Usuń opcję",
+        "optionName": "Nazwa opcji",
+        "optionValue": "Wartość opcji"
+      }
+    },
+    "customFields": {
+      "title": "Pola niestandardowe",
+      "name": "Nazwa pola",
+      "value": "Wartość pola",
+      "form": {
+        "addField": "Dodaj pole niestandardowe",
+        "removeField": "Usuń pole"
+      }
+    },
+    "modifiers": {
+      "title": "Modyfikatory",
+      "name": "Nazwa modyfikatora",
+      "optionLabel": "Etykieta opcji",
+      "defaultValue": "Wartość domyślna",
+      "form": {
+        "addModifier": "Dodaj modyfikator",
+        "removeModifier": "Usuń modyfikator",
+        "required": "Wymagane",
+        "checkedByDefault": "Domyślnie zaznaczone",
+        "defaultValue": "Wartość domyślna"
+      }
+    },
+    "common": {
+      "save": "Zapisz",
+      "cancel": "Anuluj",
+      "loading": "Ładowanie...",
+      "error": "Wystąpił błąd",
+      "success": "Zmiany zostały pomyślnie zapisane",
+      "required": "Wymagane",
+      "optional": "Opcjonalne",
+      "actions": {
+        "save": "Zapisz zmiany",
+        "saving": "Zapisywanie...",
+        "cancel": "Anuluj",
+        "edit": "Edytuj",
+        "delete": "Usuń"
+      }
+    }
+  }
+} 

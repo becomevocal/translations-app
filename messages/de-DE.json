@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Mehrsprachige Übersetzungen",
+    "getStarted": {
+      "title": "Erste Schritte",
+      "description": "Wählen Sie einen Kanal und eine Sprache aus, um mit der Übersetzung Ihrer Produkte zu beginnen.",
+      "selectChannel": "Kanal auswählen",
+      "selectLocale": "Sprache auswählen",
+      "checking": "Mehrsprachige Funktionalität wird überprüft...",
+      "active": "Mehrsprachige Funktionalität ist aktiv!",
+      "inactive": "Mehrsprachige Funktionalität ist nicht verfügbar.",
+      "checkingDescription": "Bitte warten Sie, während wir die Konfiguration Ihres Shops überprüfen.",
+      "activeDescription": "Ihr Shop ist bereit für die Verwendung mehrerer Sprachen.",
+      "inactiveDescription": "Ihr aktueller Plan unterstützt keine mehreren Sprachen.",
+      "startWorkflow": "Übersetzungsworkflow starten",
+      "contactSupport": "Support kontaktieren"
+    },
+    "home": {
+      "welcome": "Willkommen im Übersetzungszentrum!",
+      "description": "Hier können Sie lernen, wie Sie mehrere Sprachen in Ihrem Catalyst-Shop verwalten."
+    },
+    "resources": {
+      "title": "Ressourcen",
+      "translationGuide": {
+        "title": "Übersetzungsleitfaden",
+        "description": "Lernen Sie die besten Praktiken für die Übersetzung Ihres Katalog-Inhalts",
+        "links": {
+          "bestPractices": "Beste Übersetzungspraktiken",
+          "managing": "Mehrsprachige Inhalte verwalten"
+        }
+      },
+      "support": {
+        "title": "Übersetzungsunterstützung",
+        "description": "Erhalten Sie Hilfe bei der Verwaltung von Übersetzungen und Lokalisierungseinstellungen",
+        "links": {
+          "faq": "Übersetzungs-FAQ",
+          "settings": "Lokalisierungseinstellungen"
+        }
+      }
+    },
+    "products": {
+      "title": "Produkte",
+      "name": "Produktname",
+      "description": "Beschreibung",
+      "seo": {
+        "title": "SEO-Titel",
+        "description": "SEO-Beschreibung"
+      },
+      "form": {
+        "loading": "Produktinformationen werden geladen...",
+        "loadingError": "Fehler beim Laden der Produktinformationen",
+        "savingError": "Fehler beim Speichern der Produktinformationen",
+        "saveSuccess": "Produktinformationen erfolgreich gespeichert",
+        "unsavedChanges": "Sie haben ungespeicherte Änderungen",
+        "channelSelector": {
+          "label": "Kanal auswählen",
+          "placeholder": "Wählen Sie einen Kanal..."
+        },
+        "localeSelector": {
+          "label": "Sprache auswählen",
+          "placeholder": "Wählen Sie eine Sprache...",
+          "callout": "Wählen Sie oben eine Sprache aus, um mit der Bearbeitung der Übersetzungen für dieses Produkt zu beginnen."
+        },
+        "fields": {
+          "name": "Produktname",
+          "description": "Beschreibung",
+          "pageTitle": "Seitentitel",
+          "metaDescription": "Meta-Beschreibung",
+          "preOrderMessage": "Vorbestellungsnachricht",
+          "warranty": "Garantie",
+          "availabilityDescription": "Verfügbarkeitsbeschreibung",
+          "searchKeywords": "Suchbegriffe",
+          "options": "Optionen",
+          "modifiers": "Modifikatoren",
+          "customFields": "Benutzerdefinierte Felder"
+        }
+      }
+    },
+    "variants": {
+      "title": "Varianten",
+      "optionLabel": "Optionsbezeichnung",
+      "form": {
+        "addOption": "Option hinzufügen",
+        "removeOption": "Option entfernen",
+        "optionName": "Optionsname",
+        "optionValue": "Optionswert"
+      }
+    },
+    "customFields": {
+      "title": "Benutzerdefinierte Felder",
+      "name": "Feldname",
+      "value": "Feldwert",
+      "form": {
+        "addField": "Benutzerdefiniertes Feld hinzufügen",
+        "removeField": "Feld entfernen"
+      }
+    },
+    "modifiers": {
+      "title": "Modifikatoren",
+      "name": "Modifikatorname",
+      "optionLabel": "Optionsbezeichnung",
+      "defaultValue": "Standardwert",
+      "form": {
+        "addModifier": "Modifikator hinzufügen",
+        "removeModifier": "Modifikator entfernen",
+        "required": "Erforderlich",
+        "checkedByDefault": "Standardmäßig aktiviert",
+        "defaultValue": "Standardwert"
+      }
+    },
+    "common": {
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "loading": "Wird geladen...",
+      "error": "Ein Fehler ist aufgetreten",
+      "success": "Änderungen erfolgreich gespeichert",
+      "required": "Erforderlich",
+      "optional": "Optional",
+      "actions": {
+        "save": "Änderungen speichern",
+        "saving": "Wird gespeichert...",
+        "cancel": "Abbrechen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      }
+    }
+  }
+} 

@@ -2,6 +2,7 @@ import { Box, Text } from "@bigcommerce/big-design";
 import { ArrowUpwardIcon } from "@bigcommerce/big-design-icons";
 import React from "react";
 import styled from "styled-components";
+import { useTranslations } from "next-intl";
 
 const StyledBox = styled(Box)`
   margin: auto;
@@ -17,11 +18,13 @@ const StyledBox = styled(Box)`
 `;
 
 const LocaleSelectorCallout: React.FC = () => {
+  const t = useTranslations();
+  
   return (
     <StyledBox>
       <ArrowUpwardIcon color="primary60" size="xLarge" />
       <Text color="primary60">
-        Select a locale above to start editing translations for this product.
+        {t("app.products.form.localeSelector.callout")}
       </Text>
     </StyledBox>
   );

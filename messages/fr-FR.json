@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Traductions multilingues",
+    "getStarted": {
+      "title": "Commencer",
+      "description": "Sélectionnez un canal et une langue pour commencer à traduire vos produits.",
+      "selectChannel": "Sélectionner le canal",
+      "selectLocale": "Sélectionner la langue",
+      "checking": "Vérification de la fonctionnalité multilingue...",
+      "active": "La fonctionnalité multilingue est active !",
+      "inactive": "La fonctionnalité multilingue n'est pas disponible.",
+      "checkingDescription": "Veuillez patienter pendant que nous vérifions la configuration de votre boutique.",
+      "activeDescription": "Votre boutique est prête à utiliser plusieurs langues.",
+      "inactiveDescription": "Votre forfait actuel ne prend pas en charge plusieurs langues.",
+      "startWorkflow": "Démarrer le flux de traduction",
+      "contactSupport": "Contacter le support"
+    },
+    "home": {
+      "welcome": "Bienvenue au Centre de Traduction !",
+      "description": "C'est ici que vous pouvez en apprendre davantage sur la gestion des langues multiples sur votre vitrine Catalyst."
+    },
+    "resources": {
+      "title": "Ressources",
+      "translationGuide": {
+        "title": "Guide de traduction",
+        "description": "Découvrez les meilleures pratiques pour traduire le contenu de votre catalogue",
+        "links": {
+          "bestPractices": "Meilleures pratiques de traduction",
+          "managing": "Gestion du contenu multilingue"
+        }
+      },
+      "support": {
+        "title": "Support de traduction",
+        "description": "Obtenez de l'aide pour gérer les traductions et les paramètres de localisation",
+        "links": {
+          "faq": "FAQ sur la traduction",
+          "settings": "Paramètres de localisation"
+        }
+      }
+    },
+    "products": {
+      "title": "Produits",
+      "name": "Nom du produit",
+      "description": "Description",
+      "seo": {
+        "title": "Titre SEO",
+        "description": "Description SEO"
+      },
+      "form": {
+        "loading": "Chargement des informations produit...",
+        "loadingError": "Erreur lors du chargement des informations produit",
+        "savingError": "Erreur lors de l'enregistrement des informations produit",
+        "saveSuccess": "Informations produit enregistrées avec succès",
+        "unsavedChanges": "Vous avez des modifications non enregistrées",
+        "channelSelector": {
+          "label": "Sélectionner le canal",
+          "placeholder": "Choisir un canal..."
+        },
+        "localeSelector": {
+          "label": "Sélectionner la langue",
+          "placeholder": "Choisir une langue...",
+          "callout": "Sélectionnez une langue ci-dessus pour commencer à éditer les traductions de ce produit."
+        },
+        "fields": {
+          "name": "Nom du produit",
+          "description": "Description",
+          "pageTitle": "Titre de la page",
+          "metaDescription": "Meta description",
+          "preOrderMessage": "Message de précommande",
+          "warranty": "Garantie",
+          "availabilityDescription": "Description de la disponibilité",
+          "searchKeywords": "Mots-clés de recherche",
+          "options": "Options",
+          "modifiers": "Modificateurs",
+          "customFields": "Champs personnalisés"
+        }
+      }
+    },
+    "variants": {
+      "title": "Variantes",
+      "optionLabel": "Étiquette d'option",
+      "form": {
+        "addOption": "Ajouter une option",
+        "removeOption": "Supprimer l'option",
+        "optionName": "Nom de l'option",
+        "optionValue": "Valeur de l'option"
+      }
+    },
+    "customFields": {
+      "title": "Champs personnalisés",
+      "name": "Nom du champ",
+      "value": "Valeur du champ",
+      "form": {
+        "addField": "Ajouter un champ personnalisé",
+        "removeField": "Supprimer le champ"
+      }
+    },
+    "modifiers": {
+      "title": "Modificateurs",
+      "name": "Nom du modificateur",
+      "optionLabel": "Étiquette d'option",
+      "defaultValue": "Valeur par défaut",
+      "form": {
+        "addModifier": "Ajouter un modificateur",
+        "removeModifier": "Supprimer le modificateur",
+        "required": "Obligatoire",
+        "checkedByDefault": "Coché par défaut",
+        "defaultValue": "Valeur par défaut"
+      }
+    },
+    "common": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "loading": "Chargement...",
+      "error": "Une erreur est survenue",
+      "success": "Modifications enregistrées avec succès",
+      "required": "Obligatoire",
+      "optional": "Optionnel",
+      "actions": {
+        "save": "Enregistrer les modifications",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      }
+    }
+  }
+} 

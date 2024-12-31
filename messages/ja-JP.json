@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "多言語翻訳",
+    "getStarted": {
+      "title": "はじめに",
+      "description": "チャネルと言語を選択して、商品の翻訳を開始してください。",
+      "selectChannel": "チャネルを選択",
+      "selectLocale": "言語を選択",
+      "checking": "多言語機能を確認中...",
+      "active": "多言語機能が有効です！",
+      "inactive": "多言語機能は利用できません。",
+      "checkingDescription": "ストアの設定を確認しています。しばらくお待ちください。",
+      "activeDescription": "ストアで複数の言語を使用する準備が整いました。",
+      "inactiveDescription": "現在のプランでは複数の言語をサポートしていません。",
+      "startWorkflow": "翻訳ワークフローを開始",
+      "contactSupport": "サポートに問い合わせ"
+    },
+    "home": {
+      "welcome": "翻訳センターへようこそ！",
+      "description": "Catalystストアでの多言語管理について学ぶことができます。"
+    },
+    "resources": {
+      "title": "リソース",
+      "translationGuide": {
+        "title": "翻訳ガイド",
+        "description": "カタログコンテンツの翻訳のベストプラクティスを学ぶ",
+        "links": {
+          "bestPractices": "翻訳のベストプラクティス",
+          "managing": "多言語コンテンツの管理"
+        }
+      },
+      "support": {
+        "title": "翻訳サポート",
+        "description": "翻訳とローカライゼーション設定の管理に関するヘルプを取得",
+        "links": {
+          "faq": "翻訳FAQ",
+          "settings": "ローカライゼーション設定"
+        }
+      }
+    },
+    "products": {
+      "title": "商品",
+      "name": "商品名",
+      "description": "説明",
+      "seo": {
+        "title": "SEOタイトル",
+        "description": "SEO説明"
+      },
+      "form": {
+        "loading": "商品情報を読み込み中...",
+        "loadingError": "商品情報の読み込み中にエラーが発生しました",
+        "savingError": "商品情報の保存中にエラーが発生しました",
+        "saveSuccess": "商品情報が正常に保存されました",
+        "unsavedChanges": "保存されていない変更があります",
+        "channelSelector": {
+          "label": "チャネルを選択",
+          "placeholder": "チャネルを選択してください..."
+        },
+        "localeSelector": {
+          "label": "言語を選択",
+          "placeholder": "言語を選択してください...",
+          "callout": "上記から言語を選択して、この商品の翻訳の編集を開始してください。"
+        },
+        "fields": {
+          "name": "商品名",
+          "description": "説明",
+          "pageTitle": "ページタイトル",
+          "metaDescription": "メタ説明",
+          "preOrderMessage": "予約注文メッセージ",
+          "warranty": "保証",
+          "availabilityDescription": "在庫状況の説明",
+          "searchKeywords": "検索キーワード",
+          "options": "オプション",
+          "modifiers": "修飾子",
+          "customFields": "カスタムフィールド"
+        }
+      }
+    },
+    "variants": {
+      "title": "バリエーション",
+      "optionLabel": "オプションラベル",
+      "form": {
+        "addOption": "オプションを追加",
+        "removeOption": "オプションを削除",
+        "optionName": "オプション名",
+        "optionValue": "オプション値"
+      }
+    },
+    "customFields": {
+      "title": "カスタムフィールド",
+      "name": "フィールド名",
+      "value": "フィールド値",
+      "form": {
+        "addField": "カスタムフィールドを追加",
+        "removeField": "フィールドを削除"
+      }
+    },
+    "modifiers": {
+      "title": "修飾子",
+      "name": "修飾子名",
+      "optionLabel": "オプションラベル",
+      "defaultValue": "デフォルト値",
+      "form": {
+        "addModifier": "修飾子を追加",
+        "removeModifier": "修飾子を削除",
+        "required": "必須",
+        "checkedByDefault": "デフォルトでチェック",
+        "defaultValue": "デフォルト値"
+      }
+    },
+    "common": {
+      "save": "保存",
+      "cancel": "キャンセル",
+      "loading": "読み込み中...",
+      "error": "エラーが発生しました",
+      "success": "変更が正常に保存されました",
+      "required": "必須",
+      "optional": "任意",
+      "actions": {
+        "save": "変更を保存",
+        "saving": "保存中...",
+        "cancel": "キャンセル",
+        "edit": "編集",
+        "delete": "削除"
+      }
+    }
+  }
+} 

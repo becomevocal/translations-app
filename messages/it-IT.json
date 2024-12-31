@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Traduzioni Multilingue",
+    "getStarted": {
+      "title": "Inizia",
+      "description": "Seleziona un canale e una lingua per iniziare a tradurre i tuoi prodotti.",
+      "selectChannel": "Seleziona Canale",
+      "selectLocale": "Seleziona Lingua",
+      "checking": "Verifica della funzionalità multilingue in corso...",
+      "active": "La funzionalità multilingue è attiva!",
+      "inactive": "La funzionalità multilingue non è disponibile.",
+      "checkingDescription": "Attendere mentre verifichiamo la configurazione del tuo negozio.",
+      "activeDescription": "Il tuo negozio è pronto per utilizzare più lingue.",
+      "inactiveDescription": "Il tuo piano attuale non supporta più lingue.",
+      "startWorkflow": "Avvia flusso di traduzione",
+      "contactSupport": "Contatta il supporto"
+    },
+    "home": {
+      "welcome": "Benvenuto al Centro Traduzioni!",
+      "description": "Qui puoi imparare a gestire più lingue nel tuo negozio Catalyst."
+    },
+    "resources": {
+      "title": "Risorse",
+      "translationGuide": {
+        "title": "Guida alla Traduzione",
+        "description": "Scopri le migliori pratiche per tradurre il contenuto del tuo catalogo",
+        "links": {
+          "bestPractices": "Migliori Pratiche di Traduzione",
+          "managing": "Gestione dei Contenuti Multilingue"
+        }
+      },
+      "support": {
+        "title": "Supporto Traduzioni",
+        "description": "Ottieni aiuto per gestire traduzioni e impostazioni di localizzazione",
+        "links": {
+          "faq": "FAQ sulle Traduzioni",
+          "settings": "Impostazioni di Localizzazione"
+        }
+      }
+    },
+    "products": {
+      "title": "Prodotti",
+      "name": "Nome Prodotto",
+      "description": "Descrizione",
+      "seo": {
+        "title": "Titolo SEO",
+        "description": "Descrizione SEO"
+      },
+      "form": {
+        "loading": "Caricamento informazioni prodotto...",
+        "loadingError": "Errore nel caricamento delle informazioni del prodotto",
+        "savingError": "Errore nel salvataggio delle informazioni del prodotto",
+        "saveSuccess": "Informazioni prodotto salvate con successo",
+        "unsavedChanges": "Hai modifiche non salvate",
+        "channelSelector": {
+          "label": "Seleziona Canale",
+          "placeholder": "Scegli un canale..."
+        },
+        "localeSelector": {
+          "label": "Seleziona Lingua",
+          "placeholder": "Scegli una lingua...",
+          "callout": "Seleziona una lingua sopra per iniziare a modificare le traduzioni di questo prodotto."
+        },
+        "fields": {
+          "name": "Nome Prodotto",
+          "description": "Descrizione",
+          "pageTitle": "Titolo Pagina",
+          "metaDescription": "Meta Descrizione",
+          "preOrderMessage": "Messaggio Pre-ordine",
+          "warranty": "Garanzia",
+          "availabilityDescription": "Descrizione Disponibilità",
+          "searchKeywords": "Parole Chiave di Ricerca",
+          "options": "Opzioni",
+          "modifiers": "Modificatori",
+          "customFields": "Campi Personalizzati"
+        }
+      }
+    },
+    "variants": {
+      "title": "Varianti",
+      "optionLabel": "Etichetta Opzione",
+      "form": {
+        "addOption": "Aggiungi Opzione",
+        "removeOption": "Rimuovi Opzione",
+        "optionName": "Nome Opzione",
+        "optionValue": "Valore Opzione"
+      }
+    },
+    "customFields": {
+      "title": "Campi Personalizzati",
+      "name": "Nome Campo",
+      "value": "Valore Campo",
+      "form": {
+        "addField": "Aggiungi Campo Personalizzato",
+        "removeField": "Rimuovi Campo"
+      }
+    },
+    "modifiers": {
+      "title": "Modificatori",
+      "name": "Nome Modificatore",
+      "optionLabel": "Etichetta Opzione",
+      "defaultValue": "Valore Predefinito",
+      "form": {
+        "addModifier": "Aggiungi Modificatore",
+        "removeModifier": "Rimuovi Modificatore",
+        "required": "Obbligatorio",
+        "checkedByDefault": "Selezionato di Default",
+        "defaultValue": "Valore Predefinito"
+      }
+    },
+    "common": {
+      "save": "Salva",
+      "cancel": "Annulla",
+      "loading": "Caricamento...",
+      "error": "Si è verificato un errore",
+      "success": "Modifiche salvate con successo",
+      "required": "Obbligatorio",
+      "optional": "Opzionale",
+      "actions": {
+        "save": "Salva Modifiche",
+        "saving": "Salvataggio...",
+        "cancel": "Annulla",
+        "edit": "Modifica",
+        "delete": "Elimina"
+      }
+    }
+  }
+} 

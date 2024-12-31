@@ -58,7 +58,8 @@
         },
         "localeSelector": {
           "label": "Seleccionar Idioma",
-          "placeholder": "Elija un idioma..."
+          "placeholder": "Elegir un idioma...",
+          "callout": "Selecciona un idioma arriba para comenzar a editar las traducciones de este producto."
         },
         "fields": {
           "name": "Nombre del Producto",

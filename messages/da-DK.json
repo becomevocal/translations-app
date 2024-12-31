@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Flersprogede oversættelser",
+    "getStarted": {
+      "title": "Kom i gang",
+      "description": "Vælg en kanal og et sprog for at begynde at oversætte dine produkter.",
+      "selectChannel": "Vælg kanal",
+      "selectLocale": "Vælg sprog",
+      "checking": "Kontrollerer flersproget funktionalitet...",
+      "active": "Flersproget funktionalitet er aktiv!",
+      "inactive": "Flersproget funktionalitet er ikke tilgængelig.",
+      "checkingDescription": "Vent venligst mens vi kontrollerer din butikskonfiguration.",
+      "activeDescription": "Din butik er klar til at bruge flere sprog.",
+      "inactiveDescription": "Din nuværende plan understøtter ikke flere sprog.",
+      "startWorkflow": "Start oversættelsesarbejdsgang",
+      "contactSupport": "Kontakt support"
+    },
+    "home": {
+      "welcome": "Velkommen til Oversættelsescenteret!",
+      "description": "Her kan du lære om håndtering af flere sprog i din Catalyst-butik."
+    },
+    "resources": {
+      "title": "Ressourcer",
+      "translationGuide": {
+        "title": "Oversættelsesguide",
+        "description": "Lær bedste praksis for oversættelse af dit katalogindhold",
+        "links": {
+          "bestPractices": "Bedste oversættelsespraksis",
+          "managing": "Håndtering af flersproget indhold"
+        }
+      },
+      "support": {
+        "title": "Oversættelsesstøtte",
+        "description": "Få hjælp til håndtering af oversættelser og lokaliseringsindstillinger",
+        "links": {
+          "faq": "Oversættelses-FAQ",
+          "settings": "Lokaliseringsindstillinger"
+        }
+      }
+    },
+    "products": {
+      "title": "Produkter",
+      "name": "Produktnavn",
+      "description": "Beskrivelse",
+      "seo": {
+        "title": "SEO-titel",
+        "description": "SEO-beskrivelse"
+      },
+      "form": {
+        "loading": "Indlæser produktinformation...",
+        "loadingError": "Fejl ved indlæsning af produktinformation",
+        "savingError": "Fejl ved gemning af produktinformation",
+        "saveSuccess": "Produktinformation gemt med succes",
+        "unsavedChanges": "Du har ikke-gemte ændringer",
+        "channelSelector": {
+          "label": "Vælg kanal",
+          "placeholder": "Vælg en kanal..."
+        },
+        "localeSelector": {
+          "label": "Vælg sprog",
+          "placeholder": "Vælg et sprog...",
+          "callout": "Vælg et sprog ovenfor for at begynde at redigere oversættelser for dette produkt."
+        },
+        "fields": {
+          "name": "Produktnavn",
+          "description": "Beskrivelse",
+          "pageTitle": "Sidetitel",
+          "metaDescription": "Meta-beskrivelse",
+          "preOrderMessage": "Forudbestillingsbesked",
+          "warranty": "Garanti",
+          "availabilityDescription": "Tilgængelighedsbeskrivelse",
+          "searchKeywords": "Søgeord",
+          "options": "Muligheder",
+          "modifiers": "Modifikatorer",
+          "customFields": "Tilpassede felter"
+        }
+      }
+    },
+    "variants": {
+      "title": "Varianter",
+      "optionLabel": "Valgmulighed etiket",
+      "form": {
+        "addOption": "Tilføj valgmulighed",
+        "removeOption": "Fjern valgmulighed",
+        "optionName": "Valgmulighed navn",
+        "optionValue": "Valgmulighed værdi"
+      }
+    },
+    "customFields": {
+      "title": "Tilpassede felter",
+      "name": "Feltnavn",
+      "value": "Feltværdi",
+      "form": {
+        "addField": "Tilføj tilpasset felt",
+        "removeField": "Fjern felt"
+      }
+    },
+    "modifiers": {
+      "title": "Modifikatorer",
+      "name": "Modifikatornavn",
+      "optionLabel": "Valgmulighed etiket",
+      "defaultValue": "Standardværdi",
+      "form": {
+        "addModifier": "Tilføj modifikator",
+        "removeModifier": "Fjern modifikator",
+        "required": "Påkrævet",
+        "checkedByDefault": "Markeret som standard",
+        "defaultValue": "Standardværdi"
+      }
+    },
+    "common": {
+      "save": "Gem",
+      "cancel": "Annuller",
+      "loading": "Indlæser...",
+      "error": "Der opstod en fejl",
+      "success": "Ændringer gemt med succes",
+      "required": "Påkrævet",
+      "optional": "Valgfri",
+      "actions": {
+        "save": "Gem ændringer",
+        "saving": "Gemmer...",
+        "cancel": "Annuller",
+        "edit": "Rediger",
+        "delete": "Slet"
+      }
+    }
+  }
+} 

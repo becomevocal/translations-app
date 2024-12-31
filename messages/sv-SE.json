@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Flerspråkiga översättningar",
+    "getStarted": {
+      "title": "Kom igång",
+      "description": "Välj en kanal och ett språk för att börja översätta dina produkter.",
+      "selectChannel": "Välj kanal",
+      "selectLocale": "Välj språk",
+      "checking": "Kontrollerar flerspråkig funktionalitet...",
+      "active": "Flerspråkig funktionalitet är aktiv!",
+      "inactive": "Flerspråkig funktionalitet är inte tillgänglig.",
+      "checkingDescription": "Vänta medan vi kontrollerar din butikskonfiguration.",
+      "activeDescription": "Din butik är redo att använda flera språk.",
+      "inactiveDescription": "Din nuvarande plan stöder inte flera språk.",
+      "startWorkflow": "Starta översättningsflöde",
+      "contactSupport": "Kontakta support"
+    },
+    "home": {
+      "welcome": "Välkommen till Översättningscentret!",
+      "description": "Här kan du lära dig om hantering av flera språk i din Catalyst-butik."
+    },
+    "resources": {
+      "title": "Resurser",
+      "translationGuide": {
+        "title": "Översättningsguide",
+        "description": "Lär dig bästa praxis för att översätta ditt kataloginnehåll",
+        "links": {
+          "bestPractices": "Bästa översättningspraxis",
+          "managing": "Hantera flerspråkigt innehåll"
+        }
+      },
+      "support": {
+        "title": "Översättningssupport",
+        "description": "Få hjälp med att hantera översättningar och lokaliseringsinställningar",
+        "links": {
+          "faq": "Översättnings-FAQ",
+          "settings": "Lokaliseringsinställningar"
+        }
+      }
+    },
+    "products": {
+      "title": "Produkter",
+      "name": "Produktnamn",
+      "description": "Beskrivning",
+      "seo": {
+        "title": "SEO-titel",
+        "description": "SEO-beskrivning"
+      },
+      "form": {
+        "loading": "Laddar produktinformation...",
+        "loadingError": "Fel vid laddning av produktinformation",
+        "savingError": "Fel vid sparande av produktinformation",
+        "saveSuccess": "Produktinformation sparad",
+        "unsavedChanges": "Du har osparade ändringar",
+        "channelSelector": {
+          "label": "Välj kanal",
+          "placeholder": "Välj en kanal..."
+        },
+        "localeSelector": {
+          "label": "Välj språk",
+          "placeholder": "Välj ett språk...",
+          "callout": "Välj ett språk ovan för att börja redigera översättningar för denna produkt."
+        },
+        "fields": {
+          "name": "Produktnamn",
+          "description": "Beskrivning",
+          "pageTitle": "Sidtitel",
+          "metaDescription": "Metabeskrivning",
+          "preOrderMessage": "Förbeställningsmeddelande",
+          "warranty": "Garanti",
+          "availabilityDescription": "Tillgänglighetsbeskrivning",
+          "searchKeywords": "Sökord",
+          "options": "Alternativ",
+          "modifiers": "Modifierare",
+          "customFields": "Anpassade fält"
+        }
+      }
+    },
+    "variants": {
+      "title": "Varianter",
+      "optionLabel": "Alternativetikett",
+      "form": {
+        "addOption": "Lägg till alternativ",
+        "removeOption": "Ta bort alternativ",
+        "optionName": "Alternativnamn",
+        "optionValue": "Alternativvärde"
+      }
+    },
+    "customFields": {
+      "title": "Anpassade fält",
+      "name": "Fältnamn",
+      "value": "Fältvärde",
+      "form": {
+        "addField": "Lägg till anpassat fält",
+        "removeField": "Ta bort fält"
+      }
+    },
+    "modifiers": {
+      "title": "Modifierare",
+      "name": "Modifierarnamn",
+      "optionLabel": "Alternativetikett",
+      "defaultValue": "Standardvärde",
+      "form": {
+        "addModifier": "Lägg till modifierare",
+        "removeModifier": "Ta bort modifierare",
+        "required": "Obligatorisk",
+        "checkedByDefault": "Förkryssad som standard",
+        "defaultValue": "Standardvärde"
+      }
+    },
+    "common": {
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "loading": "Laddar...",
+      "error": "Ett fel har uppstått",
+      "success": "Ändringar sparade",
+      "required": "Obligatorisk",
+      "optional": "Valfri",
+      "actions": {
+        "save": "Spara ändringar",
+        "saving": "Sparar...",
+        "cancel": "Avbryt",
+        "edit": "Redigera",
+        "delete": "Ta bort"
+      }
+    }
+  }
+} 

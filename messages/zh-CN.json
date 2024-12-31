@@ -1,0 +1,130 @@
+{
+  "app": {
+    "title": "多语言翻译",
+    "getStarted": {
+      "title": "开始使用",
+      "description": "选择一个渠道和语言以开始翻译您的产品。",
+      "selectChannel": "选择渠道",
+      "selectLocale": "选择语言",
+      "checking": "正在检查多语言功能...",
+      "active": "多语言功能已激活！",
+      "inactive": "多语言功能不可用。",
+      "checkingDescription": "请稍候，我们正在检查您商店的配置。",
+      "activeDescription": "您的商店已准备好使用多种语言。",
+      "inactiveDescription": "您当前的计划不支持多种语言。",
+      "startWorkflow": "开始翻译工作流程",
+      "contactSupport": "联系支持"
+    },
+    "home": {
+      "welcome": "欢迎来到翻译中心！",
+      "description": "在这里您可以了解如何在您的Catalyst店铺中管理多种语言。"
+    },
+    "resources": {
+      "title": "资源",
+      "translationGuide": {
+        "title": "翻译指南",
+        "description": "了解翻译您的商品目录内容的最佳实践",
+        "links": {
+          "bestPractices": "翻译最佳实践",
+          "managing": "管理多语言内容"
+        }
+      },
+      "support": {
+        "title": "翻译支持",
+        "description": "获取管理翻译和本地化设置的帮助",
+        "links": {
+          "faq": "翻译常见问题",
+          "settings": "本地化设置"
+        }
+      }
+    },
+    "products": {
+      "title": "产品",
+      "name": "产品名称",
+      "description": "描述",
+      "seo": {
+        "title": "SEO标题",
+        "description": "SEO描述"
+      },
+      "form": {
+        "loading": "正在加载产品信息...",
+        "loadingError": "加载产品信息时出错",
+        "savingError": "保存产品信息时出错",
+        "saveSuccess": "产品信息保存成功",
+        "unsavedChanges": "您有未保存的更改",
+        "channelSelector": {
+          "label": "选择渠道",
+          "placeholder": "选择一个渠道..."
+        },
+        "localeSelector": {
+          "label": "选择语言",
+          "placeholder": "选择一种语言..."
+        },
+        "fields": {
+          "name": "产品名称",
+          "description": "描述",
+          "pageTitle": "页面标题",
+          "metaDescription": "元描述",
+          "preOrderMessage": "预订信息",
+          "warranty": "保修",
+          "availabilityDescription": "可用性描述",
+          "searchKeywords": "搜索关键词",
+          "options": "选项",
+          "modifiers": "修改器",
+          "customFields": "自定义字段"
+        }
+      }
+    },
+    "variants": {
+      "title": "变体",
+      "optionLabel": "选项标签",
+      "form": {
+        "addOption": "添加选项",
+        "removeOption": "删除选项",
+        "optionName": "选项名称",
+        "optionValue": "选项值"
+      }
+    },
+    "customFields": {
+      "title": "自定义字段",
+      "name": "字段名称",
+      "value": "字段值",
+      "form": {
+        "addField": "添加自定义字段",
+        "removeField": "删除字段"
+      }
+    },
+    "modifiers": {
+      "title": "修改器",
+      "name": "修改器名称",
+      "optionLabel": "选项标签",
+      "defaultValue": "默认值",
+      "form": {
+        "addModifier": "添加修改器",
+        "removeModifier": "删除修改器",
+        "required": "必填",
+        "checkedByDefault": "默认选中",
+        "defaultValue": "默认值"
+      }
+    },
+    "common": {
+      "save": "保存",
+      "cancel": "取消",
+      "loading": "加载中...",
+      "error": "发生错误",
+      "success": "更改保存成功",
+      "required": "必填",
+      "optional": "可选",
+      "actions": {
+        "save": "保存更改",
+        "saving": "保存中...",
+        "cancel": "取消",
+        "edit": "编辑",
+        "delete": "删除"
+      }
+    },
+    "localeSelector": {
+      "callout": "在上方选择语言以开始编辑此产品的翻译。"
+    }
+  }
+} 
