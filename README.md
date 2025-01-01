@@ -30,7 +30,7 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Add Sentry error tracking
 - [x] Translate app strings (including API route responses and setting user locale via JWT)
 - [x] Use default locale and available locales from channel locale settings instead of constant
-- [ ] Verify app extension is only added once after app is reinstalled 
+- [x] Verify app extension is only added once after app is reinstalled 
 - [ ] Simplify multiple database support, setup, and deployment docs
 - [ ] Pull out Admin GraphQL client into a separate package
 - [ ] Add import / export functionality
