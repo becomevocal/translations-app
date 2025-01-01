@@ -1,33 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { z } from "zod";
 import db from "@/lib/db";
 import { createAppExtension } from "@/lib/appExtensions";
 import { encodePayload } from "@/lib/auth";
+import { oauthResponseSchema, queryParamSchema, sessionPayloadSchema } from "@/lib/authorize";
 import { setSession, createSession } from "@/lib/session";
 import { SignJWT } from "jose";
-
-const queryParamSchema = z.object({
-  code: z.string(),
-  scope: z.string(),
-  context: z.string(),
-});
-
-const oauthResponseSchema = z.object({
-  access_token: z.string(),
-  scope: z.string(),
-  user: z.object({
-    id: z.number(),
-    username: z.string(),
-    email: z.string(),
-  }),
-  owner: z.object({
-    id: z.number(),
-    username: z.string(),
-    email: z.string(),
-  }),
-  context: z.string(),
-  account_uuid: z.string(),
-});
 
 export async function GET(req: NextRequest) {
   const parsedParams = queryParamSchema.safeParse(
@@ -106,19 +85,41 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const clientToken = await new SignJWT({
-    exp: Math.floor(Date.now() / 1000) + 60 * 60,
+  // Since the auth callback *doesn't* return a user.locale, we need to use the browser locale.
+  // (When the user loads the app after it's auth'd, the load callback *does* return a user.locale
+  const userBrowserLocale = req.headers.get('Accept-Language')?.split(',')[0] || 'en-US';
+
+  const jwtPayload: z.infer<typeof sessionPayloadSchema> = {
+    aud: process.env.CLIENT_ID!,
+    iss: 'bc',
     iat: Math.floor(Date.now() / 1000),
     nbf: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour
+    jti: randomUUID(),
+    sub: `stores/${storeHash}`,
+    user: {
+      id: oauthUser.id,
+      email: oauthUser.email,
+      locale: userBrowserLocale
+    },
+    owner: {
+      id: authOwner.id,
+      email: authOwner.email
+    },
+    url: '',
+    channel_id: null,
     userId: oauthUser.id,
-    path : "/",
+    email: oauthUser.email,
     channelId: null,
     storeHash,
-  })
+    locale: userBrowserLocale
+  };
+
+  const clientToken = await new SignJWT(jwtPayload)
   .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
   .sign(new TextEncoder().encode(process.env.JWT_KEY));
 
-  // await setSession(clientToken, storeHash);
+  await setSession(clientToken, storeHash);
   const { name, value, config } = await createSession(clientToken, storeHash);
 
   const encodedContext = encodePayload({ context, user: oauthUser, owner: authOwner });

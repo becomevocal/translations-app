@@ -1,54 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import db from "@/lib/db";
 import { encodePayload } from "@/lib/auth";
+import { LoadCallbackJwtPayloadSchema } from "@/lib/authorize";
 import { createSession, setSession } from "@/lib/session";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-
-const queryParamSchema = z.object({
-  code: z.string(),
-  scope: z.string(),
-  context: z.string(),
-});
-
-const oauthResponseSchema = z.object({
-  access_token: z.string(),
-  scope: z.string(),
-  user: z.object({
-    id: z.number(),
-    username: z.string(),
-    email: z.string(),
-  }),
-  owner: z.object({
-    id: z.number(),
-    username: z.string(),
-    email: z.string(),
-  }),
-  context: z.string(),
-  account_uuid: z.string(),
-});
-
-const jwtSchema = z.object({
-  aud: z.string(),
-  iss: z.string(),
-  iat: z.number(),
-  nbf: z.number(),
-  exp: z.number(),
-  jti: z.string(),
-  sub: z.string(),
-  user: z.object({
-    id: z.number(),
-    email: z.string().email(),
-    locale: z.string(),
-  }),
-  owner: z.object({
-    id: z.number(),
-    email: z.string().email(),
-  }),
-  url: z.string(),
-  channel_id: z.number().nullable(),
-});
 
 const buildRedirectUrl = (url: string, encodedContext: string) => {
     const [path, query = ''] = url.split('?');
@@ -71,7 +26,7 @@ export async function GET(req: NextRequest) {
     new TextEncoder().encode(process.env.CLIENT_SECRET)
   );
 
-  const parsedJwt = jwtSchema.safeParse(payload);
+  const parsedJwt = LoadCallbackJwtPayloadSchema.safeParse(payload);
 
   if (!parsedJwt.success) {
     return new NextResponse("JWT properties invalid", { status: 403 });
@@ -87,6 +42,7 @@ export async function GET(req: NextRequest) {
     iat: payload.iat,
     nbf: payload.iat,
     userId: user.id,
+    email: user.email,
     channelId: payload.channel_id,
     storeHash,
     locale: user.locale,
