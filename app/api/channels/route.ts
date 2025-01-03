@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { bigcommerceClient, getSession } from "@/lib/auth";
+import { BigCommerceClient } from '@/lib/bigcommerce-client';
 import { fallbackLocale, hardcodedAvailableLocales } from '@/lib/constants';
 import { unstable_cache } from 'next/cache';
 
@@ -31,14 +32,17 @@ export async function GET(
 
   try {
     const { accessToken, storeHash } = await getSession({ query: { context } });
-    const bigcommerce = bigcommerceClient(accessToken, storeHash);
+    const bigcommerce = new BigCommerceClient({
+      accessToken: accessToken,
+      storeHash: storeHash,
+    });
 
     const getChannelsData = async (): Promise<ChannelResponse[]> => {
-      const { data: channelsData } = await bigcommerce.get('/channels?available=true');
+      const { data: channelsData } = await bigcommerce.getAvailableChannels();
 
       const result = await Promise.all(channelsData.map(async (channel: Channel) => {
         try {
-          const { data: localesData } = await bigcommerce.get(`/settings/store/locales?channel_id=${channel.id}`);
+          const { data: localesData } = await bigcommerce.getChannelLocales(channel.id);
           const locales: Locale[] = localesData.map((locale: { code: string, status: string, is_default: boolean }) => ({
             ...locale,
             title: hardcodedAvailableLocales.find(({ id }) => id === locale.code)?.name,
@@ -77,12 +81,12 @@ export async function GET(
         tags: [`store-${storeHash}`], // Tag for cache invalidation
       }
     )();
-    
+
     return Response.json(cachedData);
   } catch (error: any) {
     const { message, response } = error;
 
-    return new Response(message || "Authentication failed, please re-install", {
+    return new Response(message || 'Authentication failed, please re-install', {
       status: response?.status || 500,
     });
   }

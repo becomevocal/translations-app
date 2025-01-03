@@ -1,19 +1,19 @@
 import { type NextRequest } from "next/server";
-import { bigcommerceClient } from "@/lib/auth";
+import { BigCommerceClient } from "@/lib/bigcommerce-client";
 import { unstable_cache } from "next/cache";
 import db from "@/lib/db";
 import { authorize } from "@/lib/authorize";
 
 async function getStoreData(
-  accessToken: string | null,
+  accessToken: string | undefined,
   storeHash: string | undefined
 ) {
-  const bigcommerce = bigcommerceClient(
-    accessToken || "",
-    storeHash || "",
-    "v2"
-  );
-  const storeSettings = await bigcommerce.get("/store");
+  const bigcommerce = new BigCommerceClient({
+    accessToken: accessToken,
+    storeHash: storeHash,
+  });
+
+  const storeSettings = await bigcommerce.getStoreInformation();
 
   return {
     multi_language_enabled:
@@ -30,25 +30,21 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    let accessToken: string | null;
-    let storeHash: string | undefined;
-
     const authData = await authorize();
-    storeHash = authData?.storeHash;
-
-    if (storeHash === null || storeHash === undefined) {
+    
+    if (authData?.storeHash === null || authData?.storeHash === undefined) {
       throw Error("Store hash is null or undefined");
     }
-
-    accessToken = await db.getStoreToken(storeHash);
+    
+    const accessToken = await db.getStoreToken(authData.storeHash);
 
     // Cache per storeHash
     const cachedData = await unstable_cache(
-      async () => getStoreData(accessToken, storeHash),
-      [`store-information-${storeHash}`], // cache key
+      async () => getStoreData(accessToken, authData.storeHash),
+      [`store-information-${authData.storeHash}`], // cache key
       {
         revalidate: 3600, // Cache for 1 hour
-        tags: [`store-${storeHash}`], // Tag for cache invalidation
+        tags: [`store-${authData.storeHash}`], // Tag for cache invalidation
       }
     )();
 

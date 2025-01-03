@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { encodePayload } from "@/lib/auth";
-import { LoadCallbackJwtPayloadSchema } from "@/lib/authorize";
+import { encodeSessionPayload } from "@/lib/auth";
+import { loadCallbackJwtPayloadSchema } from "@/lib/authorize";
 import { createSession, setSession } from "@/lib/session";
-import { SignJWT, jwtVerify } from "jose";
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const buildRedirectUrl = (url: string, encodedContext: string) => {
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     new TextEncoder().encode(process.env.CLIENT_SECRET)
   );
 
-  const parsedJwt = LoadCallbackJwtPayloadSchema.safeParse(payload);
+  const parsedJwt = loadCallbackJwtPayloadSchema.safeParse(payload);
 
   if (!parsedJwt.success) {
     return new NextResponse("JWT properties invalid", { status: 403 });
@@ -36,19 +36,13 @@ export async function GET(req: NextRequest) {
 
   const storeHash = sub.split("/")[1] as string;
 
-  const clientToken = await new SignJWT({
-    ...payload,
-    exp: payload.exp,
-    iat: payload.iat,
-    nbf: payload.iat,
+  const clientToken = await encodeSessionPayload({
     userId: user.id,
-    email: user.email,
-    channelId: payload.channel_id,
+    userEmail: user.email,
+    channelId: Number(payload?.channel_id) || null,
     storeHash,
-    locale: user.locale,
-  })
-    .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-    .sign(new TextEncoder().encode(process.env.JWT_KEY));
+    userLocale: user.locale
+  });
 
   // create new searchParams preserving the existing ones but removing the signed_payload_jwt
   const newSearchParams = new URLSearchParams(rUrl.searchParams.toString());
@@ -60,14 +54,8 @@ export async function GET(req: NextRequest) {
   const cookieStore = await cookies()
   cookieStore.set(name, value, config)
 
-  const encodedContext = encodePayload({
-    context: parsedJwt.data.sub,
-    user: parsedJwt.data.user,
-    owner: parsedJwt.data.owner,
-  });
-
   const response = NextResponse.redirect(
-    `${process.env.APP_ORIGIN}${buildRedirectUrl(parsedJwt.data.url ?? '/', `${encodedContext}&${newSearchParams.toString()}`)}`,
+    `${process.env.APP_ORIGIN}${buildRedirectUrl(parsedJwt.data.url ?? '/', `${clientToken}&${newSearchParams.toString()}`)}`,
     {
       status: 307,
     }

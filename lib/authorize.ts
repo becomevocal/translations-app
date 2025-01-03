@@ -25,7 +25,7 @@ export const oauthResponseSchema = z.object({
   account_uuid: z.string(),
 });
 
-export const LoadCallbackJwtPayloadSchema = z.object({
+export const loadCallbackJwtPayloadSchema = z.object({
   aud: z.string(),
   iss: z.string(),
   iat: z.number(),
@@ -46,12 +46,12 @@ export const LoadCallbackJwtPayloadSchema = z.object({
   channel_id: z.number().nullable(),
 });
 
-export const sessionPayloadSchema = LoadCallbackJwtPayloadSchema.extend({
-  userId: z.number(),
-  email: z.string(),
+export const appSessionPayloadSchema = z.object({
   channelId: z.number().nullable(),
   storeHash: z.string(),
-  locale: z.string().optional(),
+  userId: z.number(),
+  userEmail: z.string(),
+  userLocale: z.string().optional(),
 });
 
 export async function authorize() {
@@ -64,7 +64,7 @@ export async function authorize() {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_KEY as string);
-    const parsed = sessionPayloadSchema.safeParse(payload);
+    const parsed = appSessionPayloadSchema.safeParse(payload);
 
     if (!parsed.success) {
       console.log('Schema validation failed:', parsed.error);

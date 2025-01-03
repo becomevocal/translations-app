@@ -2,6 +2,7 @@ export interface User {
     email: string;
     id: number;
     username?: string;
+    locale?: string;
 }
 
 export interface SessionProps {

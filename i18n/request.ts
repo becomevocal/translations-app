@@ -1,7 +1,7 @@
 import { getRequestConfig } from 'next-intl/server';
-import { decodePayload } from '@/lib/auth';
+import { decodeSessionPayload } from '@/lib/auth';
 import { getSessionToken } from '@/lib/session';
- 
+
 export default getRequestConfig(async () => {
   let userLocale = 'en-US'; // default fallback
   
@@ -9,13 +9,10 @@ export default getRequestConfig(async () => {
     const sessionToken = await getSessionToken();
     
     if (sessionToken) {
-      const payload = decodePayload(sessionToken);
+      const payload = await decodeSessionPayload(sessionToken);
       
-      if (typeof payload === 'object' && payload !== null && 
-          'user' in payload && 
-          typeof payload.user === 'object' && payload.user !== null &&
-          'locale' in payload.user) {
-        userLocale = payload.user.locale;
+      if (payload?.userLocale) {
+        userLocale = payload.userLocale;
       }
     }
   } catch (error) {

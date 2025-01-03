@@ -1,12 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
 import { z } from "zod";
 import db from "@/lib/db";
 import { createAppExtension } from "@/lib/appExtensions";
-import { encodePayload } from "@/lib/auth";
-import { oauthResponseSchema, queryParamSchema, sessionPayloadSchema } from "@/lib/authorize";
+import { encodeSessionPayload } from "@/lib/auth";
+import { oauthResponseSchema, queryParamSchema, appSessionPayloadSchema } from "@/lib/authorize";
 import { setSession, createSession } from "@/lib/session";
-import { SignJWT } from "jose";
 
 export async function GET(req: NextRequest) {
   const parsedParams = queryParamSchema.safeParse(
@@ -89,42 +87,18 @@ export async function GET(req: NextRequest) {
   // (When the user loads the app after it's auth'd, the load callback *does* return a user.locale
   const userBrowserLocale = req.headers.get('Accept-Language')?.split(',')[0] || 'en-US';
 
-  const jwtPayload: z.infer<typeof sessionPayloadSchema> = {
-    aud: process.env.CLIENT_ID!,
-    iss: 'bc',
-    iat: Math.floor(Date.now() / 1000),
-    nbf: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour
-    jti: randomUUID(),
-    sub: `stores/${storeHash}`,
-    user: {
-      id: oauthUser.id,
-      email: oauthUser.email,
-      locale: userBrowserLocale
-    },
-    owner: {
-      id: authOwner.id,
-      email: authOwner.email
-    },
-    url: '',
-    channel_id: null,
+  const clientToken = await encodeSessionPayload({
     userId: oauthUser.id,
-    email: oauthUser.email,
+    userEmail: oauthUser.email,
     channelId: null,
     storeHash,
-    locale: userBrowserLocale
-  };
-
-  const clientToken = await new SignJWT(jwtPayload)
-  .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-  .sign(new TextEncoder().encode(process.env.JWT_KEY));
+    userLocale: userBrowserLocale
+  });
 
   await setSession(clientToken, storeHash);
   const { name, value, config } = await createSession(clientToken, storeHash);
 
-  const encodedContext = encodePayload({ context, user: oauthUser, owner: authOwner });
-
-  const response = NextResponse.redirect(`${process.env.APP_ORIGIN}/?context=${encodedContext}`, {
+  const response = NextResponse.redirect(`${process.env.APP_ORIGIN}/?context=${clientToken}`, {
     status: 302,
     statusText: "Found",
   });

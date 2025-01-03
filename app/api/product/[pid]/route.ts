@@ -1,5 +1,6 @@
 import { type NextRequest } from "next/server";
-import { bigcommerceClient, getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
+import { BigCommerceClient } from "@/lib/bigcommerce-client";
 import {
   fallbackLocale,
   translatableProductFields,
@@ -1223,10 +1224,11 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
     } else {
       // This is for the default lang, so update the main product
       // (currently the front-end does not allow this)
-      const { data: updatedProduct } = await bigcommerceClient(
+      const bigcommerce = new BigCommerceClient({
         accessToken,
-        storeHash
-      ).put(`/catalog/products/${pid}`, body);
+        storeHash,
+      });
+      const { data: updatedProduct } = await bigcommerce.put(`/v3/catalog/products/${pid}`, body);
       result = updatedProduct;
     }
 
