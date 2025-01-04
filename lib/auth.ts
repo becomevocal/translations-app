@@ -87,17 +87,30 @@ export async function decodeSessionPayload(encodedContext: string) {
 
 // Removes store and storeUser on uninstall
 export async function removeDataStore(session: SessionProps) {
-  await db.deleteStore(session);
-  await db.deleteUser(session);
+  if (!session.store_hash) return;
+
+  await db.deleteStore(session.store_hash);
+  if (session.user) {
+    await db.deleteUser(session.store_hash, session.user);
+  }
 }
 
 // Removes users from app - getSession() for user will fail after user is removed
 export async function removeUserData(session: SessionProps) {
-  await db.deleteUser(session);
+  if (!session.store_hash) return;
+  
+  await db.deleteUser(session.store_hash, {
+    id: session.user.id,
+    email: session.user.email,
+    username: session.user.username
+  });
 }
 
 // Removes user from storeUsers on logout
 export async function logoutUser({ storeHash, user }: SessionContextProps) {
-  const session = { context: `store/${storeHash}`, user };
-  await db.deleteUser(session);
+  await db.deleteUser(storeHash, {
+    id: user.id,
+    email: user.email,
+    username: user.username
+  });
 }

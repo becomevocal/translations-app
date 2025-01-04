@@ -6,7 +6,7 @@ import { authorize } from "@/lib/authorize";
 
 async function getStoreData(
   accessToken: string | undefined,
-  storeHash: string | undefined
+  storeHash: string
 ) {
   const bigcommerce = new BigCommerceClient({
     accessToken: accessToken,
@@ -32,19 +32,20 @@ export async function GET(request: NextRequest) {
   try {
     const authData = await authorize();
     
-    if (authData?.storeHash === null || authData?.storeHash === undefined) {
-      throw Error("Store hash is null or undefined");
+    if (!authData) {
+      throw Error("Authorization failed");
     }
-    
-    const accessToken = await db.getStoreToken(authData.storeHash);
+
+    const { storeHash } = authData;
+    const accessToken = await db.getStoreToken(storeHash);
 
     // Cache per storeHash
     const cachedData = await unstable_cache(
-      async () => getStoreData(accessToken, authData.storeHash),
-      [`store-information-${authData.storeHash}`], // cache key
+      async () => getStoreData(accessToken, storeHash),
+      [`store-information-${storeHash}`], // cache key
       {
         revalidate: 3600, // Cache for 1 hour
-        tags: [`store-${authData.storeHash}`], // Tag for cache invalidation
+        tags: [`store-${storeHash}`], // Tag for cache invalidation
       }
     )();
 

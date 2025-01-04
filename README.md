@@ -37,6 +37,63 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 
 ## Getting Started
 
+### Database Setup
+
+This app uses [Drizzle ORM](https://orm.drizzle.team) for database management and supports multiple database types:
+
+#### Option 1: Vercel Postgres (Recommended for Production)
+
+1. Create a Postgres database on Vercel:
+   ```bash
+   # Install Vercel CLI if you haven't already
+   npm i -g vercel
+   
+   # Link your project to Vercel
+   vercel link
+   
+   # Create a new Postgres database
+   vercel storage create postgres multi-lang-translations-db
+   ```
+
+2. Set up your environment variables:
+   ```bash
+   # Pull environment variables from Vercel
+   vercel env pull .env
+   ```
+   This will populate your `.env` file with the necessary `POSTGRES_*` variables.
+
+#### Option 2: SQLite (Good for Development)
+
+1. Set your environment variables in `.env`:
+   ```bash
+   DB_TYPE=sqlite
+   DATABASE_URL=sqlite:./local.db
+   ```
+
+#### Option 3: MySQL
+
+1. Set your environment variables in `.env`:
+   ```bash
+   DB_TYPE=mysql
+   DATABASE_URL=mysql://user:password@host:port/database
+   ```
+
+### Database Management
+
+After setting up your database, run these commands:
+
+1. Run database migrations:
+   ```bash
+   npm run db:migrate
+   ```
+
+2. (Optional) Use Drizzle Studio to manage your data:
+   ```bash
+   npm run db:studio
+   ```
+
+### Development Server
+
 ```bash
 npm install
 npm run dev

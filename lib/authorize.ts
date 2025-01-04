@@ -48,13 +48,21 @@ export const loadCallbackJwtPayloadSchema = z.object({
 
 export const appSessionPayloadSchema = z.object({
   channelId: z.number().nullable(),
-  storeHash: z.string(),
+  storeHash: z.string().min(1),
   userId: z.number(),
   userEmail: z.string(),
   userLocale: z.string().optional(),
 });
 
-export async function authorize() {
+type AuthData = null | {
+  channelId: number | null;
+  storeHash: NonNullable<string>;
+  userId: number;
+  userEmail: string;
+  userLocale?: string;
+};
+
+export async function authorize(): Promise<AuthData> {
   const token = await getSessionToken();
 
   if (!token) {
