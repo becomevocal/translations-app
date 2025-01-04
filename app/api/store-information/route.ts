@@ -5,9 +5,13 @@ import db from "@/lib/db";
 import { authorize } from "@/lib/authorize";
 
 async function getStoreData(
-  accessToken: string | undefined,
+  accessToken: string | null,
   storeHash: string
 ) {
+  if (!accessToken) {
+    throw new Error("BigCommerce API token is required");
+  }
+
   const bigcommerce = new BigCommerceClient({
     accessToken: accessToken,
     storeHash: storeHash,
