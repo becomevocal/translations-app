@@ -16,7 +16,8 @@ export const stores = mysqlTable('stores', {
   storeHash: varchar('storehash', { length: 10 }).notNull(),
   accessToken: varchar('accesstoken', { length: 255 }),
   scope: varchar('scope', { length: 255 }),
-  adminId: int('adminid').notNull()
+  ownerId: int('ownerid').notNull(),
+  accountUuid: varchar('accountuuid', { length: 255 }).notNull()
 }, (table) => {
   return {
     storeHashIdx: uniqueIndex('storehash_idx').on(table.storeHash),

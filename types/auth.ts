@@ -8,13 +8,14 @@ export interface User {
 export interface SessionProps {
     access_token?: string;
     context: string;
-    owner?: User;
+    owner: User;
     scope?: string;
     store_hash?: string;
     sub?: string;
     timestamp?: number;
     user: User;
-    url?: string
+    url?: string;
+    account_uuid?: string;
 }
 
 export interface SessionContextProps {

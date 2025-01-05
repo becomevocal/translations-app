@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { SignJWT, jwtVerify, JWTPayload } from "jose";
 import { QueryParams, SessionContextProps, SessionProps } from "../types";
-import { db } from "@/lib/db";
+import { dbClient as db } from "@/lib/db";
 import { BigCommerceClient } from "./bigcommerce-client";
 import { appSessionPayloadSchema } from "./authorize";
 

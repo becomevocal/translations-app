@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "node ./postinstall.mjs",
-    "db:generate": "drizzle-kit generate:$DB_TYPE",
-    "db:migrate": "tsx lib/db/drizzle_migrate.ts",
-    "db:push": "drizzle-kit push:$DB_TYPE",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

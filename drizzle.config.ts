@@ -18,7 +18,7 @@ function getDatabaseConfig(): Config {
     case 'mysql':
       return {
         ...baseConfig,
-        schema: './lib/dbs/drizzle_schema_mysql.ts',
+        schema: './lib/db/drizzle_schema_mysql.ts',
         dialect: 'mysql',
         dbCredentials: {
           url: DATABASE_URL
@@ -27,7 +27,7 @@ function getDatabaseConfig(): Config {
     case 'sqlite':
       return {
         ...baseConfig,
-        schema: './lib/dbs/drizzle_schema_sqlite.ts',
+        schema: './lib/db/drizzle_schema_sqlite.ts',
         dialect: 'sqlite',
         dbCredentials: {
           url: DATABASE_URL.replace('sqlite:', '')
@@ -36,7 +36,7 @@ function getDatabaseConfig(): Config {
     default: // postgres
       return {
         ...baseConfig,
-        schema: './lib/dbs/drizzle_schema_pg.ts',
+        schema: './lib/db/drizzle_schema_pg.ts',
         dialect: 'postgresql',
         dbCredentials: {
           url: DATABASE_URL

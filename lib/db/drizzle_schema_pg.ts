@@ -16,7 +16,8 @@ export const stores = pgTable('stores', {
   storeHash: varchar('storehash', { length: 10 }).notNull(),
   accessToken: text('accesstoken'),
   scope: text('scope'),
-  adminId: integer('adminid').notNull()
+  ownerId: integer('ownerid').notNull(),
+  accountUuid: text('accountuuid').notNull()
 }, (table) => {
   return {
     storeHashIdx: uniqueIndex('storehash_idx').on(table.storeHash),

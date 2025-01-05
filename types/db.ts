@@ -1,5 +1,3 @@
-import { SessionProps } from "./index";
-
 export interface StoreData {
   accessToken?: string;
   scope?: string;

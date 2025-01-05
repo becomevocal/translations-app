@@ -31,11 +31,26 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Translate app strings (including API route responses and setting user locale via JWT)
 - [x] Use default locale and available locales from channel locale settings instead of constant
 - [x] Verify app extension is only added once after app is reinstalled 
-- [ ] Simplify multiple database support, setup, and deployment docs
+- [x] Simplify multiple database support, setup, and deployment docs
+- [ ] Finish manual api token support
+- [ ] Streamline types across callbacks, sessions, and db functions
 - [ ] Pull out Admin GraphQL client into a separate package
 - [ ] Add import / export functionality
 
 ## Getting Started
+
+### Environment Variables Setup
+
+1. Copy the sample environment file:
+   ```bash
+   cp .env.sample .env.local
+   ```
+
+2. Update the following required variables in `.env.local`:
+   - `CLIENT_ID` and `CLIENT_SECRET`: Get these from the [BigCommerce Developer Portal](https://developer.bigcommerce.com/api-docs/apps/quick-start#register-a-draft-app)
+   - `APP_ORIGIN`: Your app's URL (for local development, this will be your ngrok URL)
+   - `JWT_KEY`: A secure random string of 32+ characters
+   - `DATABASE_URL`: Your database connection string (see Database Setup below)
 
 ### Database Setup
 
@@ -78,20 +93,29 @@ This app uses [Neon](https://vercel.com/marketplace/neon) (serverless Postgres) 
 
 After setting up your database, run these commands:
 
-1. Run database migrations:
+1. Install dependencies:
+   ```bash
+   npm run dev
+   ```
+
+2. Generate the database tables from the schema:
+   ```bash
+   npm run db:generate
+   ```
+
+3. Run database migrations to create the tables in your database:
    ```bash
    npm run db:migrate
    ```
 
-2. (Optional) Use Drizzle Studio to manage your data:
+4. (Optional) Use Drizzle Studio to manage your data:
    ```bash
    npm run db:studio
    ```
 
-### Development Server
+### Run the App Locally
 
 ```bash
-npm install
 npm run dev
 ```
 
