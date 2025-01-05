@@ -1,4 +1,4 @@
-import { drizzleDb } from '@/lib/db';
+import { db } from '.';
 import { migrate as pgMigrate } from 'drizzle-orm/vercel-postgres/migrator';
 import { migrate as mysqlMigrate } from 'drizzle-orm/mysql2/migrator';
 import { migrate as sqliteMigrate } from 'drizzle-orm/better-sqlite3/migrator';
@@ -12,13 +12,13 @@ async function main() {
   try {
     switch (DB_TYPE) {
       case 'mysql':
-        await mysqlMigrate(drizzleDb, { migrationsFolder: './drizzle' });
+        await mysqlMigrate(db, { migrationsFolder: './drizzle' });
         break;
       case 'sqlite':
-        await sqliteMigrate(drizzleDb, { migrationsFolder: './drizzle' });
+        await sqliteMigrate(db, { migrationsFolder: './drizzle' });
         break;
       default: // postgres
-        await pgMigrate(drizzleDb, { migrationsFolder: './drizzle' });
+        await pgMigrate(db, { migrationsFolder: './drizzle' });
         break;
     }
     console.log('Migrations completed successfully');

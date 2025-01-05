@@ -39,32 +39,27 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 
 ### Database Setup
 
-This app uses [Drizzle ORM](https://orm.drizzle.team) for database management and supports multiple database types:
+This app uses [Neon](https://vercel.com/marketplace/neon) (serverless Postgres) with [Drizzle ORM](https://orm.drizzle.team) for database management. It's also compatible with MySQL and SQLite with a tiny change to environment variables.
 
-#### Option 1: Vercel Postgres (Recommended for Production)
+#### Option 1: Postgres via Neon (Recommended for Production)
 
-1. Create a Postgres database on Vercel:
-   ```bash
-   # Install Vercel CLI if you haven't already
-   npm i -g vercel
-   
-   # Link your project to Vercel
-   vercel link
-   
-   # Create a new Postgres database
-   vercel storage create postgres multi-lang-translations-db
-   ```
+1. Create a Neon database through Vercel's marketplace:
+   - Visit [Neon on Vercel Marketplace](https://vercel.com/marketplace/neon)
+   - Click "Add Integration"
+   - Follow the setup instructions
 
 2. Set up your environment variables:
    ```bash
    # Pull environment variables from Vercel
-   vercel env pull .env
+   vercel env pull .env.local
    ```
-   This will populate your `.env` file with the necessary `POSTGRES_*` variables.
+   This will populate your `.env.local` file with the necessary `DATABASE_URL` variable.
 
-#### Option 2: SQLite (Good for Development)
+3. Ensure `DB_TYPE=postgres` is set in `.env.local`
 
-1. Set your environment variables in `.env`:
+#### Option 2: SQLite (Great for Development)
+
+1. Set your environment variables in `.env.local`:
    ```bash
    DB_TYPE=sqlite
    DATABASE_URL=sqlite:./local.db
@@ -77,6 +72,7 @@ This app uses [Drizzle ORM](https://orm.drizzle.team) for database management an
    DB_TYPE=mysql
    DATABASE_URL=mysql://user:password@host:port/database
    ```
+
 
 ### Database Management
 

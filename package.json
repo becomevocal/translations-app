@@ -8,9 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "node ./postinstall.mjs",
-    "postgres-seed": "node scripts/postgres-db.mjs",
     "db:generate": "drizzle-kit generate:$DB_TYPE",
-    "db:migrate": "tsx lib/dbs/migrate.ts",
+    "db:migrate": "tsx lib/db/drizzle_migrate.ts",
     "db:push": "drizzle-kit push:$DB_TYPE",
     "db:studio": "drizzle-kit studio"
   },

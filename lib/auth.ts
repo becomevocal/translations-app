@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { SignJWT, jwtVerify, JWTPayload } from "jose";
 import { QueryParams, SessionContextProps, SessionProps } from "../types";
-import db from "./db";
+import { db } from "@/lib/db";
 import { BigCommerceClient } from "./bigcommerce-client";
 import { appSessionPayloadSchema } from "./authorize";
 
@@ -98,7 +98,7 @@ export async function removeDataStore(session: SessionProps) {
 // Removes users from app - getSession() for user will fail after user is removed
 export async function removeUserData(session: SessionProps) {
   if (!session.store_hash) return;
-  
+
   await db.deleteUser(session.store_hash, {
     id: session.user.id,
     email: session.user.email,

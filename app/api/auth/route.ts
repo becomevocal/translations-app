@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import db from "@/lib/db";
+import { db } from "@/lib/db";
 import { createAppExtension } from "@/lib/appExtensions";
 import { encodeSessionPayload } from "@/lib/auth";
 import { oauthResponseSchema, queryParamSchema, appSessionPayloadSchema } from "@/lib/authorize";
@@ -36,6 +36,8 @@ export async function GET(req: NextRequest) {
 
   const parsedOAuthResponse = oauthResponseSchema.safeParse(body);
 
+  console.log(parsedOAuthResponse);
+
   if (!parsedOAuthResponse.success) {
     return new NextResponse("Invalid access token response", { status: 500 });
   }
@@ -46,6 +48,7 @@ export async function GET(req: NextRequest) {
     scope,
     user: oauthUser,
     owner: authOwner,
+    account_uuid: accountUuid,
   } = parsedOAuthResponse.data;
 
   const storeHash = context.split("/")[1];
