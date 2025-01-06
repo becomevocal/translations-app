@@ -32,9 +32,9 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Use default locale and available locales from channel locale settings instead of constant
 - [x] Verify app extension is only added once after app is reinstalled 
 - [x] Simplify multiple database support, setup, and deployment docs
-- [ ] Finish manual api token support
+- [x] Ability to explicitly set api token, store hash, and locale as env variables
 - [ ] Streamline types across callbacks, sessions, and db functions
-- [ ] Pull out Admin GraphQL client into a separate package
+- [ ] Pull out Admin GraphQL client into a separate package (also better handle query complexity)
 - [ ] Add import / export functionality
 
 ## Getting Started
@@ -72,7 +72,7 @@ This app uses [Neon](https://vercel.com/marketplace/neon) (serverless Postgres) 
 
 3. Ensure `DB_TYPE=postgres` is set in `.env.local`
 
-#### Option 2: SQLite (Great for Development)
+#### Option 2: SQLite (Great for development)
 
 1. Set your environment variables in `.env.local`:
    ```bash
@@ -87,7 +87,6 @@ This app uses [Neon](https://vercel.com/marketplace/neon) (serverless Postgres) 
    DB_TYPE=mysql
    DATABASE_URL=mysql://user:password@host:port/database
    ```
-
 
 ### Database Management
 

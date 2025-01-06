@@ -35,7 +35,7 @@ export function getBCAuth(query: QueryParams) {
 export async function getSession({ query: { context = "" } }) {
   if (typeof context !== "string") return;
 
-  if (DB_TYPE === "hardcoded") {
+  if (DB_TYPE === "explicit_store_token") {
     return {
       accessToken: HARDCODED_ACCESS_TOKEN,
       storeHash: HARDCODED_STORE_HASH,

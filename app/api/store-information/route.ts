@@ -41,7 +41,16 @@ export async function GET(request: NextRequest) {
     }
 
     const { storeHash } = authData;
-    const accessToken = await db.getStoreToken(storeHash);
+    let accessToken: string | null = null;
+    
+    if (process.env.DB_TYPE === "explicit_store_token") {
+      if (!process.env.HARDCODED_ACCESS_TOKEN) {
+        throw new Error("HARDCODED_ACCESS_TOKEN env var is not set");
+      }
+      accessToken = process.env.HARDCODED_ACCESS_TOKEN;
+    } else {
+      accessToken = await db.getStoreToken(storeHash);
+    }
 
     // Cache per storeHash
     const cachedData = await unstable_cache(

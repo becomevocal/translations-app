@@ -20,7 +20,7 @@ const fetcher = async (url: string): Promise<Channel[]> => {
 
 export function useChannels(context: string | null) {
   const { data, error, isLoading } = useSWR<Channel[]>(
-    context ? `/api/channels?context=${context}` : null,
+    `/api/channels?context=${context}`,
     fetcher,
     {
       revalidateOnFocus: false,
