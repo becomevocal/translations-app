@@ -2,11 +2,11 @@
 
 import { Flex, FlexItem, Panel } from "@bigcommerce/big-design";
 import { useTranslations } from 'next-intl';
-import { useStoreInfo } from "@/components/StoreInfoProvider";
-import ErrorMessage from "@/components/ErrorMessage";
+import { useStoreInfo } from "@/components/store-info-provider";
+import ErrorMessage from "@/components/error-message";
 import { Header, Page } from "@bigcommerce/big-design-patterns";
-import { TranslationsGetStarted } from "@/components/TranslationsGetStarted";
-import { ResourceGroup } from "@/components/ResourceGroup";
+import { TranslationsGetStarted } from "@/components/translations-get-started";
+import { ResourceGroup } from "@/components/resource-group";
 
 export default function Home() {
   const t = useTranslations('app');

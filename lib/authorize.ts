@@ -1,6 +1,5 @@
-import jwt from "jsonwebtoken";
 import { z } from "zod";
-import { getSessionToken } from "./session";
+import { BigCommerceClient } from "./bigcommerce-client";
 
 export const queryParamSchema = z.object({
   code: z.string(),
@@ -73,7 +72,7 @@ export async function authorize(): Promise<AuthData> {
     };
   }
 
-  const token = await getSessionToken();
+  const token = await BigCommerceClient.getSessionFromCookie();
 
   if (!token) {
     console.log('No token found');
@@ -81,11 +80,11 @@ export async function authorize(): Promise<AuthData> {
   }
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_KEY as string);
+    const payload = await BigCommerceClient.verifyJWT(token, process.env.JWT_KEY as string);
     const parsed = appSessionPayloadSchema.safeParse(payload);
 
     if (!parsed.success) {
-      console.log('Schema validation failed:', parsed.error);
+      console.log('JWT schema validation failed:', parsed.error);
       return null;
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Flex, FormControlLabel } from "@bigcommerce/big-design";
+import { Box, FormControlLabel } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
 import Skeleton from "react-loading-skeleton";

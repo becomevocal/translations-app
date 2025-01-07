@@ -1,13 +1,11 @@
 import { type NextRequest } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getSessionFromContext } from "@/lib/auth";
 import { BigCommerceClient } from "@/lib/bigcommerce-client";
 import {
   fallbackLocale,
   translatableProductFields,
 } from "@/lib/constants";
-import { debugLog } from "@/lib/debug";
 import { createGraphQLClient } from "@/lib/graphql-client";
-import { debuglog } from "util";
 
 type Locale = {
   code: string;
@@ -846,7 +844,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
 
   try {
     const { defaultLocale, availableLocales } = await getChannelLocales(context, channelId);
-    const { accessToken, storeHash } = await getSession({ query: { context } });
+    const { accessToken, storeHash } = await getSessionFromContext(context);
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     const gqlData = await graphQLClient.getProductLocaleData({
@@ -857,8 +855,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
     });
 
     if (!gqlData?.data?.store?.products?.edges?.[0]?.node) {
-      debugLog(gqlData, "GET-error-response-");
-      return new Response("Product not found or invalid GraphQL response", {
+      return new Response(`Product ID ${pid} not found or invalid GraphQL response`, {
         status: 404,
       });
     }
@@ -1010,7 +1007,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
   try {
     const { defaultLocale } = await getChannelLocales(context, channelId);
     let result: any;
-    const { accessToken, storeHash } = await getSession({ query: { context } });
+    const { accessToken, storeHash } = await getSessionFromContext(context);
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     if (body["locale"] && body.locale !== defaultLocale) {

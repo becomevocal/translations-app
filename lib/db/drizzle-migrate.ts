@@ -7,9 +7,9 @@ import Database from 'better-sqlite3';
 import { migrate as pgMigrate } from 'drizzle-orm/vercel-postgres/migrator';
 import { migrate as mysqlMigrate } from 'drizzle-orm/mysql2/migrator';
 import { migrate as sqliteMigrate } from 'drizzle-orm/better-sqlite3/migrator';
-import * as pgSchema from './drizzle_schema_pg';
-import * as mysqlSchema from './drizzle_schema_mysql';
-import * as sqliteSchema from './drizzle_schema_sqlite';
+import * as pgSchema from './drizzle-schema-pg';
+import * as mysqlSchema from './drizzle-schema-mysql';
+import * as sqliteSchema from './drizzle-schema-sqlite';
 
 const { DB_TYPE = 'postgres', DATABASE_URL } = process.env;
 

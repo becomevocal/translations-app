@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { encodeSessionPayload } from "@/lib/auth";
+import { BigCommerceClient } from "@/lib/bigcommerce-client";
 import { loadCallbackJwtPayloadSchema } from "@/lib/authorize";
-import { createSession, setSession } from "@/lib/session";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
@@ -36,13 +35,13 @@ export async function GET(req: NextRequest) {
 
   const storeHash = sub.split("/")[1] as string;
 
-  const clientToken = await encodeSessionPayload({
+  const clientToken = await BigCommerceClient.encodeSessionPayload({
     userId: user.id,
     userEmail: user.email,
     channelId: Number(payload?.channel_id) || null,
     storeHash,
     userLocale: user.locale
-  });
+  }, process.env.JWT_KEY as string);
 
   // create new searchParams preserving the existing ones but removing the signed_payload_jwt
   const newSearchParams = new URLSearchParams(rUrl.searchParams.toString());
@@ -50,7 +49,7 @@ export async function GET(req: NextRequest) {
   newSearchParams.delete("signed_payload");
 
   // await setSession(clientToken, storeHash);
-  const { name, value, config } = await createSession(clientToken, storeHash);
+  const { name, value, config } = await BigCommerceClient.createSession(clientToken, storeHash);
   const cookieStore = await cookies()
   cookieStore.set(name, value, config)
 

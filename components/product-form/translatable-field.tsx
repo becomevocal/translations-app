@@ -1,6 +1,6 @@
 import React from "react";
 import { Grid, GridItem, FormGroup, Input, Textarea } from "@bigcommerce/big-design";
-import Editor from "./TinyEditor";
+import Editor from "../tiny-editor";
 
 interface TranslatableFieldProps {
   type: "input" | "textarea";

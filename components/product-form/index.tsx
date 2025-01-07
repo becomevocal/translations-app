@@ -1,22 +1,35 @@
 "use client";
 
-import React, { useCallback, useReducer, useEffect, FormEvent, MouseEvent, useMemo } from "react";
-import { useTranslations } from 'next-intl';
-import { Button, Box, Flex, HR, Form as StyledForm } from "@bigcommerce/big-design";
+import React, {
+  useCallback,
+  useReducer,
+  useEffect,
+  FormEvent,
+  MouseEvent,
+  useMemo,
+} from "react";
+import { useTranslations } from "next-intl";
+import {
+  Button,
+  Box,
+  Flex,
+  HR,
+  Form as StyledForm,
+} from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { translatableProductFields } from "@/lib/constants";
 import { ActionBar } from "bigcommerce-design-patterns";
-import ErrorMessage from "./ErrorMessage";
-import Loading, { LoadingScreen } from "./LoadingIndicator";
-import { addAlert } from "@/components/AlertsManager";
-import { useStoreInfo } from "@/components/StoreInfoProvider";
-import { TranslationsGetStarted } from "@/components/TranslationsGetStarted";
-import ChannelLocaleSelector from "./ChannelLocaleSelector";
-import TranslatableField from "./TranslatableField";
-import ProductOptions from "./ProductOptions";
-import ProductModifiers from "./ProductModifiers";
-import CustomFields from "./CustomFields";
-import ActionBarPaddingBox from "./ActionBarPaddingBox";
+import ActionBarPaddingBox from "../action-bar-padding-box";
+import ErrorMessage from "../error-message";
+import Loading, { LoadingScreen } from "../loading-indicator";
+import { addAlert } from "@/components/alerts-manager";
+import { useStoreInfo } from "@/components/store-info-provider";
+import { TranslationsGetStarted } from "@/components/translations-get-started";
+import ChannelLocaleSelector from "./locale-selector";
+import TranslatableField from "./translatable-field";
+import ProductOptions from "./product-options";
+import ProductModifiers from "./product-modifiers";
+import CustomFields from "./custom-fields";
 
 interface Channel {
   channel_id: number;
@@ -227,7 +240,7 @@ const getFormObjectForLocale = (
 };
 
 function ProductForm({ channels, productId, context }: ProductFormProps) {
-  const t = useTranslations('app');
+  const t = useTranslations("app");
   const { storeInformation, isLoading: isStoreInfoLoading } = useStoreInfo();
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
@@ -246,8 +259,14 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
   } = state;
 
   const defaultLocale = useMemo(() => {
-    const currentChannelData = channels.find(c => c.channel_id === currentChannel);
-    return currentChannelData?.locales.find(l => l.is_default)?.code || currentChannelData?.locales[0].code || storeInformation.language;
+    const currentChannelData = channels.find(
+      (c) => c.channel_id === currentChannel
+    );
+    return (
+      currentChannelData?.locales.find((l) => l.is_default)?.code ||
+      currentChannelData?.locales[0].code ||
+      storeInformation.language
+    );
   }, [channels, currentChannel, storeInformation.language]);
 
   const fetchProductData = useCallback(async () => {
@@ -256,7 +275,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
       const res = await fetch(
         `/api/product/${productId}?context=${context}&channel_id=${currentChannel}`
       );
-      if (!res.ok) throw new Error(t('products.form.loadingError'));
+      if (!res.ok) throw new Error(t("products.form.loadingError"));
       const data = await res.json();
       dispatch({ type: "SET_PRODUCT_DATA", payload: data });
     } catch (error) {
@@ -264,8 +283,8 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
       dispatch({ type: "SET_PRODUCT_INFO_LOADING_ERROR", payload: true });
       addAlert({
         type: "error",
-        header: t('common.error'),
-        messages: [{ text: t('products.form.loadingError') }],
+        header: t("common.error"),
+        messages: [{ text: t("products.form.loadingError") }],
       });
     }
   }, [productId, context, currentChannel, t]);
@@ -277,7 +296,9 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
   }, [fetchProductData, productId, currentChannel]);
 
   const handleSubmit = useCallback(
-    async (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
+    async (
+      event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>
+    ) => {
       event.preventDefault();
 
       if (Object.keys(errors).length > 0) return;
@@ -306,22 +327,30 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         });
         addAlert({
           type: "success",
-          header: t('common.success'),
+          header: t("common.success"),
           autoDismiss: true,
-          messages: [{ text: t('products.form.saveSuccess') }],
+          messages: [{ text: t("products.form.saveSuccess") }],
         });
       } catch (error) {
         console.error("Error updating the product: ", error);
         addAlert({
           type: "error",
-          header: t('common.error'),
+          header: t("common.error"),
           autoDismiss: true,
-          messages: [{ text: t('products.form.savingError') }],
+          messages: [{ text: t("products.form.savingError") }],
         });
         dispatch({ type: "SET_PRODUCT_SAVING", payload: false });
       }
     },
-    [currentChannel, currentLocale, form, errors, productId, productData, context]
+    [
+      currentChannel,
+      currentLocale,
+      form,
+      errors,
+      productId,
+      productData,
+      context,
+    ]
   );
 
   const handleLocaleChange = useCallback(
@@ -368,7 +397,10 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
       ) {
         const newForm = { ...form };
 
-        if (name.startsWith("customField_") || name.startsWith("customFieldName_")) {
+        if (
+          name.startsWith("customField_") ||
+          name.startsWith("customFieldName_")
+        ) {
           const [_, fieldId] = name.split("_");
           if (!newForm.customFields) {
             newForm.customFields = {};
@@ -381,7 +413,10 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
           } else {
             newForm.customFields[fieldId].value = value;
           }
-        } else if (name.startsWith("option_") || name.startsWith("optionValue_")) {
+        } else if (
+          name.startsWith("option_") ||
+          name.startsWith("optionValue_")
+        ) {
           const [type, id] = name.split("_");
           if (!newForm.options) {
             newForm.options = {};
@@ -429,7 +464,10 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
             newForm.modifiers[id].defaultValue = value;
           } else if (type === "modifierDefaultValueFloat") {
             if (!newForm.modifiers[id]) {
-              newForm.modifiers[id] = { displayName: "", defaultValueFloat: "" };
+              newForm.modifiers[id] = {
+                displayName: "",
+                defaultValueFloat: "",
+              };
             }
             newForm.modifiers[id].defaultValueFloat = value;
           }
@@ -489,8 +527,12 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                   type={field.type}
                   label={t(field.labelKey)}
                   name={field.key}
-                  defaultValue={String(productData[field.key as keyof FormFields] || "")}
-                  currentValue={String(form[field.key as keyof FormFields] || "")}
+                  defaultValue={String(
+                    productData[field.key as keyof FormFields] || ""
+                  )}
+                  currentValue={String(
+                    form[field.key as keyof FormFields] || ""
+                  )}
                   defaultLocale={defaultLocale}
                   currentLocale={currentLocale}
                   onChange={handleChange}
@@ -516,7 +558,10 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
               );
             }
 
-            if (field.type === "modifiersList" && productData?.modifiers?.edges) {
+            if (
+              field.type === "modifiersList" &&
+              productData?.modifiers?.edges
+            ) {
               return (
                 <ProductModifiers
                   key={`modifiers_${currentLocale}`}
@@ -529,7 +574,10 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
               );
             }
 
-            if (field.type === "customFieldsList" && productData?.customFields?.edges) {
+            if (
+              field.type === "customFieldsList" &&
+              productData?.customFields?.edges
+            ) {
               return (
                 <CustomFields
                   key={`customFields_${currentLocale}`}
@@ -554,7 +602,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
                 disabled={isProductSaving}
                 isLoading={isProductSaving}
               >
-                {t('common.actions.save')}
+                {t("common.actions.save")}
               </Button>
             </ActionBar>
           )}

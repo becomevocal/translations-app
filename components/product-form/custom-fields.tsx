@@ -4,7 +4,7 @@ import React from "react";
 import { useTranslations } from 'next-intl';
 import { Box, Grid, GridItem, FormGroup, Input } from "@bigcommerce/big-design";
 import { ReceiptIcon } from "@bigcommerce/big-design-icons";
-import SectionHeader from "./SectionHeader";
+import SectionHeader from "./section-header";
 
 interface CustomField {
   id: string;

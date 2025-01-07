@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 import { Box, Flex, FlexItem, Select } from "@bigcommerce/big-design";
-import LocaleSelectorCallout from "./LocaleSelectorCallout";
+import LocaleSelectorCallout from "./locale-selector-callout";
 
 interface Channel {
   channel_id: number;
@@ -30,7 +30,7 @@ const ChannelLocaleSelector = ({
   onChannelChange,
   onLocaleChange,
 }: Props) => {
-  const t = useTranslations('app.products.form');
+  const t = useTranslations("app.products.form");
   const currentChannelData = channels.find(
     (channel) => channel.channel_id === currentChannel
   );
@@ -40,8 +40,8 @@ const ChannelLocaleSelector = ({
       <FlexItem flexGrow={1}>
         <Box>
           <Select
-            label={t('channelSelector.label')}
-            placeholder={t('channelSelector.placeholder')}
+            label={t("channelSelector.label")}
+            placeholder={t("channelSelector.placeholder")}
             options={channels.map((channel) => ({
               value: channel.channel_id,
               content: channel.channel_name,
@@ -54,8 +54,8 @@ const ChannelLocaleSelector = ({
       <FlexItem flexGrow={1}>
         <Box>
           <Select
-            label={t('localeSelector.label')}
-            placeholder={t('localeSelector.placeholder')}
+            label={t("localeSelector.label")}
+            placeholder={t("localeSelector.placeholder")}
             options={
               currentChannelData?.locales.map((locale) => ({
                 value: locale.code,
@@ -66,12 +66,12 @@ const ChannelLocaleSelector = ({
             onOptionChange={onLocaleChange}
           />
         </Box>
-        {currentChannelData?.locales.find(locale => 
-          locale.code === currentLocale && locale.is_default
+        {currentChannelData?.locales.find(
+          (locale) => locale.code === currentLocale && locale.is_default
         ) && <LocaleSelectorCallout />}
       </FlexItem>
     </Flex>
   );
 };
 
-export default ChannelLocaleSelector; 
+export default ChannelLocaleSelector;

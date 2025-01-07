@@ -1,10 +1,9 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
-import * as schema from '../drizzle_schema_mysql';
+import * as schema from '../drizzle-schema-mysql';
 import { eq, and } from 'drizzle-orm';
 import type { DatabaseOperations } from './types';
-import type { UserInfo } from '@/types/db';
-import type { SessionProps } from '@/types';
+import type { BaseUser, AuthSession } from '@/types';
 
 const { DATABASE_URL } = process.env;
 
@@ -24,7 +23,7 @@ export class MySQLClient implements DatabaseOperations {
     return result.length > 0;
   }
 
-  async setUser(user: UserInfo) {
+  async setUser(user: BaseUser) {
     if (!user) return;
     try {
       await this.db
@@ -43,7 +42,7 @@ export class MySQLClient implements DatabaseOperations {
     }
   }
 
-  async setStore(session: SessionProps) {
+  async setStore(session: AuthSession) {
     if (!session.store_hash || !session.access_token || !session.account_uuid) return;
     try {
       await this.db
@@ -69,7 +68,7 @@ export class MySQLClient implements DatabaseOperations {
     }
   }
 
-  async setStoreUser(session: SessionProps) {
+  async setStoreUser(session: AuthSession) {
     if (!session.store_hash || !session.user?.id) return;
     try {
       await this.db
@@ -100,7 +99,7 @@ export class MySQLClient implements DatabaseOperations {
       .where(eq(this.schema.stores.storeHash, storeHash));
   }
 
-  async deleteUser(storeHash: string, user: UserInfo) {
+  async deleteUser(storeHash: string, user: BaseUser) {
     if (!storeHash || !user) return;
     await this.db
       .delete(this.schema.storeUsers)

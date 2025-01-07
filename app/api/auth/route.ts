@@ -1,9 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { dbClient as db } from "@/lib/db";
-import { createAppExtension } from "@/lib/appExtensions";
-import { encodeSessionPayload } from "@/lib/auth";
+import { createAppExtension } from "@/lib/app-extensions";
+import { BigCommerceClient } from "@/lib/bigcommerce-client";
 import { oauthResponseSchema, queryParamSchema } from "@/lib/authorize";
-import { setSession, createSession } from "@/lib/session";
 
 export async function GET(req: NextRequest) {
   const parsedParams = queryParamSchema.safeParse(
@@ -93,23 +92,20 @@ export async function GET(req: NextRequest) {
   // (When the user loads the app after it's auth'd, the load callback *does* return a user.locale
   const userBrowserLocale = req.headers.get('Accept-Language')?.split(',')[0] || 'en-US';
 
-  const clientToken = await encodeSessionPayload({
+  const clientToken = await BigCommerceClient.encodeSessionPayload({
     userId: oauthUser.id,
     userEmail: oauthUser.email,
     channelId: null,
     storeHash,
     userLocale: userBrowserLocale
-  });
+  }, process.env.JWT_KEY as string);
 
-  await setSession(clientToken, storeHash);
-  const { name, value, config } = await createSession(clientToken, storeHash);
+  await BigCommerceClient.setSession(clientToken, storeHash);
 
   const response = NextResponse.redirect(`${process.env.APP_ORIGIN}/?context=${clientToken}`, {
     status: 302,
     statusText: "Found",
   });
-
-  response.cookies.set(name, value, config);
 
   return response;
 }

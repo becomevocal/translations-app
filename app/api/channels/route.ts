@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server'
-import { bigcommerceClient, getSession } from "@/lib/auth";
+import { getSessionFromContext } from "@/lib/auth";
 import { BigCommerceClient } from '@/lib/bigcommerce-client';
 import { fallbackLocale, hardcodedAvailableLocales } from '@/lib/constants';
 import { unstable_cache } from 'next/cache';
@@ -31,7 +31,7 @@ export async function GET(
   const context = searchParams.get('context') ?? ''
 
   try {
-    const { accessToken, storeHash } = await getSession({ query: { context } });
+    const { accessToken, storeHash } = await getSessionFromContext(context);
     const bigcommerce = new BigCommerceClient({
       accessToken: accessToken,
       storeHash: storeHash,

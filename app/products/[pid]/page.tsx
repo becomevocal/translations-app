@@ -1,9 +1,9 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
-import ErrorMessage from "@/components/ErrorMessage";
-import ProductForm from "@/components/ProductForm";
-import { LoadingScreen } from "@/components/LoadingIndicator";
+import ErrorMessage from "@/components/error-message";
+import ProductForm from "@/components/product-form";
+import { LoadingScreen } from "@/components/loading-indicator";
 import { useHasMounted } from "@/hooks/useMounted";
 import { useChannels } from "@/hooks/useChannels";
 

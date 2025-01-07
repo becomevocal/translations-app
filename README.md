@@ -33,8 +33,9 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Verify app extension is only added once after app is reinstalled 
 - [x] Simplify multiple database support, setup, and deployment docs
 - [x] Ability to explicitly set api token, store hash, and locale as env variables
-- [ ] Streamline types across callbacks, sessions, and db functions
-- [ ] Pull out Admin GraphQL client into a separate package (also better handle query complexity)
+- [x] Streamline types across callbacks, sessions, and db functions
+- [ ] Separate auth code into client so it can be a separate package
+- [ ] Pull out Admin GraphQL client (including app extensions) into a separate package (also better handle query complexity)
 - [ ] Add import / export functionality
 
 ## Getting Started

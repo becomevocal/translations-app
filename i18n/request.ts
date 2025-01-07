@@ -1,15 +1,14 @@
 import { getRequestConfig } from "next-intl/server";
-import { decodeSessionPayload } from "@/lib/auth";
-import { getSessionToken } from "@/lib/session";
+import { BigCommerceClient } from "@/lib/bigcommerce-client";
 
 export default getRequestConfig(async () => {
   let userLocale = "en-US"; // default fallback
 
   try {
-    const sessionToken = await getSessionToken();
+    const sessionToken = await BigCommerceClient.getSessionFromCookie();
 
     if (sessionToken) {
-      const payload = await decodeSessionPayload(sessionToken);
+      const payload = await BigCommerceClient.decodeSessionPayload(sessionToken, process.env.JWT_KEY as string) as { userLocale?: string };
 
       if (payload?.userLocale) {
         userLocale = payload.userLocale;
