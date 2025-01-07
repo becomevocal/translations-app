@@ -5,27 +5,11 @@ import { BigCommerceClient } from "./bigcommerce-client";
 import { appSessionPayloadSchema } from "./authorize";
 
 const {
-  API_URL,
-  AUTH_CALLBACK,
-  CLIENT_ID,
-  CLIENT_SECRET,
-  JWT_KEY = "",
-  LOGIN_URL,
   DB_TYPE,
   HARDCODED_ACCESS_TOKEN,
   HARDCODED_STORE_HASH,
-  COOKIE_NAME,
 } = process.env;
 
-export const bigcommerceClient = new BigCommerceClient({
-  clientId: CLIENT_ID || "",
-  secret: CLIENT_SECRET,
-  callback: AUTH_CALLBACK,
-  headers: { "Accept-Encoding": "*" },
-  apiUrl: API_URL,
-  loginUrl: LOGIN_URL,
-  cookieName: COOKIE_NAME,
-});
 
 export async function getSessionFromContext(context: string = "") {
   if (typeof context !== "string") return;
