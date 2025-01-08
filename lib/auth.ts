@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { AuthSession } from "../types";
 import { dbClient as db } from "@/lib/db";
-import { BigCommerceClient } from "./bigcommerce-client";
-import { appSessionPayloadSchema } from "./authorize";
+import { BigCommerceAuthClient } from "./bigcommerce-auth-client";
+import { appSessionPayloadSchema, signedPayloadJwtSchema } from "./schemas";
 
 const {
   DB_TYPE,
@@ -10,6 +9,12 @@ const {
   HARDCODED_STORE_HASH,
 } = process.env;
 
+export const authClient = new BigCommerceAuthClient({
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  callback: process.env.AUTH_CALLBACK,
+  jwtKey: process.env.JWT_KEY,
+});
 
 export async function getSessionFromContext(context: string = "") {
   if (typeof context !== "string") return;
@@ -23,9 +28,8 @@ export async function getSessionFromContext(context: string = "") {
   }
 
   const { storeHash, userId, userEmail, userLocale } =
-    (await BigCommerceClient.decodeSessionPayload(
-      context,
-      process.env.JWT_KEY as string
+    (await authClient.decodeSessionPayload(
+      context
     )) as z.infer<typeof appSessionPayloadSchema> & {
       context: string;
       user: any;
@@ -45,22 +49,26 @@ export async function getSessionFromContext(context: string = "") {
 }
 
 // Removes store and storeUser from database
-export async function removeStoreData(session: AuthSession) {
-  if (!session.store_hash) return;
+export async function removeStoreData(session: z.infer<typeof signedPayloadJwtSchema>) {
+  const storeHash = session.sub.split("/")[1];
+  if (!storeHash) return;
 
-  await db.deleteStore(session.store_hash);
+  await db.deleteStore(storeHash);
   if (session.user) {
-    await db.deleteUser(session.store_hash, session.user);
+    await db.deleteUser(storeHash, {
+      id: session.user.id,
+      email: session.user.email,
+    });
   }
 }
 
 // Removes users from database
-export async function removeUserData(session: AuthSession) {
-  if (!session.store_hash) return;
+export async function removeUserData(session: z.infer<typeof signedPayloadJwtSchema>) {
+  const storeHash = session.sub.split("/")[1];
+  if (!storeHash) return;
 
-  await db.deleteUser(session.store_hash, {
+  await db.deleteUser(storeHash, {
     id: session.user.id,
     email: session.user.email,
-    username: session.user.username,
   });
 }

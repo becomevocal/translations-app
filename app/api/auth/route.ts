@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { authClient } from "@/lib/auth";
 import { dbClient as db } from "@/lib/db";
 import { createAppExtension } from "@/lib/app-extensions";
-import { BigCommerceClient } from "@/lib/bigcommerce-client";
-import { oauthResponseSchema, queryParamSchema } from "@/lib/authorize";
+import { oauthResponseSchema, queryParamSchema } from "@/lib/schemas";
+import { setSession } from "@/lib/session";
 
 export async function GET(req: NextRequest) {
   const parsedParams = queryParamSchema.safeParse(
@@ -13,24 +14,12 @@ export async function GET(req: NextRequest) {
     return new NextResponse("Invalid query parameters", { status: 400 });
   }
 
-  const oauthResponse = await fetch(`https://login.bigcommerce.com/oauth2/token`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      client_id: process.env.CLIENT_ID,
-      client_secret: process.env.CLIENT_SECRET,
-      code: parsedParams.data.code,
-      context: parsedParams.data.context,
-      scope: parsedParams.data.scope,
-      grant_type: "authorization_code",
-      redirect_uri: process.env.AUTH_CALLBACK,
-    }),
-  });
-
-  const body = await oauthResponse.json();
+  let body;
+  try {
+    body = await authClient.performOauthHandshake(parsedParams.data);
+  } catch (error: any) {
+    return new NextResponse(error.message || "OAuth handshake failed", { status: 500 });
+  }
 
   const parsedOAuthResponse = oauthResponseSchema.safeParse(body);
 
@@ -92,15 +81,15 @@ export async function GET(req: NextRequest) {
   // (When the user loads the app after it's auth'd, the load callback *does* return a user.locale
   const userBrowserLocale = req.headers.get('Accept-Language')?.split(',')[0] || 'en-US';
 
-  const clientToken = await BigCommerceClient.encodeSessionPayload({
+  const clientToken = await authClient.encodeSessionPayload({
     userId: oauthUser.id,
     userEmail: oauthUser.email,
     channelId: null,
     storeHash,
     userLocale: userBrowserLocale
-  }, process.env.JWT_KEY as string);
+  });
 
-  await BigCommerceClient.setSession(clientToken, storeHash);
+  await setSession(clientToken);
 
   const response = NextResponse.redirect(`${process.env.APP_ORIGIN}/?context=${clientToken}`, {
     status: 302,

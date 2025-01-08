@@ -1,15 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { BigCommerceClient } from "@/lib/bigcommerce-client";
-import { loadCallbackJwtPayloadSchema } from "@/lib/authorize";
-import { jwtVerify } from "jose";
-import { cookies } from "next/headers";
+import { authClient } from "@/lib/auth";
+import { signedPayloadJwtSchema } from "@/lib/schemas";
+import { setSession } from "@/lib/session";
 
 const buildRedirectUrl = (url: string, encodedContext: string) => {
-    const [path, query = ''] = url.split('?');
-    const queryParams = new URLSearchParams(`context=${encodedContext}&${query}`);
+  const [path, query = ""] = url.split("?");
+  const queryParams = new URLSearchParams(`context=${encodedContext}&${query}`);
 
-    return `${path}?${queryParams}`;
-}
+  return `${path}?${queryParams}`;
+};
 
 export async function GET(req: NextRequest) {
   const rUrl = new URL(req.nextUrl);
@@ -20,12 +19,8 @@ export async function GET(req: NextRequest) {
     return new NextResponse("Missing signed_payload_jwt", { status: 401 });
   }
 
-  const { payload } = await jwtVerify(
-    signed_payload_jwt,
-    new TextEncoder().encode(process.env.CLIENT_SECRET)
-  );
-
-  const parsedJwt = loadCallbackJwtPayloadSchema.safeParse(payload);
+  const payload = await authClient.verifyBigCommerceJWT(signed_payload_jwt);
+  const parsedJwt = signedPayloadJwtSchema.safeParse(payload);
 
   if (!parsedJwt.success) {
     return new NextResponse("JWT properties invalid", { status: 403 });
@@ -35,32 +30,30 @@ export async function GET(req: NextRequest) {
 
   const storeHash = sub.split("/")[1] as string;
 
-  const clientToken = await BigCommerceClient.encodeSessionPayload({
+  const clientToken = await authClient.encodeSessionPayload({
     userId: user.id,
     userEmail: user.email,
     channelId: Number(payload?.channel_id) || null,
     storeHash,
-    userLocale: user.locale
-  }, process.env.JWT_KEY as string);
+    userLocale: user.locale,
+  });
 
   // create new searchParams preserving the existing ones but removing the signed_payload_jwt
   const newSearchParams = new URLSearchParams(rUrl.searchParams.toString());
   newSearchParams.delete("signed_payload_jwt");
   newSearchParams.delete("signed_payload");
 
-  // await setSession(clientToken, storeHash);
-  const { name, value, config } = await BigCommerceClient.createSession(clientToken, storeHash);
-  const cookieStore = await cookies()
-  cookieStore.set(name, value, config)
+  await setSession(clientToken);
 
   const response = NextResponse.redirect(
-    `${process.env.APP_ORIGIN}${buildRedirectUrl(parsedJwt.data.url ?? '/', `${clientToken}&${newSearchParams.toString()}`)}`,
+    `${process.env.APP_ORIGIN}${buildRedirectUrl(
+      path ?? "/",
+      `${clientToken}&${newSearchParams.toString()}`
+    )}`,
     {
       status: 307,
     }
   );
-
-  response.cookies.set(name, value, config);
 
   return response;
 }

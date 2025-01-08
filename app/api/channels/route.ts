@@ -1,6 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { getSessionFromContext } from "@/lib/auth";
-import { BigCommerceClient } from '@/lib/bigcommerce-client';
+import { BigCommerceClient } from '@/lib/bigcommerce-admin-client';
 import { fallbackLocale, hardcodedAvailableLocales } from '@/lib/constants';
 import { unstable_cache } from 'next/cache';
 

@@ -1,11 +1,11 @@
 import { type NextRequest } from "next/server";
 import { getSessionFromContext } from "@/lib/auth";
-import { BigCommerceClient } from "@/lib/bigcommerce-client";
+import { BigCommerceClient } from "@/lib/bigcommerce-admin-client";
 import {
   fallbackLocale,
   translatableProductFields,
 } from "@/lib/constants";
-import { createGraphQLClient } from "@/lib/graphql-client";
+import { createGraphQLClient } from "@/lib/bigcommerce-graphql-client";
 
 type Locale = {
   code: string;

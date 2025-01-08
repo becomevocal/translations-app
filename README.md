@@ -34,7 +34,8 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Simplify multiple database support, setup, and deployment docs
 - [x] Ability to explicitly set api token, store hash, and locale as env variables
 - [x] Streamline types across callbacks, sessions, and db functions
-- [ ] Separate auth code into client so it can be a separate package
+- [x] Update uninstall and remove user routes
+- [-] Separate auth and session code into client so it can be a separate package
 - [ ] Pull out Admin GraphQL client (including app extensions) into a separate package (also better handle query complexity)
 - [ ] Add import / export functionality
 
