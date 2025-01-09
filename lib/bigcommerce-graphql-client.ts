@@ -1,6 +1,8 @@
 interface GraphQLClientConfig {
   accessToken: string;
   storeHash: string;
+  maxRetries?: number;
+  failOnLimitReached?: boolean;
 }
 
 export interface ProductLocaleQueryOptions {
@@ -19,17 +21,50 @@ export interface ProductLocaleMutationOptions {
 export class GraphQLClient {
   private baseUrl: string;
   private headers: Headers;
+  private maxRetries: number;
+  private failOnLimitReached: boolean;
 
-  constructor({ accessToken, storeHash }: GraphQLClientConfig) {
+  constructor({ accessToken, storeHash, maxRetries = 3, failOnLimitReached = false }: GraphQLClientConfig) {
     this.baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/graphql`;
     this.headers = new Headers({
       'X-Auth-Token': accessToken,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     });
+    this.maxRetries = maxRetries;
+    this.failOnLimitReached = failOnLimitReached;
   }
 
-  async request<T = any>(query: string, variables: Record<string, any> = {}): Promise<T> {
+  private async handleRateLimit(retryCount: number = 0, retryAfterMs: number = 30000): Promise<void> {
+    if (this.failOnLimitReached) {
+      const error = new Error(`Rate limit reached. Retry after ${Math.ceil(retryAfterMs / 1000)} seconds`);
+      (error as any).retryAfter = Math.ceil(retryAfterMs / 1000);
+      throw error;
+    }
+
+    if (retryCount >= this.maxRetries) {
+      throw new Error(`Rate limit reached. Max retries (${this.maxRetries}) exceeded.`);
+    }
+
+    console.warn(
+      `Rate limit reached. Retrying after ${Math.ceil(retryAfterMs / 1000)} seconds. ` +
+      `Attempt ${retryCount + 1}/${this.maxRetries}`
+    );
+    
+    await new Promise(resolve => setTimeout(resolve, retryAfterMs));
+  }
+
+  private lastQuery: string = "";
+  private lastVariables: Record<string, any> = {};
+
+  async request<T = any>(
+    query: string,
+    variables: Record<string, any> = {},
+    retryCount: number = 0
+  ): Promise<T> {
+    this.lastQuery = query;
+    this.lastVariables = variables;
+
     const requestOptions = {
       method: 'POST',
       headers: this.headers,
@@ -37,33 +72,33 @@ export class GraphQLClient {
       redirect: 'follow' as RequestRedirect,
     };
 
-    // console.log("\n\nGraphQL Query:\n", query);
-    // console.log("\n\nGraphQL Variables:\n", JSON.stringify(variables, null, 2));
-
     const response = await fetch(this.baseUrl, requestOptions);
+
+    // Handle rate limiting
+    if (response.status === 429) {
+      const retryAfterMs = parseInt(response.headers.get('X-Rate-Limit-Time-Reset-Ms') || '30000', 10);
+      
+      // Log remaining quota information
+      const quota = response.headers.get("X-Rate-Limit-Requests-Quota");
+      const remaining = response.headers.get("X-Rate-Limit-Requests-Left");
+      const timeWindow = response.headers.get("X-Rate-Limit-Time-Window-Ms");
+
+      console.warn(
+        `GraphQL Rate Limits - ` +
+        `Quota: ${quota}, Remaining: ${remaining}, Window: ${timeWindow}ms`
+      );
+
+      await this.handleRateLimit(retryCount, retryAfterMs);
+      return this.request(query, variables, retryCount + 1);
+    }
+
     const data = await response.json();
 
-    // console.log("\n\nGraphQL Response:\n", JSON.stringify(data, null, 2));
-
+    // Handle GraphQL errors
     if (typeof data === 'object' && data && 'errors' in data) {
-      // TODO: Log the GraphQL error message including the schema details
-      // Sample error response:
-      // [
-      //   {
-      //       "message": "Internal server error",
-      //       "path": [
-      //           "product",
-      //           "setProductModifiersInformation"
-      //       ],
-      //       "locations": [
-      //           {
-      //               "line": 7,
-      //               "column": 9
-      //           }
-      //       ]
-      //   }
-      // ]
-      throw new Error((data.errors as any[])[0].message);
+      const error = new Error((data.errors as any[])[0].message);
+      (error as any).errors = data.errors;
+      throw error;
     }
 
     return data as T;
