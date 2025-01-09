@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SignJWT, jwtVerify } from "jose";
+import debug from 'debug';
 import { AuthSession, QueryParams } from "../types";
 import { signedPayloadJwtSchema } from "./schemas";
 
@@ -14,10 +15,19 @@ interface AuthClientConfig {
 export class BigCommerceAuthClient {
   private config: AuthClientConfig;
   private loginUrl: string;
+  private logger: debug.Debugger;
 
   constructor(config: AuthClientConfig) {
     this.config = config;
     this.loginUrl = config.loginUrl || "https://login.bigcommerce.com";
+    this.logger = debug('bigcommerce:auth');
+
+    this.logger('Initialized BigCommerce Auth client:', {
+      hasClientId: !!config.clientId,
+      hasClientSecret: !!config.clientSecret,
+      hasJwtKey: !!config.jwtKey,
+      loginUrl: this.loginUrl
+    });
   }
 
   static createClient(config: AuthClientConfig): BigCommerceAuthClient {
@@ -38,10 +48,17 @@ export class BigCommerceAuthClient {
     expiration: number | string | Date = "1h"
   ) {
     if (!this.config.jwtKey) {
-      throw new Error("JWT Key is required for encoding session payload");
+      const error = new Error("JWT Key is required for encoding session payload");
+      this.logger('JWT encoding failed:', error);
+      throw error;
     }
 
-    return await new SignJWT({
+    this.logger('Encoding session payload:', {
+      payloadKeys: Object.keys(payload),
+      expiration
+    });
+
+    const token = await new SignJWT({
       ...payload,
       iat: Math.floor(Date.now() / 1000),
       nbf: Math.floor(Date.now() / 1000),
@@ -49,6 +66,9 @@ export class BigCommerceAuthClient {
       .setProtectedHeader({ alg: "HS256", typ: "JWT" })
       .setExpirationTime(expiration)
       .sign(new TextEncoder().encode(this.config.jwtKey));
+
+    this.logger('Session payload encoded successfully');
+    return token;
   }
 
   /**
@@ -60,15 +80,28 @@ export class BigCommerceAuthClient {
    */
   async decodeSessionPayload(encodedContext: string) {
     if (!this.config.jwtKey) {
-      throw new Error("JWT Key is required for decoding session payload");
+      const error = new Error("JWT Key is required for decoding session payload");
+      this.logger('JWT decoding failed:', error);
+      throw error;
     }
 
-    const { payload } = await jwtVerify(
-      encodedContext,
-      new TextEncoder().encode(this.config.jwtKey)
-    );
+    this.logger('Decoding session payload');
 
-    return payload;
+    try {
+      const { payload } = await jwtVerify(
+        encodedContext,
+        new TextEncoder().encode(this.config.jwtKey)
+      );
+
+      this.logger('Session payload decoded successfully:', {
+        payloadKeys: Object.keys(payload)
+      });
+
+      return payload;
+    } catch (error) {
+      this.logger('JWT decoding failed:', error);
+      throw error;
+    }
   }
 
   /**
@@ -80,15 +113,28 @@ export class BigCommerceAuthClient {
    */
   async verifyAppJWT(token: string) {
     if (!this.config.jwtKey) {
-      throw new Error("JWT Key is required for App JWT verification");
+      const error = new Error("JWT Key is required for App JWT verification");
+      this.logger('JWT verification failed:', error);
+      throw error;
     }
 
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(this.config.jwtKey)
-    );
+    this.logger('Verifying app JWT');
 
-    return payload;
+    try {
+      const { payload } = await jwtVerify(
+        token,
+        new TextEncoder().encode(this.config.jwtKey)
+      );
+
+      this.logger('App JWT verified successfully:', {
+        payloadKeys: Object.keys(payload)
+      });
+
+      return payload;
+    } catch (error) {
+      this.logger('JWT verification failed:', error);
+      throw error;
+    }
   }
 
   /**
@@ -101,15 +147,30 @@ export class BigCommerceAuthClient {
    */
   async verifyBigCommerceJWT(token: string): Promise<z.infer<typeof signedPayloadJwtSchema>> {
     if (!this.config.clientSecret) {
-      throw new Error("Client Secret is required for BigCommerce JWT verification");
+      const error = new Error("Client Secret is required for BigCommerce JWT verification");
+      this.logger('BigCommerce JWT verification failed:', error);
+      throw error;
     }
 
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(this.config.clientSecret)
-    );
+    this.logger('Verifying BigCommerce JWT');
 
-    return signedPayloadJwtSchema.parse(payload);
+    try {
+      const { payload } = await jwtVerify(
+        token,
+        new TextEncoder().encode(this.config.clientSecret)
+      );
+
+      const validatedPayload = signedPayloadJwtSchema.parse(payload);
+
+      this.logger('BigCommerce JWT verified successfully:', {
+        payloadKeys: Object.keys(validatedPayload)
+      });
+
+      return validatedPayload;
+    } catch (error) {
+      this.logger('BigCommerce JWT verification failed:', error);
+      throw error;
+    }
   }
 
   /**
@@ -121,7 +182,9 @@ export class BigCommerceAuthClient {
    */
   async performOauthHandshake(query: QueryParams) {
     if (!this.config.clientId || !this.config.clientSecret) {
-      throw new Error("Client ID and Client Secret are required to perform OAuth handshake");
+      const error = new Error("Client ID and Client Secret are required to perform OAuth handshake");
+      this.logger('OAuth handshake failed:', error);
+      throw error;
     }
 
     const authUrl = `${this.loginUrl}/oauth2/token`;
@@ -135,20 +198,41 @@ export class BigCommerceAuthClient {
       redirect_uri: this.config.callback,
     };
 
-    const response = await fetch(authUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(body),
+    this.logger('Starting OAuth handshake:', {
+      authUrl,
+      code: query.code,
+      scope: query.scope,
+      context: query.context
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || `HTTP error during OAuth handshake! status: ${response.status}`);
-    }
+    try {
+      const response = await fetch(authUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    return response.json();
+      if (!response.ok) {
+        const error = await response.json();
+        this.logger('OAuth handshake failed:', {
+          status: response.status,
+          error
+        });
+        throw new Error(error.message || `HTTP error during OAuth handshake! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      this.logger('OAuth handshake successful:', {
+        responseKeys: Object.keys(data)
+      });
+
+      return data;
+    } catch (error) {
+      this.logger('OAuth handshake failed:', error);
+      throw error;
+    }
   }
 } 

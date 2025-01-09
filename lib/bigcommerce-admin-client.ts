@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 interface BigCommerceConfig {
   clientId?: string;
   accessToken?: string;
@@ -97,12 +99,14 @@ export class BigCommerceClient {
   private loginUrl: string;
   private headers: Record<string, string>;
   private maxRetries: number;
+  private logger: debug.Debugger;
 
   constructor(config: BigCommerceConfig) {
     this.config = config;
     this.apiUrl = config.apiUrl || "https://api.bigcommerce.com";
     this.loginUrl = config.loginUrl || "https://login.bigcommerce.com";
     this.maxRetries = config.maxRetries || 3;
+    this.logger = debug('bigcommerce:admin');
 
     this.baseUrl = this.config.storeHash
       ? `${this.apiUrl}/stores/${this.config.storeHash}`
@@ -118,6 +122,12 @@ export class BigCommerceClient {
     if (config.accessToken) {
       this.headers["X-Auth-Token"] = config.accessToken;
     }
+
+    this.logger('Initialized BigCommerce Admin client with config:', {
+      apiUrl: this.apiUrl,
+      storeHash: this.config.storeHash,
+      hasAccessToken: !!config.accessToken
+    });
   }
 
   static createClient(config: BigCommerceConfig): BigCommerceClient {
@@ -131,17 +141,22 @@ export class BigCommerceClient {
     if (this.config.failOnLimitReached) {
       const error = new Error(`Rate limit reached. Retry after ${retryAfterSecs} seconds`);
       (error as any).retryAfter = retryAfterSecs;
+      this.logger('Rate limit reached, failing request:', error);
       throw error;
     }
 
     if (retryCount >= this.maxRetries) {
-      throw new Error(`Rate limit reached. Max retries (${this.maxRetries}) exceeded.`);
+      const error = new Error(`Rate limit reached. Max retries (${this.maxRetries}) exceeded.`);
+      this.logger('Rate limit reached, max retries exceeded:', error);
+      throw error;
     }
 
     const quota = response.headers.get("X-Rate-Limit-Requests-Quota");
     const remaining = response.headers.get("X-Rate-Limit-Requests-Left");
     const timeWindow = response.headers.get("X-Rate-Limit-Time-Window-Ms");
 
+    this.logger('Rate limit info:', { quota, remaining, timeWindow, retryAfterMs });
+    
     console.warn(
       `Rate limit reached. Retrying after ${retryAfterSecs} seconds. ` +
       `Attempt ${retryCount + 1}/${this.maxRetries}. ` +
@@ -175,7 +190,20 @@ export class BigCommerceClient {
       body: options.body ? JSON.stringify(options.body) : undefined,
     };
 
+    this.logger('Making request:', {
+      url,
+      method: requestOptions.method,
+      headers: Object.keys(requestOptions.headers),
+      hasBody: !!requestOptions.body
+    });
+
     const response = await fetch(url, requestOptions);
+
+    this.logger('Received response:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
 
     if (response.status === 429) {
       return this.handleRateLimit(response, options.retryCount || 0);
@@ -183,10 +211,18 @@ export class BigCommerceClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: "Unknown error" }));
+      this.logger('Request failed:', {
+        status: response.status,
+        error
+      });
       throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
+    this.logger('Request successful:', {
+      endpoint,
+      dataKeys: Object.keys(data)
+    });
     return data as T;
   }
 

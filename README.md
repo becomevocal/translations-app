@@ -35,7 +35,7 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Ability to explicitly set api token, store hash, and locale as env variables
 - [x] Streamline types across callbacks, sessions, and db functions
 - [x] Update uninstall and remove user routes
-- [-] Separate auth and session code into client so it can be a separate package
+- [-] Separate auth and session code into client with it's own types so it can be a separate package
 - [ ] Pull out Admin GraphQL client (including app extensions) into a separate package (also better handle query complexity)
 - [ ] Add import / export functionality
 
@@ -121,3 +121,44 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+
+## Debugging
+
+The app uses the `debug` package for detailed logging of API operations. Each client has its own namespace:
+
+- `bigcommerce:admin` - Admin API client operations
+- `bigcommerce:graphql` - GraphQL API client operations  
+- `bigcommerce:auth` - Auth client operations
+
+To enable debugging, set the DEBUG environment variable:
+
+```bash
+# Debug everything
+DEBUG=bigcommerce:* npm run dev
+
+# Debug specific clients
+DEBUG=bigcommerce:auth,bigcommerce:admin npm run dev
+
+# Debug with timestamps
+DEBUG=bigcommerce:*,bigcommerce:admin:* npm run dev
+```
+
+The debug output includes:
+
+- Request details (URL, method, headers)
+- Response details (status, headers)
+- Rate limit information
+- GraphQL queries and variables
+- JWT operations (encode, decode, verify)
+- OAuth handshake details
+- Error details with full context
+
+Example debug output:
+```
+bigcommerce:admin Initialized BigCommerce Admin client with config: +0ms
+bigcommerce:admin Making request: { url: "https://api.bigcommerce.com/stores/hash/v2/store.json" } +2ms
+bigcommerce:admin Received response: { status: 200, headers: {...} } +150ms
+bigcommerce:graphql Making GraphQL request: { query: "query { store { ... } }" } +0ms
+bigcommerce:auth Verifying BigCommerce JWT +1ms
+```

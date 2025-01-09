@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 interface GraphQLClientConfig {
   accessToken: string;
   storeHash: string;
@@ -23,6 +25,7 @@ export class GraphQLClient {
   private headers: Headers;
   private maxRetries: number;
   private failOnLimitReached: boolean;
+  private logger: debug.Debugger;
 
   constructor({ accessToken, storeHash, maxRetries = 3, failOnLimitReached = false }: GraphQLClientConfig) {
     this.baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/graphql`;
@@ -33,18 +36,31 @@ export class GraphQLClient {
     });
     this.maxRetries = maxRetries;
     this.failOnLimitReached = failOnLimitReached;
+    this.logger = debug('bigcommerce:graphql');
+
+    this.logger('Initialized BigCommerce GraphQL client:', {
+      storeHash,
+      hasAccessToken: !!accessToken,
+      maxRetries,
+      failOnLimitReached
+    });
   }
 
   private async handleRateLimit(retryCount: number = 0, retryAfterMs: number = 30000): Promise<void> {
     if (this.failOnLimitReached) {
       const error = new Error(`Rate limit reached. Retry after ${Math.ceil(retryAfterMs / 1000)} seconds`);
       (error as any).retryAfter = Math.ceil(retryAfterMs / 1000);
+      this.logger('Rate limit reached, failing request:', error);
       throw error;
     }
 
     if (retryCount >= this.maxRetries) {
-      throw new Error(`Rate limit reached. Max retries (${this.maxRetries}) exceeded.`);
+      const error = new Error(`Rate limit reached. Max retries (${this.maxRetries}) exceeded.`);
+      this.logger('Rate limit reached, max retries exceeded:', error);
+      throw error;
     }
+
+    this.logger('Rate limit info:', { retryCount, retryAfterMs });
 
     console.warn(
       `Rate limit reached. Retrying after ${Math.ceil(retryAfterMs / 1000)} seconds. ` +
@@ -72,7 +88,19 @@ export class GraphQLClient {
       redirect: 'follow' as RequestRedirect,
     };
 
+    this.logger('Making GraphQL request:', {
+      query: query.replace(/\s+/g, ' ').trim(),
+      variables,
+      headers: Object.fromEntries(this.headers.entries())
+    });
+
     const response = await fetch(this.baseUrl, requestOptions);
+
+    this.logger('Received GraphQL response:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
 
     // Handle rate limiting
     if (response.status === 429) {
@@ -83,10 +111,12 @@ export class GraphQLClient {
       const remaining = response.headers.get("X-Rate-Limit-Requests-Left");
       const timeWindow = response.headers.get("X-Rate-Limit-Time-Window-Ms");
 
-      console.warn(
-        `GraphQL Rate Limits - ` +
-        `Quota: ${quota}, Remaining: ${remaining}, Window: ${timeWindow}ms`
-      );
+      this.logger('GraphQL Rate Limits:', {
+        quota,
+        remaining,
+        timeWindow,
+        retryAfterMs
+      });
 
       await this.handleRateLimit(retryCount, retryAfterMs);
       return this.request(query, variables, retryCount + 1);
@@ -98,10 +128,16 @@ export class GraphQLClient {
     if (typeof data === 'object' && data && 'errors' in data) {
       const error = new Error((data.errors as any[])[0].message);
       (error as any).errors = data.errors;
+      this.logger('GraphQL errors:', data.errors);
       throw error;
     }
 
-    return data as T;
+    this.logger('GraphQL request successful:', {
+      hasData: !!data.data,
+      dataKeys: data.data ? Object.keys(data.data) : []
+    });
+
+    return data;
   }
 
   async getProductLocaleData({
