@@ -1,4 +1,15 @@
 import debug from 'debug';
+import {
+  AppExtension,
+  AppExtensionContext,
+  AppExtensionLabel,
+  AppExtensionModel,
+  AppExtensionResponse,
+  AppExtensionCreateResponse,
+  AppExtensionUpdateResponse,
+  AppExtensionDeleteResponse,
+  appExtensionQueries
+} from './graphql/app-extensions';
 
 interface GraphQLClientConfig {
   accessToken: string;
@@ -74,22 +85,25 @@ export class GraphQLClient {
   private lastVariables: Record<string, any> = {};
 
   async request<T = any>(
-    query: string,
+    query: string | { query: string; variables?: Record<string, any> },
     variables: Record<string, any> = {},
     retryCount: number = 0
   ): Promise<T> {
-    this.lastQuery = query;
-    this.lastVariables = variables;
+    this.lastQuery = typeof query === 'string' ? query : query.query;
+    this.lastVariables = typeof query === 'string' ? variables : query.variables || {};
 
     const requestOptions = {
       method: 'POST',
       headers: this.headers,
-      body: JSON.stringify({ query, variables }),
+      body: JSON.stringify({
+        query: this.lastQuery,
+        variables: this.lastVariables,
+      }),
       redirect: 'follow' as RequestRedirect,
     };
 
     this.logger('Making GraphQL request:', {
-      query: query.replace(/\s+/g, ' ').trim(),
+      query: this.lastQuery.replace(/\s+/g, ' ').trim(),
       variables,
       headers: Object.fromEntries(this.headers.entries())
     });
@@ -964,6 +978,88 @@ export class GraphQLClient {
     `;
 
     return this.request(mutationQuery, variables);
+  }
+
+  // App Extensions Methods
+  async getAppExtensions(): Promise<AppExtension[]> {
+    const response = await this.request<AppExtensionResponse>(
+      appExtensionQueries.getAppExtensions()
+    );
+    return response.data.store.appExtensions.edges.map(edge => edge.node);
+  }
+
+  async createAppExtension(params: {
+    context: AppExtensionContext;
+    model: AppExtensionModel;
+    url: string;
+    label: AppExtensionLabel;
+  }): Promise<string> {
+    const response = await this.request<AppExtensionCreateResponse>(
+      appExtensionQueries.createAppExtension(params)
+    );
+    return response.data?.appExtension?.createAppExtension?.appExtension?.id;
+  }
+
+  async updateAppExtension(params: {
+    id: string;
+    input: { label: AppExtensionLabel };
+  }): Promise<AppExtension> {
+    const response = await this.request<AppExtensionUpdateResponse>(
+      appExtensionQueries.updateAppExtension(params)
+    );
+    return response.data?.appExtension?.updateAppExtension?.appExtension;
+  }
+
+  async deleteAppExtension(id: string): Promise<string> {
+    const response = await this.request<AppExtensionDeleteResponse>(
+      appExtensionQueries.deleteAppExtension(id)
+    );
+    return response.data?.appExtension?.deleteAppExtension?.deletedAppExtensionId;
+  }
+
+  async upsertAppExtension(params: {
+    context: AppExtensionContext;
+    model: AppExtensionModel;
+    url: string;
+    label: AppExtensionLabel;
+  }): Promise<string> {
+    this.logger('Upserting app extension:', params);
+
+    // Get existing extensions
+    const existingExtensions = await this.getAppExtensions();
+
+    // Find matching extensions
+    const matchingExtensions = existingExtensions.filter(
+      extension =>
+        extension.context === params.context &&
+        extension.model === params.model &&
+        extension.url === params.url
+    );
+
+    // If matching extensions exist
+    if (matchingExtensions.length > 0) {
+      const [firstExtension, ...duplicates] = matchingExtensions;
+
+      // Delete duplicate extensions
+      for (const duplicate of duplicates) {
+        this.logger('Deleting duplicate app extension: %s', duplicate.id);
+        await this.deleteAppExtension(duplicate.id);
+      }
+
+      // Update the label of the existing extension
+      this.logger('Updating existing app extension label');
+      await this.updateAppExtension({
+        id: firstExtension.id,
+        input: { label: params.label },
+      });
+
+      this.logger('Using existing app extension: %s', firstExtension.id);
+      return firstExtension.id;
+    }
+
+    // Create new extension
+    this.logger('Creating new app extension');
+    return this.createAppExtension(params);
   }
 }
 

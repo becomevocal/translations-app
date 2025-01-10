@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { authClient } from "@/lib/auth";
 import { dbClient as db } from "@/lib/db";
-import { createAppExtension } from "@/lib/app-extensions";
+import { GraphQLClient } from "@/lib/bigcommerce-graphql-client";
 import { oauthResponseSchema, queryParamSchema } from "@/lib/schemas";
 import { setSession } from "@/lib/session";
+import { appExtensions } from "@/lib/constants";
 
 export async function GET(req: NextRequest) {
   const parsedParams = queryParamSchema.safeParse(
@@ -70,7 +71,15 @@ export async function GET(req: NextRequest) {
     "store_app_extensions_manage"
   );
   if (isAppExtensionsScopeEnabled && storeHash) {
-    await createAppExtension({ accessToken, storeHash });
+    const graphqlClient = new GraphQLClient({
+      accessToken,
+      storeHash,
+    });
+
+    // Register all configured app extensions
+    for (const extension of appExtensions) {
+      await graphqlClient.upsertAppExtension(extension);
+    }
   } else {
     console.warn(
       "WARNING: App extensions scope is not enabled yet. To register app extensions update the scope in Developer Portal: https://devtools.bigcommerce.com"

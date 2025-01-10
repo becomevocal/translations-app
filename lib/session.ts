@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-const COOKIE_NAME = process.env.COOKIE_NAME || "bigcommerce.token";
+const COOKIE_NAME = process.env.COOKIE_NAME || "bigcommerce-app-token";
 
 export const DEFAULT_COOKIE_CONFIG = {
   httpOnly: true,
