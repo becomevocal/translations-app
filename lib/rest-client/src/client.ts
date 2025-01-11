@@ -1,99 +1,8 @@
 import debug from 'debug';
+import { RestClientConfig, RequestOptions, StoreInformationResponse } from './types';
 
-interface BigCommerceConfig {
-  clientId?: string;
-  accessToken?: string;
-  storeHash?: string;
-  secret?: string;
-  callback?: string;
-  headers?: Record<string, string>;
-  apiUrl?: string;
-  loginUrl?: string;
-  logLevel?: string;
-  failOnLimitReached?: boolean;
-  maxRetries?: number;
-  timeout?: number;
-}
-
-interface RequestOptions {
-  method?: string;
-  headers?: Record<string, string>;
-  body?: any;
-  timeout?: number;
-  retryCount?: number;
-}
-
-interface StoreInformationResponse {
-  id: string;
-  account_uuid: string;
-  domain: string;
-  secure_url: string;
-  control_panel_base_url: string;
-  status: string;
-  name: string;
-  first_name: string;
-  last_name: string;
-  address: string;
-  country: string;
-  country_code: string;
-  phone: string;
-  admin_email: string;
-  order_email: string;
-  favicon_url: string;
-  timezone: {
-    name: string;
-    raw_offset: number;
-    dst_offset: number;
-    dst_correction: boolean;
-    date_format: {
-      display: string;
-      export: string;
-      extended_display: string;
-    };
-  };
-  language: string;
-  currency: string;
-  currency_symbol: string;
-  decimal_separator: string;
-  thousands_separator: string;
-  decimal_places: number;
-  currency_symbol_location: string;
-  weight_units: string;
-  dimension_units: string;
-  dimension_decimal_places: number;
-  dimension_decimal_token: string;
-  dimension_thousands_token: string;
-  plan_name: string;
-  plan_level: string;
-  plan_is_trial: boolean;
-  industry: string;
-  logo: {
-    url: string;
-  } | [];
-  is_price_entered_with_tax: boolean;
-  store_id: number;
-  default_channel_id: number;
-  default_site_id: number;
-  active_comparison_modules: string[];
-  features: {
-    stencil_enabled: boolean;
-    sitewidehttps_enabled: boolean;
-    facebook_catalog_id: string;
-    checkout_type: string;
-    wishlists_enabled: boolean;
-    graphql_storefront_api_enabled: boolean;
-    shopper_consent_tracking_enabled: boolean;
-    multi_storefront_enabled: boolean;
-    multi_language_enabled: boolean;
-    storefront_limits: {
-      active: number;
-      total_including_inactive: number;
-    };
-  };
-}
-
-export class BigCommerceClient {
-  private config: BigCommerceConfig;
+export class BigCommerceRestClient {
+  private config: RestClientConfig;
   private baseUrl: string;
   private apiUrl: string;
   private loginUrl: string;
@@ -101,12 +10,12 @@ export class BigCommerceClient {
   private maxRetries: number;
   private logger: debug.Debugger;
 
-  constructor(config: BigCommerceConfig) {
+  constructor(config: RestClientConfig) {
     this.config = config;
     this.apiUrl = config.apiUrl || "https://api.bigcommerce.com";
     this.loginUrl = config.loginUrl || "https://login.bigcommerce.com";
     this.maxRetries = config.maxRetries || 3;
-    this.logger = debug('bigcommerce:admin');
+    this.logger = debug('bigcommerce:rest');
 
     this.baseUrl = this.config.storeHash
       ? `${this.apiUrl}/stores/${this.config.storeHash}`
@@ -123,27 +32,20 @@ export class BigCommerceClient {
       this.headers["X-Auth-Token"] = config.accessToken;
     }
 
-    this.logger('Initialized BigCommerce Admin client with config:', {
+    this.logger('Initialized BigCommerce REST client:', {
       apiUrl: this.apiUrl,
       storeHash: this.config.storeHash,
       hasAccessToken: !!config.accessToken
     });
   }
 
-  static createClient(config: BigCommerceConfig): BigCommerceClient {
-    return new BigCommerceClient(config);
+  static createClient(config: RestClientConfig): BigCommerceRestClient {
+    return new BigCommerceRestClient(config);
   }
 
   private async handleRateLimit(response: Response, retryCount: number = 0): Promise<any> {
-    const retryAfterMs = parseInt(response.headers.get("X-Rate-Limit-Time-Reset-Ms") || "30000", 10);
-    const retryAfterSecs = Math.ceil(retryAfterMs / 1000);
-    
-    if (this.config.failOnLimitReached) {
-      const error = new Error(`Rate limit reached. Retry after ${retryAfterSecs} seconds`);
-      (error as any).retryAfter = retryAfterSecs;
-      this.logger('Rate limit reached, failing request:', error);
-      throw error;
-    }
+    const retryAfterHeader = response.headers.get('X-Rate-Limit-Time-Reset-Ms');
+    const retryAfterMs = retryAfterHeader ? parseInt(retryAfterHeader, 10) : 30000;
 
     if (retryCount >= this.maxRetries) {
       const error = new Error(`Rate limit reached. Max retries (${this.maxRetries}) exceeded.`);
@@ -151,26 +53,28 @@ export class BigCommerceClient {
       throw error;
     }
 
+    // Log remaining quota information
     const quota = response.headers.get("X-Rate-Limit-Requests-Quota");
     const remaining = response.headers.get("X-Rate-Limit-Requests-Left");
     const timeWindow = response.headers.get("X-Rate-Limit-Time-Window-Ms");
 
-    this.logger('Rate limit info:', { quota, remaining, timeWindow, retryAfterMs });
-    
+    this.logger('REST Rate Limits:', {
+      quota,
+      remaining,
+      timeWindow,
+      retryAfterMs
+    });
+
     console.warn(
-      `Rate limit reached. Retrying after ${retryAfterSecs} seconds. ` +
-      `Attempt ${retryCount + 1}/${this.maxRetries}. ` +
-      `Quota: ${quota}, Remaining: ${remaining}, Window: ${timeWindow}ms`
+      `Rate limit reached. Retrying after ${Math.ceil(retryAfterMs / 1000)} seconds. ` +
+      `Attempt ${retryCount + 1}/${this.maxRetries}`
     );
     
     await new Promise(resolve => setTimeout(resolve, retryAfterMs));
-    
-    const newOptions = {
+    return this.request(this.lastRequestPath, {
       ...this.lastRequestOptions,
       retryCount: retryCount + 1
-    };
-    
-    return this.request(this.lastRequestPath, newOptions);
+    });
   }
 
   private lastRequestPath: string = "";
@@ -289,11 +193,4 @@ export class BigCommerceClient {
   async getStoreInformation() {
     return this.request<StoreInformationResponse>(`/v2/store.json`, { method: "GET" });
   }
-}
-
-// Helper function to create a client instance
-export function createBigCommerceClient(
-  config: BigCommerceConfig
-): BigCommerceClient {
-  return BigCommerceClient.createClient(config);
-}
+} 

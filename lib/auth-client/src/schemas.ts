@@ -1,6 +1,14 @@
 import { z } from "zod";
 
-export const queryParamSchema = z.object({
+export const appSessionPayloadSchema = z.object({
+  channelId: z.number().nullable(),
+  storeHash: z.string().min(1),
+  userId: z.number(),
+  userEmail: z.string(),
+  userLocale: z.string().optional(),
+});
+
+export const authCallbackQuerySchema = z.object({
   code: z.string(),
   scope: z.string(),
   context: z.string(),
@@ -33,21 +41,13 @@ export const signedPayloadJwtSchema = z.object({
   sub: z.string(),
   user: z.object({
     id: z.number(),
-    email: z.string().email(),
-    locale: z.string(),
+    email: z.string(),
+    locale: z.string().optional(),
   }),
   owner: z.object({
     id: z.number(),
-    email: z.string().email(),
+    email: z.string(),
   }),
   url: z.string(),
   channel_id: z.number().nullable(),
 });
-
-export const appSessionPayloadSchema = z.object({
-  channelId: z.number().nullable(),
-  storeHash: z.string().min(1),
-  userId: z.number(),
-  userEmail: z.string(),
-  userLocale: z.string().optional(),
-}); 

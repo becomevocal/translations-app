@@ -1,4 +1,4 @@
-import { CreateAppExtension } from "./graphql/app-extensions";
+import { CreateAppExtension } from "@bigcommerce/translations-graphql-client";
 
 export const fallbackLocale = {
   code: "en",

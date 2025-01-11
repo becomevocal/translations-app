@@ -1,16 +1,7 @@
-import { z } from "zod";
 import { SignJWT, jwtVerify } from "jose";
 import debug from 'debug';
-import { AuthSession, QueryParams } from "../types";
+import { AuthClientConfig, QueryParams, SignedPayloadJwt } from "./types";
 import { signedPayloadJwtSchema } from "./schemas";
-
-interface AuthClientConfig {
-  clientId?: string;
-  clientSecret?: string;
-  callback?: string;
-  jwtKey?: string;
-  loginUrl?: string;
-}
 
 export class BigCommerceAuthClient {
   private config: AuthClientConfig;
@@ -38,7 +29,6 @@ export class BigCommerceAuthClient {
   /**
    * Creates a JWT for the app's session management.
    * Used after successful OAuth to create a session token containing user and store info.
-   * Called in auth/route.ts and load/route.ts to create the client-side session.
    * 
    * @param payload - The session data to encode (user info, store info)
    * @param expiration - Token expiration time (default: 1 hour)
@@ -74,7 +64,6 @@ export class BigCommerceAuthClient {
   /**
    * Decodes a session JWT without validation.
    * Used to read session data when validation isn't required.
-   * Called in i18n/request.ts to get user locale preferences.
    * 
    * @param encodedContext - The JWT token to decode
    */
@@ -107,7 +96,6 @@ export class BigCommerceAuthClient {
   /**
    * Verifies a JWT created by this app (via encodeSessionPayload).
    * Used to validate app session tokens.
-   * Called in authorize.ts to verify the current session.
    * 
    * @param token - The app session JWT to verify
    */
@@ -140,12 +128,12 @@ export class BigCommerceAuthClient {
   /**
    * Verifies a JWT created by BigCommerce.
    * Used to validate signed_payload_jwt from BigCommerce callbacks.
-   * Called in uninstall/route.ts and remove-user/route.ts for app lifecycle events.
+   * 
    * Returns a strongly typed payload matching BigCommerce's JWT structure.
    * 
    * @param token - The BigCommerce signed JWT to verify
    */
-  async verifyBigCommerceJWT(token: string): Promise<z.infer<typeof signedPayloadJwtSchema>> {
+  async verifyBigCommerceJWT(token: string): Promise<SignedPayloadJwt> {
     if (!this.config.clientSecret) {
       const error = new Error("Client Secret is required for BigCommerce JWT verification");
       this.logger('BigCommerce JWT verification failed:', error);
@@ -176,7 +164,6 @@ export class BigCommerceAuthClient {
   /**
    * Performs the OAuth handshake with BigCommerce.
    * Used during app installation to exchange the auth code for an access token.
-   * Called in auth/route.ts when BigCommerce redirects back to the app.
    * 
    * @param query - The OAuth query parameters from BigCommerce
    */

@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm run build:auth-client && npm run build:graphql-client && npm run build:rest-client && next build",
     "start": "next start",
     "lint": "next lint",
+    "build:auth-client": "npm run build --prefix lib/auth-client",
+    "build:graphql-client": "npm run build --prefix lib/graphql-client",
+    "build:rest-client": "npm run build --prefix lib/rest-client",
     "postinstall": "node ./postinstall.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -16,6 +19,9 @@
   "dependencies": {
     "@bigcommerce/big-design": "^1.4.2",
     "@bigcommerce/big-design-patterns": "^2.0.0",
+    "@bigcommerce/translations-auth-client": "file:lib/auth-client",
+    "@bigcommerce/translations-graphql-client": "file:lib/graphql-client",
+    "@bigcommerce/translations-rest-client": "file:lib/rest-client",
     "@edge-csrf/nextjs": "^2.5.2",
     "@libsql/client": "^0.14.0",
     "@sentry/nextjs": "^8.47.0",

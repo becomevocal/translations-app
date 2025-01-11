@@ -1,11 +1,11 @@
 import { type NextRequest } from "next/server";
 import { getSessionFromContext } from "@/lib/auth";
-import { BigCommerceClient } from "@/lib/bigcommerce-admin-client";
+import { BigCommerceRestClient } from "@bigcommerce/translations-rest-client";
 import {
   fallbackLocale,
   translatableProductFields,
 } from "@/lib/constants";
-import { createGraphQLClient } from "@/lib/bigcommerce-graphql-client";
+import { createGraphQLClient } from "@bigcommerce/translations-graphql-client";
 
 type Locale = {
   code: string;
@@ -1221,7 +1221,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
     } else {
       // This is for the default lang, so update the main product
       // (currently the front-end does not allow this)
-      const bigcommerce = new BigCommerceClient({
+      const bigcommerce = new BigCommerceRestClient({
         accessToken,
         storeHash,
       });

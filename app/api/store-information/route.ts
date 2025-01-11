@@ -1,8 +1,8 @@
 import { type NextRequest } from "next/server";
-import { BigCommerceClient } from "@/lib/bigcommerce-admin-client";
+import { BigCommerceRestClient } from "@bigcommerce/translations-rest-client";
 import { unstable_cache } from "next/cache";
 import { dbClient as db } from "@/lib/db";
-import { authorize } from "@/lib/authorize";
+import { authorize } from "@/lib/auth";
 
 async function getStoreData(
   accessToken: string | null,
@@ -12,7 +12,7 @@ async function getStoreData(
     throw new Error("BigCommerce API token is required");
   }
 
-  const bigcommerce = new BigCommerceClient({
+  const bigcommerce = new BigCommerceRestClient({
     accessToken: accessToken,
     storeHash: storeHash,
   });

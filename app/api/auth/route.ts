@@ -1,13 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { authClient } from "@/lib/auth";
 import { dbClient as db } from "@/lib/db";
-import { GraphQLClient } from "@/lib/bigcommerce-graphql-client";
-import { oauthResponseSchema, queryParamSchema } from "@/lib/schemas";
+import {
+  oauthResponseSchema,
+  authCallbackQuerySchema,
+} from "@bigcommerce/translations-auth-client";
+import { GraphQLClient } from "@bigcommerce/translations-graphql-client";
 import { setSession } from "@/lib/session";
 import { appExtensions } from "@/lib/constants";
 
 export async function GET(req: NextRequest) {
-  const parsedParams = queryParamSchema.safeParse(
+  const parsedParams = authCallbackQuerySchema.safeParse(
     Object.fromEntries(req.nextUrl.searchParams)
   );
 
@@ -19,7 +22,9 @@ export async function GET(req: NextRequest) {
   try {
     body = await authClient.performOauthHandshake(parsedParams.data);
   } catch (error: any) {
-    return new NextResponse(error.message || "OAuth handshake failed", { status: 500 });
+    return new NextResponse(error.message || "OAuth handshake failed", {
+      status: 500,
+    });
   }
 
   const parsedOAuthResponse = oauthResponseSchema.safeParse(body);
@@ -88,22 +93,26 @@ export async function GET(req: NextRequest) {
 
   // Since the auth callback *doesn't* return a user.locale, we need to use the browser locale.
   // (When the user loads the app after it's auth'd, the load callback *does* return a user.locale
-  const userBrowserLocale = req.headers.get('Accept-Language')?.split(',')[0] || 'en-US';
+  const userBrowserLocale =
+    req.headers.get("Accept-Language")?.split(",")[0] || "en-US";
 
   const clientToken = await authClient.encodeSessionPayload({
     userId: oauthUser.id,
     userEmail: oauthUser.email,
     channelId: null,
     storeHash,
-    userLocale: userBrowserLocale
+    userLocale: userBrowserLocale,
   });
 
   await setSession(clientToken);
 
-  const response = NextResponse.redirect(`${process.env.APP_ORIGIN}/?context=${clientToken}`, {
-    status: 302,
-    statusText: "Found",
-  });
+  const response = NextResponse.redirect(
+    `${process.env.APP_ORIGIN}/?context=${clientToken}`,
+    {
+      status: 302,
+      statusText: "Found",
+    }
+  );
 
   return response;
 }

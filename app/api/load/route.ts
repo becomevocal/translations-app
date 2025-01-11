@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { authClient } from "@/lib/auth";
-import { signedPayloadJwtSchema } from "@/lib/schemas";
+import { signedPayloadJwtSchema } from "@bigcommerce/translations-auth-client";
 import { setSession } from "@/lib/session";
 
 const buildRedirectUrl = (url: string, encodedContext: string) => {

@@ -1,8 +1,8 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest } from "next/server";
 import { getSessionFromContext } from "@/lib/auth";
-import { BigCommerceClient } from '@/lib/bigcommerce-admin-client';
-import { fallbackLocale, hardcodedAvailableLocales } from '@/lib/constants';
-import { unstable_cache } from 'next/cache';
+import { BigCommerceRestClient } from "@bigcommerce/translations-rest-client";
+import { fallbackLocale, hardcodedAvailableLocales } from "@/lib/constants";
+import { unstable_cache } from "next/cache";
 
 type Locale = {
   code: string;
@@ -24,15 +24,13 @@ type ChannelResponse = {
   locales: Locale[];
 };
 
-export async function GET(
-  request: NextRequest
-) {
-  const searchParams = request.nextUrl.searchParams
-  const context = searchParams.get('context') ?? ''
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const context = searchParams.get("context") ?? "";
 
   try {
     const { accessToken, storeHash } = await getSessionFromContext(context);
-    const bigcommerce = new BigCommerceClient({
+    const bigcommerce = new BigCommerceRestClient({
       accessToken: accessToken,
       storeHash: storeHash,
     });
@@ -40,34 +38,49 @@ export async function GET(
     const getChannelsData = async (): Promise<ChannelResponse[]> => {
       const { data: channelsData } = await bigcommerce.getAvailableChannels();
 
-      const result = await Promise.all(channelsData.map(async (channel: Channel) => {
-        try {
-          const { data: localesData } = await bigcommerce.getChannelLocales(channel.id);
-          const locales: Locale[] = localesData.map((locale: { code: string, status: string, is_default: boolean }) => ({
-            ...locale,
-            title: hardcodedAvailableLocales.find(({ id }) => id === locale.code)?.name,
-          }));
-          
-          const defaultLocale = locales.find(locale => locale.is_default)?.code || fallbackLocale.code;
-          
-          return {
-            channel_id: channel.id,
-            channel_name: channel.name,
-            default_locale: defaultLocale,
-            locales
-          };
-        } catch (innerError) {
-          console.error(`Failed to fetch locales for channel ${channel.id}:`, innerError);
-          return {
-            channel_id: channel.id,
-            channel_name: channel.name,
-            default_locale: fallbackLocale.code,
-            locales: [
-              fallbackLocale
-            ]
-          };
-        }
-      }));
+      const result = await Promise.all(
+        channelsData.map(async (channel: Channel) => {
+          try {
+            const { data: localesData } = await bigcommerce.getChannelLocales(
+              channel.id
+            );
+            const locales: Locale[] = localesData.map(
+              (locale: {
+                code: string;
+                status: string;
+                is_default: boolean;
+              }) => ({
+                ...locale,
+                title: hardcodedAvailableLocales.find(
+                  ({ id }) => id === locale.code
+                )?.name,
+              })
+            );
+
+            const defaultLocale =
+              locales.find((locale) => locale.is_default)?.code ||
+              fallbackLocale.code;
+
+            return {
+              channel_id: channel.id,
+              channel_name: channel.name,
+              default_locale: defaultLocale,
+              locales,
+            };
+          } catch (innerError) {
+            console.error(
+              `Failed to fetch locales for channel ${channel.id}:`,
+              innerError
+            );
+            return {
+              channel_id: channel.id,
+              channel_name: channel.name,
+              default_locale: fallbackLocale.code,
+              locales: [fallbackLocale],
+            };
+          }
+        })
+      );
 
       return result;
     };
@@ -86,7 +99,7 @@ export async function GET(
   } catch (error: any) {
     const { message, response } = error;
 
-    return new Response(message || 'Authentication failed, please re-install', {
+    return new Response(message || "Authentication failed, please re-install", {
       status: response?.status || 500,
     });
   }

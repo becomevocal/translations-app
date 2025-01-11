@@ -1,21 +1,59 @@
 import { z } from "zod";
 import { dbClient as db } from "@/lib/db";
-import { BigCommerceAuthClient } from "./bigcommerce-auth-client";
-import { appSessionPayloadSchema, signedPayloadJwtSchema } from "./schemas";
+import { getSession } from "./session";
+import {
+  AppSessionPayload,
+  appSessionPayloadSchema,
+  createAuthClient,
+  signedPayloadJwtSchema,
+} from "@bigcommerce/translations-auth-client";
 
-const {
-  DB_TYPE,
-  HARDCODED_ACCESS_TOKEN,
-  HARDCODED_STORE_HASH,
-} = process.env;
+const { DB_TYPE, HARDCODED_ACCESS_TOKEN, HARDCODED_STORE_HASH } = process.env;
 
-export const authClient = new BigCommerceAuthClient({
+// Initialize auth client
+export const authClient = createAuthClient({
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   callback: process.env.AUTH_CALLBACK,
   jwtKey: process.env.JWT_KEY,
 });
 
+// Core authorization function
+export async function authorize(): Promise<AppSessionPayload | null> {
+  if (DB_TYPE === "explicit_store_token") {
+    return {
+      channelId: null,
+      storeHash: HARDCODED_STORE_HASH as string,
+      userId: 0,
+      userEmail: "mock@example.com",
+      userLocale: process.env.HARDCODED_LOCALE,
+    };
+  }
+
+  const token = await getSession();
+
+  if (!token) {
+    console.log("No session token found");
+    return null;
+  }
+
+  try {
+    const payload = await authClient.verifyAppJWT(token);
+    const parsed = appSessionPayloadSchema.safeParse(payload);
+
+    if (!parsed.success) {
+      console.log("JWT schema validation failed:", parsed.error);
+      return null;
+    }
+
+    return parsed.data;
+  } catch (err) {
+    console.log("JWT verification failed:", err);
+    return null;
+  }
+}
+
+// Session context management
 export async function getSessionFromContext(context: string = "") {
   if (typeof context !== "string") return;
 
@@ -28,15 +66,14 @@ export async function getSessionFromContext(context: string = "") {
   }
 
   const { storeHash, userId, userEmail, userLocale } =
-    (await authClient.decodeSessionPayload(
-      context
-    )) as z.infer<typeof appSessionPayloadSchema> & {
+    (await authClient.decodeSessionPayload(context)) as z.infer<
+      typeof appSessionPayloadSchema
+    > & {
       context: string;
       user: any;
     };
   const hasUser = await db.hasStoreUser(storeHash, userId);
 
-  // Before retrieving session/ hitting APIs, check user
   if (!hasUser) {
     throw new Error(
       "User is not available. Please login or ensure you have access permissions."
@@ -48,8 +85,10 @@ export async function getSessionFromContext(context: string = "") {
   return { accessToken, storeHash, userId, userEmail, userLocale } as any;
 }
 
-// Removes store and storeUser from database
-export async function removeStoreData(session: z.infer<typeof signedPayloadJwtSchema>) {
+// Data cleanup functions
+export async function removeStoreData(
+  session: z.infer<typeof signedPayloadJwtSchema>
+) {
   const storeHash = session.sub.split("/")[1];
   if (!storeHash) return;
 
@@ -62,8 +101,9 @@ export async function removeStoreData(session: z.infer<typeof signedPayloadJwtSc
   }
 }
 
-// Removes users from database
-export async function removeUserData(session: z.infer<typeof signedPayloadJwtSchema>) {
+export async function removeUserData(
+  session: z.infer<typeof signedPayloadJwtSchema>
+) {
   const storeHash = session.sub.split("/")[1];
   if (!storeHash) return;
 

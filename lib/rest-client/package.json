@@ -1,0 +1,25 @@
+{
+  "name": "@bigcommerce/translations-rest-client",
+  "version": "0.1.0",
+  "description": "BigCommerce REST Client for the Translations App",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "debug": "^4.3.4"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.12",
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+} 
