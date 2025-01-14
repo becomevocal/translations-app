@@ -10,7 +10,6 @@ import React, {
 } from "react";
 import { useTranslations } from "next-intl";
 import {
-  Button,
   Box,
   Flex,
   HR,
@@ -18,8 +17,7 @@ import {
 } from "@bigcommerce/big-design";
 import { theme } from "@bigcommerce/big-design-theme";
 import { translatableProductFields } from "@/lib/constants";
-import { ActionBar } from "bigcommerce-design-patterns";
-import ActionBarPaddingBox from "../action-bar-padding-box";
+import { ActionBar } from "@bigcommerce/big-design-patterns";
 import ErrorMessage from "../error-message";
 import Loading, { LoadingScreen } from "../loading-indicator";
 import { addAlert } from "@/components/alerts-manager";
@@ -504,111 +502,104 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
 
   return (
     <Loading isLoading={isProductInfoLoading}>
-      <ActionBarPaddingBox>
-        <Box marginBottom="xxLarge">
-          <Flex flexDirection="column" flexGap={theme.spacing.xLarge}>
-            <ChannelLocaleSelector
-              channels={channels}
-              currentChannel={currentChannel}
-              currentLocale={currentLocale}
-              onChannelChange={handleChannelChange}
-              onLocaleChange={handleLocaleChange}
-            />
-          </Flex>
+      <Box>
+        <Flex flexDirection="column" flexGap={theme.spacing.xLarge}>
+          <ChannelLocaleSelector
+            channels={channels}
+            currentChannel={currentChannel}
+            currentLocale={currentLocale}
+            onChannelChange={handleChannelChange}
+            onLocaleChange={handleLocaleChange}
+          />
+        </Flex>
 
-          <HR color="secondary30" />
-        </Box>
+        <HR color="secondary30" />
+      </Box>
 
-        <StyledForm fullWidth={true} onSubmit={handleSubmit}>
-          {translatableProductFields.map((field) => {
-            if (field.type === "input" || field.type === "textarea") {
-              return (
-                <TranslatableField
-                  key={`${field.key}_${currentLocale}`}
-                  type={field.type}
-                  label={t(field.labelKey)}
-                  name={field.key}
-                  defaultValue={String(
-                    productData[field.key as keyof FormFields] || ""
-                  )}
-                  currentValue={String(
-                    form[field.key as keyof FormFields] || ""
-                  )}
-                  defaultLocale={defaultLocale}
-                  currentLocale={currentLocale}
-                  onChange={handleChange}
-                  onEditorChange={(content) =>
-                    handleEditorChange(content, field.key as keyof FormFields)
-                  }
-                  required={field.required}
-                  minLength={4}
-                />
-              );
-            }
+      <StyledForm fullWidth={true} onSubmit={handleSubmit}>
+        {translatableProductFields.map((field) => {
+          if (field.type === "input" || field.type === "textarea") {
+            return (
+              <TranslatableField
+                key={`${field.key}_${currentLocale}`}
+                type={field.type}
+                label={t(field.labelKey)}
+                name={field.key}
+                defaultValue={String(
+                  productData[field.key as keyof FormFields] || ""
+                )}
+                currentValue={String(form[field.key as keyof FormFields] || "")}
+                defaultLocale={defaultLocale}
+                currentLocale={currentLocale}
+                onChange={handleChange}
+                onEditorChange={(content) =>
+                  handleEditorChange(content, field.key as keyof FormFields)
+                }
+                required={field.required}
+                minLength={4}
+              />
+            );
+          }
 
-            if (field.type === "optionsList" && productData?.options?.edges) {
-              return (
-                <ProductOptions
-                  key={`options_${currentLocale}`}
-                  options={productData.options.edges}
-                  formOptions={form.options || {}}
-                  defaultLocale={defaultLocale}
-                  currentLocale={currentLocale}
-                  onChange={handleChange}
-                />
-              );
-            }
+          if (field.type === "optionsList" && productData?.options?.edges) {
+            return (
+              <ProductOptions
+                key={`options_${currentLocale}`}
+                options={productData.options.edges}
+                formOptions={form.options || {}}
+                defaultLocale={defaultLocale}
+                currentLocale={currentLocale}
+                onChange={handleChange}
+              />
+            );
+          }
 
-            if (
-              field.type === "modifiersList" &&
-              productData?.modifiers?.edges
-            ) {
-              return (
-                <ProductModifiers
-                  key={`modifiers_${currentLocale}`}
-                  modifiers={productData.modifiers.edges}
-                  formModifiers={form.modifiers || {}}
-                  defaultLocale={defaultLocale}
-                  currentLocale={currentLocale}
-                  onChange={handleChange}
-                />
-              );
-            }
+          if (field.type === "modifiersList" && productData?.modifiers?.edges) {
+            return (
+              <ProductModifiers
+                key={`modifiers_${currentLocale}`}
+                modifiers={productData.modifiers.edges}
+                formModifiers={form.modifiers || {}}
+                defaultLocale={defaultLocale}
+                currentLocale={currentLocale}
+                onChange={handleChange}
+              />
+            );
+          }
 
-            if (
-              field.type === "customFieldsList" &&
-              productData?.customFields?.edges
-            ) {
-              return (
-                <CustomFields
-                  key={`customFields_${currentLocale}`}
-                  customFields={productData.customFields.edges}
-                  formCustomFields={form.customFields || {}}
-                  defaultLocale={defaultLocale}
-                  currentLocale={currentLocale}
-                  onChange={handleChange}
-                />
-              );
-            }
+          if (
+            field.type === "customFieldsList" &&
+            productData?.customFields?.edges
+          ) {
+            return (
+              <CustomFields
+                key={`customFields_${currentLocale}`}
+                customFields={productData.customFields.edges}
+                formCustomFields={form.customFields || {}}
+                defaultLocale={defaultLocale}
+                currentLocale={currentLocale}
+                onChange={handleChange}
+              />
+            );
+          }
 
-            return null;
-          })}
+          return null;
+        })}
 
-          {currentLocale !== defaultLocale && (
-            <ActionBar>
-              <Button
-                mobileWidth="auto"
-                variant="primary"
-                onClick={handleSubmit}
-                disabled={isProductSaving}
-                isLoading={isProductSaving}
-              >
-                {t("common.actions.save")}
-              </Button>
-            </ActionBar>
-          )}
-        </StyledForm>
-      </ActionBarPaddingBox>
+        {currentLocale !== defaultLocale && (
+          <ActionBar
+            actions={[
+              {
+                text: t("common.actions.save"),
+                variant: "primary",
+                onClick: handleSubmit,
+                disabled: isProductSaving,
+                isLoading: isProductSaving,
+              },
+            ]}
+          />
+        )}
+      </StyledForm>
     </Loading>
   );
 }
