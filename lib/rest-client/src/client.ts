@@ -5,7 +5,6 @@ export class BigCommerceRestClient {
   private config: RestClientConfig;
   private baseUrl: string;
   private apiUrl: string;
-  private loginUrl: string;
   private headers: Record<string, string>;
   private maxRetries: number;
   private logger: debug.Debugger;
@@ -13,7 +12,6 @@ export class BigCommerceRestClient {
   constructor(config: RestClientConfig) {
     this.config = config;
     this.apiUrl = config.apiUrl || "https://api.bigcommerce.com";
-    this.loginUrl = config.loginUrl || "https://login.bigcommerce.com";
     this.maxRetries = config.maxRetries || 3;
     this.logger = debug('bigcommerce:rest');
 
@@ -181,6 +179,12 @@ export class BigCommerceRestClient {
   // Channels
   async getAvailableChannels() {
     return this.request<{data: any[]}>(`/v3/channels?available=true`, { method: "GET" });
+  }
+
+  async getChannelProductAssignments(channelId: number) {
+    return this.request<{data: any[]}>(`/v3/catalog/products/channel-assignments?channel_id:in=${channelId}`, {
+      method: "GET",
+    });
   }
 
   async getChannelLocales(channelId: number) {

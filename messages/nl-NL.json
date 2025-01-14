@@ -112,7 +112,7 @@
       "save": "Opslaan",
       "cancel": "Annuleren",
       "loading": "Laden...",
-      "error": "Er is een fout opgetreden",
+      "error": "Er is een fout opgetreden. Probeer het opnieuw.",
       "success": "Wijzigingen succesvol opgeslagen",
       "required": "Verplicht",
       "optional": "Optioneel",
@@ -123,6 +123,28 @@
         "edit": "Bewerken",
         "delete": "Verwijderen"
       }
+    }
+  },
+  "translations": {
+    "jobs": {
+      "title": "Vertaalopdrachten",
+      "selectChannel": "Selecteer kanaal",
+      "selectLocale": "Selecteer taal",
+      "import": "Vertalingen importeren",
+      "export": "Vertalingen exporteren",
+      "type": "Type",
+      "status": "Status",
+      "channel": "Kanaal",
+      "locale": "Taal",
+      "created": "Aangemaakt",
+      "actions": "Acties",
+      "download": "Downloaden",
+      "view": "Bestand bekijken",
+      "status_pending": "In afwachting",
+      "status_processing": "Verwerken",
+      "status_completed": "Voltooid",
+      "status_failed": "Mislukt",
+      "refresh": "Vernieuwen"
     }
   }
 } 

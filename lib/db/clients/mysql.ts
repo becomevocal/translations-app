@@ -1,9 +1,10 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import * as schema from '../drizzle-schema-mysql';
-import { eq, and } from 'drizzle-orm';
-import type { DatabaseOperations } from './types';
+import { eq, and, desc } from 'drizzle-orm';
+import type { DatabaseOperations, TranslationJob } from './types';
 import type { BaseUser, AuthSession } from '@/types';
+import type { TranslationJob as MySQLTranslationJob } from '../drizzle-schema-mysql';
 
 const { DATABASE_URL } = process.env;
 
@@ -107,5 +108,75 @@ export class MySQLClient implements DatabaseOperations {
         eq(this.schema.storeUsers.storeHash, storeHash),
         eq(this.schema.storeUsers.userId, user.id)
       ));
+  }
+
+  async getTranslationJobs(storeHash: string): Promise<TranslationJob[]> {
+    return this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(eq(this.schema.translationJobs.storeHash, storeHash))
+      .orderBy(desc(this.schema.translationJobs.createdAt));
+  }
+
+  async createTranslationJob(data: {
+    storeHash: string;
+    jobType: 'import' | 'export';
+    channelId: number;
+    locale: string;
+    fileUrl?: string;
+  }): Promise<TranslationJob> {
+    const result = await this.db
+      .insert(this.schema.translationJobs)
+      .values({
+        ...data,
+        status: 'pending',
+      });
+    
+    // MySQL returns insertId, so we need to fetch the record
+    const inserted = await this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(eq(this.schema.translationJobs.id, Number(result[0].insertId)))
+      .limit(1);
+    
+    return inserted[0];
+  }
+
+  async updateTranslationJob(id: number, data: Partial<MySQLTranslationJob>): Promise<TranslationJob> {
+    await this.db
+      .update(this.schema.translationJobs)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(this.schema.translationJobs.id, id));
+
+    // MySQL doesn't return updated record, so we need to fetch it
+    const updated = await this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(eq(this.schema.translationJobs.id, id))
+      .limit(1);
+    
+    return updated[0];
+  }
+
+  async getPendingTranslationJobs(): Promise<TranslationJob[]> {
+    return this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(eq(this.schema.translationJobs.status, 'pending'))
+      .orderBy(this.schema.translationJobs.createdAt);
+  }
+
+  async getPendingTranslationJobsByStore(storeHash: string): Promise<TranslationJob[]> {
+    return this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(and(
+        eq(this.schema.translationJobs.status, 'pending'),
+        eq(this.schema.translationJobs.storeHash, storeHash)
+      ))
+      .orderBy(this.schema.translationJobs.createdAt);
   }
 } 

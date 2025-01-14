@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, varchar, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, json, timestamp, text, varchar, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -32,4 +32,21 @@ export const storeUsers = pgTable('storeusers', {
   return {
     userStoreIdx: uniqueIndex('userid_storeHash_idx').on(table.userId, table.storeHash),
   }
-}); 
+});
+
+export const translationJobs = pgTable('translation_jobs', {
+  id: serial('id').primaryKey(),
+  storeHash: text('store_hash').notNull(),
+  status: text('status', { enum: ['pending', 'processing', 'completed', 'failed'] }).notNull().default('pending'),
+  jobType: text('job_type', { enum: ['import', 'export'] }).notNull(),
+  fileUrl: text('file_url'),
+  channelId: integer('channel_id').notNull(),
+  locale: text('locale').notNull(),
+  metadata: json('metadata'),
+  error: text('error'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type TranslationJob = typeof translationJobs.$inferSelect;
+export type NewTranslationJob = typeof translationJobs.$inferInsert; 

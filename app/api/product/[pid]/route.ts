@@ -848,8 +848,8 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     const gqlData = await graphQLClient.getProductLocaleData({
-      pid,
-      channelId,
+      pid: Number(pid),
+      channelId: Number(channelId),
       availableLocales,
       defaultLocale,
     });
@@ -1190,11 +1190,6 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
       };
 
       const gqlData = await graphQLClient.updateProductLocaleData(
-        {
-          pid,
-          channelId,
-          locale: body.locale,
-        },
         graphVariables
       );
 

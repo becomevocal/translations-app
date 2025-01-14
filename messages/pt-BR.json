@@ -112,7 +112,7 @@
       "save": "Salvar",
       "cancel": "Cancelar",
       "loading": "Carregando...",
-      "error": "Ocorreu um erro",
+      "error": "Ocorreu um erro. Por favor, tente novamente.",
       "success": "Alterações salvas com sucesso",
       "required": "Obrigatório",
       "optional": "Opcional",
@@ -123,6 +123,28 @@
         "edit": "Editar",
         "delete": "Excluir"
       }
+    }
+  },
+  "translations": {
+    "jobs": {
+      "title": "Trabalhos de tradução",
+      "selectChannel": "Selecionar canal",
+      "selectLocale": "Selecionar idioma",
+      "import": "Importar traduções",
+      "export": "Exportar traduções",
+      "type": "Tipo",
+      "status": "Status",
+      "channel": "Canal",
+      "locale": "Idioma",
+      "created": "Criado",
+      "actions": "Ações",
+      "download": "Baixar",
+      "view": "Ver arquivo",
+      "status_pending": "Pendente",
+      "status_processing": "Processando",
+      "status_completed": "Concluído",
+      "status_failed": "Falhou",
+      "refresh": "Atualizar"
     }
   }
 } 

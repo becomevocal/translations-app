@@ -248,7 +248,7 @@ export const productQueries = {
     };
   },
 
-  updateProductLocaleData: ({ pid, channelId, locale }: ProductLocaleMutationOptions, variables: any) => {
+  updateProductLocaleData: (variables: any) => {
     const hasCustomFields = variables.customFieldsInput && 
       variables.customFieldsInput.data && 
       variables.customFieldsInput.data.length > 0;
@@ -817,5 +817,31 @@ export const productQueries = {
       `,
       variables
     };
-  }
+  },
+
+  getAllProducts: (variables: { limit: number, cursor?: string }) => ({
+    query: `
+      {
+        store {
+          products {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+            edges {
+              cursor
+              node {
+                id
+                basicInformation {
+                  name
+                  description
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+    variables
+  }),
 }; 

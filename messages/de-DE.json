@@ -112,7 +112,7 @@
       "save": "Speichern",
       "cancel": "Abbrechen",
       "loading": "Wird geladen...",
-      "error": "Ein Fehler ist aufgetreten",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
       "success": "Änderungen erfolgreich gespeichert",
       "required": "Erforderlich",
       "optional": "Optional",
@@ -123,6 +123,28 @@
         "edit": "Bearbeiten",
         "delete": "Löschen"
       }
+    }
+  },
+  "translations": {
+    "jobs": {
+      "title": "Übersetzungsaufträge",
+      "selectChannel": "Kanal auswählen",
+      "selectLocale": "Sprache auswählen",
+      "import": "Übersetzungen importieren",
+      "export": "Übersetzungen exportieren",
+      "type": "Typ",
+      "status": "Status",
+      "channel": "Kanal",
+      "locale": "Sprache",
+      "created": "Erstellt",
+      "actions": "Aktionen",
+      "download": "Herunterladen",
+      "view": "Datei anzeigen",
+      "status_pending": "Ausstehend",
+      "status_processing": "Wird verarbeitet",
+      "status_completed": "Abgeschlossen",
+      "status_failed": "Fehlgeschlagen",
+      "refresh": "Aktualisieren"
     }
   }
 } 

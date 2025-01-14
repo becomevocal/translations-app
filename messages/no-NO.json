@@ -112,7 +112,7 @@
       "save": "Lagre",
       "cancel": "Avbryt",
       "loading": "Laster...",
-      "error": "En feil har oppstått",
+      "error": "Det oppstod en feil. Vennligst prøv igjen.",
       "success": "Endringer lagret",
       "required": "Påkrevd",
       "optional": "Valgfritt",
@@ -123,6 +123,28 @@
         "edit": "Rediger",
         "delete": "Slett"
       }
+    }
+  },
+  "translations": {
+    "jobs": {
+      "title": "Oversettelsesoppgaver",
+      "selectChannel": "Velg kanal",
+      "selectLocale": "Velg språk",
+      "import": "Importer oversettelser",
+      "export": "Eksporter oversettelser",
+      "refresh": "Oppdater",
+      "type": "Type",
+      "status": "Status",
+      "channel": "Kanal",
+      "locale": "Språk",
+      "created": "Opprettet",
+      "actions": "Handlinger",
+      "download": "Last ned",
+      "view": "Vis fil",
+      "status_pending": "Venter",
+      "status_processing": "Behandler",
+      "status_completed": "Fullført",
+      "status_failed": "Mislyktes"
     }
   }
 } 

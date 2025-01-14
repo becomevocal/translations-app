@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, uniqueIndex } from 'drizzle-orm/mysql-core';
+import { mysqlTable, int, varchar, uniqueIndex, json, timestamp, text } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
   id: int('id').primaryKey().autoincrement(),
@@ -32,4 +32,21 @@ export const storeUsers = mysqlTable('storeusers', {
   return {
     userStoreIdx: uniqueIndex('userid_storeHash_idx').on(table.userId, table.storeHash),
   }
-}); 
+});
+
+export const translationJobs = mysqlTable('translation_jobs', {
+  id: int('id').primaryKey().autoincrement(),
+  storeHash: text('store_hash').notNull(),
+  status: varchar('status', { length: 20, enum: ['pending', 'processing', 'completed', 'failed'] }).notNull().default('pending'),
+  jobType: varchar('job_type', { length: 10, enum: ['import', 'export'] }).notNull(),
+  fileUrl: text('file_url'),
+  channelId: int('channel_id').notNull(),
+  locale: varchar('locale', { length: 10 }).notNull(),
+  metadata: json('metadata'),
+  error: text('error'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type TranslationJob = typeof translationJobs.$inferSelect;
+export type NewTranslationJob = typeof translationJobs.$inferInsert; 

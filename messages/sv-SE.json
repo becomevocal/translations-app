@@ -112,7 +112,7 @@
       "save": "Spara",
       "cancel": "Avbryt",
       "loading": "Laddar...",
-      "error": "Ett fel har uppstått",
+      "error": "Ett fel har inträffat. Vänligen försök igen.",
       "success": "Ändringar sparade",
       "required": "Obligatorisk",
       "optional": "Valfri",
@@ -123,6 +123,28 @@
         "edit": "Redigera",
         "delete": "Ta bort"
       }
+    }
+  },
+  "translations": {
+    "jobs": {
+      "title": "Översättningsjobb",
+      "selectChannel": "Välj kanal",
+      "selectLocale": "Välj språk",
+      "import": "Importera översättningar",
+      "export": "Exportera översättningar",
+      "type": "Typ",
+      "status": "Status",
+      "channel": "Kanal",
+      "locale": "Språk",
+      "created": "Skapad",
+      "actions": "Åtgärder",
+      "download": "Ladda ner",
+      "view": "Visa fil",
+      "status_pending": "Väntar",
+      "status_processing": "Bearbetar",
+      "status_completed": "Slutförd",
+      "status_failed": "Misslyckades",
+      "refresh": "Uppdatera"
     }
   }
 } 

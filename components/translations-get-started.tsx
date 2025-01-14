@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { useTranslations } from 'next-intl';
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import ActiveStateIcon from "@/icons/multi-lang-active-icon.svg";
 import InactiveStateIcon from "@/icons/multi-lang-inactive-icon.svg";
 import LoadingStateIcon from "@/icons/multi-lang-loading-icon.svg";
@@ -13,23 +14,35 @@ export const TranslationsGetStarted = ({
   isActive?: boolean;
   isLoading?: boolean;
 }) => {
-  const t = useTranslations('app.getStarted');
+  const t = useTranslations("app.getStarted");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const context = searchParams?.get("context");
 
   const mainText = isLoading
-    ? t('checking')
+    ? t("checking")
     : isActive
-    ? t('active')
-    : t('inactive');
+    ? t("active")
+    : t("inactive");
 
   const secondaryText = isLoading
-    ? t('checkingDescription')
+    ? t("checkingDescription")
     : isActive
-    ? t('activeDescription')
-    : t('inactiveDescription');
+    ? t("activeDescription")
+    : t("inactiveDescription");
 
-  const buttonText = isActive
-    ? t('startWorkflow')
-    : t('contactSupport');
+  const buttonText = isActive ? t("startWorkflow") : t("contactSupport");
+
+  const handleClick = () => {
+    if (isActive) {
+      router.push(`/translations/jobs${context ? `?context=${context}` : ""}`);
+    } else {
+      window.open(
+        "https://support.bigcommerce.com/s/article/Multi-Language-Setup",
+        "_blank"
+      );
+    }
+  };
 
   return (
     <Flex
@@ -61,7 +74,7 @@ export const TranslationsGetStarted = ({
         </Text>
       </FlexItem>
       <FlexItem>
-        <Button isLoading={isLoading} variant="secondary">
+        <Button isLoading={isLoading} variant="secondary" onClick={handleClick}>
           {buttonText}
         </Button>
       </FlexItem>

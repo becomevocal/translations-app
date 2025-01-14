@@ -1,9 +1,10 @@
 import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { sql } from '@vercel/postgres';
 import * as schema from '../drizzle-schema-pg';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import type { DatabaseOperations } from './types';
 import type { BaseUser, AuthSession } from '@/types';
+import type { TranslationJob } from '@/types/jobs';
 
 export class PostgresClient implements DatabaseOperations {
   protected db = drizzle(sql, { schema });
@@ -94,5 +95,58 @@ export class PostgresClient implements DatabaseOperations {
         eq(this.schema.storeUsers.storeHash, storeHash),
         eq(this.schema.storeUsers.userId, user.id)
       ));
+  }
+
+  async getTranslationJobs(storeHash: string) {
+    return this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(eq(this.schema.translationJobs.storeHash, storeHash))
+      .orderBy(desc(this.schema.translationJobs.createdAt));
+  }
+
+  async createTranslationJob(data: {
+    storeHash: string;
+    jobType: 'import' | 'export';
+    channelId: number;
+    locale: string;
+    fileUrl?: string;
+  }) {
+    const result = await this.db
+      .insert(this.schema.translationJobs)
+      .values({
+        ...data,
+        status: 'pending',
+      })
+      .returning();
+    return result[0];
+  }
+
+  async updateTranslationJob(id: number, data: Partial<TranslationJob>) {
+    const result = await this.db
+      .update(this.schema.translationJobs)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(this.schema.translationJobs.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getPendingTranslationJobs() {
+    return this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(eq(this.schema.translationJobs.status, 'pending'))
+      .orderBy(this.schema.translationJobs.createdAt);
+  }
+
+  async getPendingTranslationJobsByStore(storeHash: string) {
+    return this.db
+      .select()
+      .from(this.schema.translationJobs)
+      .where(and(eq(this.schema.translationJobs.status, 'pending'), eq(this.schema.translationJobs.storeHash, storeHash)))
+      .orderBy(this.schema.translationJobs.createdAt);
   }
 } 

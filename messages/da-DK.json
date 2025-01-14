@@ -124,5 +124,27 @@
         "delete": "Slet"
       }
     }
+  },
+  "translations": {
+    "jobs": {
+      "title": "Oversættelsesopgaver",
+      "selectChannel": "Vælg kanal",
+      "selectLocale": "Vælg sprog",
+      "import": "Importér oversættelser",
+      "export": "Eksportér oversættelser",
+      "refresh": "Opdater",
+      "type": "Type",
+      "status": "Status",
+      "channel": "Kanal",
+      "locale": "Sprog",
+      "created": "Oprettet",
+      "actions": "Handlinger",
+      "download": "Download",
+      "view": "Vis fil",
+      "status_pending": "Afventer",
+      "status_processing": "Behandler",
+      "status_completed": "Fuldført",
+      "status_failed": "Mislykket"
+    }
   }
 } 

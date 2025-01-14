@@ -1,0 +1,90 @@
+import { NextRequest } from 'next/server';
+import { getSessionFromContext } from '@/lib/auth';
+import { dbClient as db } from '@/lib/db';
+import { put } from '@vercel/blob';
+
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const context = searchParams.get('context');
+    
+    if (!context) {
+      return new Response('Context is required', { status: 400 });
+    }
+
+    const { storeHash } = await getSessionFromContext(context);
+    const jobs = await db.getTranslationJobs(storeHash);
+
+    return Response.json(jobs);
+  } catch (error: any) {
+    console.error('Error fetching translation jobs:', error);
+    return new Response(error.message || 'Internal Server Error', { 
+      status: error.status || 500 
+    });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const context = searchParams.get('context');
+    
+    if (!context) {
+      return new Response('Context is required', { status: 400 });
+    }
+
+    const { storeHash } = await getSessionFromContext(context);
+    
+    // Handle file upload
+    if (request.headers.get('content-type')?.includes('multipart/form-data')) {
+      const form = await request.formData();
+      const file = form.get('file') as File;
+      const channelId = form.get('channelId') as string;
+      const locale = form.get('locale') as string;
+
+      if (!file || !channelId || !locale) {
+        return new Response('Missing required fields', { status: 400 });
+      }
+
+      // Upload file to blob storage
+      const blob = await put(file.name, file, { 
+        access: 'public',
+        contentType: 'text/csv'
+      });
+
+      // Create job with file URL
+      const job = await db.createTranslationJob({
+        storeHash,
+        jobType: 'import',
+        channelId: parseInt(channelId, 10),
+        locale,
+        fileUrl: blob.url,
+      });
+
+      return Response.json({ job });
+    }
+
+    // Handle export job creation
+    const body = await request.json();
+    const { jobType, channelId, locale } = body;
+
+    if (!jobType || !channelId || !locale) {
+      return new Response('Missing required fields', { status: 400 });
+    }
+
+    const job = await db.createTranslationJob({
+      storeHash,
+      jobType,
+      channelId,
+      locale,
+      fileUrl: undefined,
+    });
+
+    return Response.json({ job });
+  } catch (error: any) {
+    console.error('Error creating translation job:', error);
+    return new Response(error.message || 'Internal Server Error', { 
+      status: error.status || 500 
+    });
+  }
+} 

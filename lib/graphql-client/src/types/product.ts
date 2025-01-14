@@ -1,6 +1,6 @@
 export interface ProductLocaleQueryOptions {
-  pid: string;
-  channelId: string;
+  pid: number;
+  channelId: number;
   availableLocales: Array<{ code: string }>;
   defaultLocale: string;
 }

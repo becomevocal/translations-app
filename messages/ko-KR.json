@@ -112,7 +112,7 @@
       "save": "저장",
       "cancel": "취소",
       "loading": "로딩 중...",
-      "error": "오류가 발생했습니다",
+      "error": "오류가 발생했습니다. 다시 시도해 주세요.",
       "success": "변경사항이 성공적으로 저장되었습니다",
       "required": "필수",
       "optional": "선택사항",
@@ -123,6 +123,28 @@
         "edit": "편집",
         "delete": "삭제"
       }
+    }
+  },
+  "translations": {
+    "jobs": {
+      "title": "번역 작업",
+      "selectChannel": "채널 선택",
+      "selectLocale": "언어 선택",
+      "import": "번역 가져오기",
+      "export": "번역 내보내기",
+      "refresh": "새로고침",
+      "type": "유형",
+      "status": "상태",
+      "channel": "채널",
+      "locale": "언어",
+      "created": "생성일",
+      "actions": "작업",
+      "download": "다운로드",
+      "view": "파일 보기",
+      "status_pending": "대기 중",
+      "status_processing": "처리 중",
+      "status_completed": "완료됨",
+      "status_failed": "실패"
     }
   }
 } 

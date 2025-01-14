@@ -16,9 +16,11 @@ A TypeScript GraphQL client for BigCommerce's Admin API, specifically designed f
   - Automatic rate limiting management
   - Configurable retry logic
   - Comprehensive error handling
+  - Query complexity tracking
 - 📝 Detailed Logging
   - Debug-level request/response logging
   - Rate limit tracking
+  - Complexity monitoring
   - Error tracing
 
 ## Installation
@@ -46,7 +48,13 @@ const client = new GraphQLClient({
   accessToken: 'your-access-token',
   storeHash: 'store-hash',
   maxRetries: 3,           // Optional: Default is 3
-  failOnLimitReached: false // Optional: Default is false
+  failOnLimitReached: false, // Optional: Default is false
+  complexity: {
+    onComplexityUpdate: (complexity) => {
+      // Monitor query complexity
+      console.log(`Query complexity: ${complexity}/10000`);
+    }
+  }
 });
 ```
 
@@ -97,7 +105,6 @@ const result = await client.updateProductLocaleData(
         metaDescription: 'Meta descripción'
       }
     }
-    // Additional inputs for modifiers, options, etc.
   }
 );
 ```
@@ -149,7 +156,7 @@ const updatedExtension = await client.updateAppExtension({
 const deletedId = await client.deleteAppExtension('extension-id');
 ```
 
-#### Smart Extension Management
+#### App Extension Upsert
 
 ```typescript
 // Creates if doesn't exist, updates if exists, removes duplicates
@@ -183,6 +190,33 @@ try {
   }
 }
 ```
+
+## Query Complexity
+
+As of January 2025, BigCommerce's GraphQL API has a complexity limit of 10,000 per request. The client provides complexity monitoring to help you stay within this limit:
+
+```typescript
+const client = new GraphQLClient({
+  // ... other config
+  complexity: {
+    onComplexityUpdate: (complexity) => {
+      // Monitor and log query complexity
+      console.log(`Query complexity: ${complexity}/10000`);
+      
+      // Example: Alert on high complexity queries
+      if (complexity > 8000) {
+        console.warn('High complexity query detected');
+      }
+    }
+  }
+});
+```
+
+Tips for managing complexity:
+- Limit collections to smaller page sizes (e.g., `first:10` instead of `first:50`)
+- Reduce nested collection depths
+- Request only needed fields
+- Consider splitting large queries into smaller ones
 
 ## Debugging
 

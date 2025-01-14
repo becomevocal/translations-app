@@ -350,6 +350,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
       productId,
       productData,
       context,
+      t,
     ]
   );
 

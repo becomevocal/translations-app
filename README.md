@@ -1,4 +1,4 @@
-# Multi-lang Translations App
+# BigCommerce Translations App
 
 This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enables merchants to translate their catalog into multiple languages per storefront. It uses:
 - App Extensions to create a native editing experience within the product list
@@ -37,8 +37,10 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Update uninstall and remove user routes
 - [x] Separate auth and session code into client with it's own types so it can be a separate package
 - [x] Separate out Admin GraphQL client (including app extensions) into a separate package
+- [x] Improve global "failed to load" design
+- [ ] Add import / export functionality (include ensuring uploads are private)
+- [ ] Move server side locale transforms in api route into graphql client
 - [ ] Finish 'start translations' flow
-- [ ] Add import / export functionality
 
 ## Getting Started
 
@@ -54,6 +56,8 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
    - `APP_ORIGIN`: Your app's URL (for local development, this will be your ngrok URL)
    - `JWT_KEY`: A secure random string of 32+ characters
    - `DATABASE_URL`: Your database connection string (see Database Setup below)
+   - `BLOB_READ_WRITE_TOKEN`: Your Vercel Blob storage token (get this from your Vercel project settings)
+   - `CRON_SECRET`: A secure random string for protecting the cron endpoint
 
 ### Database Setup
 
@@ -100,17 +104,12 @@ After setting up your database, run these commands:
    npm run dev
    ```
 
-2. Generate the database tables from the schema:
+2. Create the required tables within your database:
    ```bash
-   npm run db:generate
+   npm run db:push
    ```
 
-3. Run database migrations to create the tables in your database:
-   ```bash
-   npm run db:migrate
-   ```
-
-4. (Optional) Use Drizzle Studio to manage your data:
+3. (Optional) Use Drizzle Studio to manage your data:
    ```bash
    npm run db:studio
    ```
@@ -163,3 +162,11 @@ bigcommerce:admin Received response: { status: 200, headers: {...} } +150ms
 bigcommerce:graphql Making GraphQL request: { query: "query { store { ... } }" } +0ms
 bigcommerce:auth Verifying BigCommerce JWT +1ms
 ```
+
+## Requirements
+
+- Node.js 20 or later
+  ```bash
+  # Using nvm (Node Version Manager)
+  nvm use
+  ```

@@ -111,7 +111,7 @@
       "save": "保存",
       "cancel": "取消",
       "loading": "加载中...",
-      "error": "发生错误",
+      "error": "发生错误。请重试。",
       "success": "更改保存成功",
       "required": "必填",
       "optional": "可选",
@@ -125,6 +125,28 @@
     },
     "localeSelector": {
       "callout": "在上方选择语言以开始编辑此产品的翻译。"
+    }
+  },
+  "translations": {
+    "jobs": {
+      "title": "翻译任务",
+      "selectChannel": "选择渠道",
+      "selectLocale": "选择语言",
+      "import": "导入翻译",
+      "export": "导出翻译",
+      "type": "类型",
+      "status": "状态",
+      "channel": "渠道",
+      "locale": "语言",
+      "created": "创建时间",
+      "actions": "操作",
+      "download": "下载",
+      "view": "查看文件",
+      "status_pending": "待处理",
+      "status_processing": "处理中",
+      "status_completed": "已完成",
+      "status_failed": "失败",
+      "refresh": "刷新"
     }
   }
 } 
