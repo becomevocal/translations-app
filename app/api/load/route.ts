@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { authClient } from "@/lib/auth";
 import { signedPayloadJwtSchema } from "@bigcommerce/translations-auth-client";
 import { setSession } from "@/lib/session";
+import { dbClient } from "@/lib/db";
 
 const buildRedirectUrl = (url: string, encodedContext: string) => {
   const [path, query = ""] = url.split("?");
@@ -26,9 +27,14 @@ export async function GET(req: NextRequest) {
     return new NextResponse("JWT properties invalid", { status: 403 });
   }
 
-  const { sub, url: path, user } = parsedJwt.data;
+  const { sub, url: path, user, owner } = parsedJwt.data;
 
   const storeHash = sub.split("/")[1] as string;
+
+  await dbClient.setStoreUser({
+    store_hash: storeHash,
+    user,
+  });
 
   const clientToken = await authClient.encodeSessionPayload({
     userId: user.id,

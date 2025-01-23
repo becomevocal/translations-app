@@ -1,6 +1,5 @@
 export * from "./user";
 export * from "./session";
-export * from "./database";
 
 export interface StoreInformation {
   multi_language_enabled: boolean;

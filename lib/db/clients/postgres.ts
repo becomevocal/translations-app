@@ -59,7 +59,7 @@ export class PostgresClient implements DatabaseOperations {
       });
   }
 
-  async setStoreUser(session: AuthSession) {
+  async setStoreUser(session: AuthSession | { store_hash: string; user: BaseUser }) {
     if (!session.store_hash || !session.user?.id) return;
     await this.db
       .insert(this.schema.storeUsers)
