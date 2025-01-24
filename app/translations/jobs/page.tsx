@@ -256,7 +256,7 @@ export default function TranslationsJobs() {
         <Header
           title={t('title')}
           backLink={{
-            text: 'Back to home',
+            text: 'Back',
             onClick: handleBackClick,
             href: '#'
           }}
@@ -372,6 +372,8 @@ export default function TranslationsJobs() {
       >
         <FormGroup>
           <Text>Select a CSV file containing your translations.</Text>
+        </FormGroup>
+        <FormGroup>
           <input
             ref={fileInputRef}
             type="file"

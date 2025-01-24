@@ -54,14 +54,13 @@ function createGraphFieldsFromPostData(
  */
 function transformGraphQLOptionsDataToLocaleData(
   optionsData: any,
-  localeCode: string
 ) {
   // Ensure we're working with an array of edges
   const options = optionsData?.edges || optionsData || [];
 
   return options.reduce((acc: any, edge: any) => {
     const optionId = edge.node.id;
-    const localeOption = edge.node[localeCode];
+    const localeOption = edge.node.overridesForLocale;
 
     acc[optionId] = {
       displayName: localeOption?.displayName || "",
@@ -203,15 +202,14 @@ function transformGraphQLCustomFieldsResponse(customFieldsData: any) {
  * @returns Transformed locale-specific custom fields data.
  */
 function transformGraphQLCustomFieldsDataToLocaleData(
-  customFieldsData: any,
-  localeCode: string
+  customFieldsData: any
 ) {
   // Ensure we're working with an array
   const customFields = customFieldsData || [];
 
   return customFields.reduce((acc: any, field: any) => {
     const fieldId = field.node.id;
-    const localeData = field.node[localeCode]?.edges?.[0]?.node || {};
+    const localeData = field.node?.overrides?.edges?.[0]?.node || {};
 
     acc[fieldId] = {
       name: localeData?.name || "",
@@ -265,15 +263,14 @@ function transformPostedCustomFieldDataToGraphQLSchema(
  * @returns Transformed locale-specific modifiers data.
  */
 function transformGraphQLModifiersDataToLocaleData(
-  modifiersData: any,
-  localeCode: string
+  modifiersData: any
 ) {
   // Ensure we're working with an array of edges
   const modifiers = modifiersData?.edges || modifiersData || [];
 
   return modifiers.reduce((acc: any, edge: any) => {
     const modifierId = edge.node.id;
-    const localeModifier = edge.node[localeCode];
+    const localeModifier = edge.node.overridesForLocale;
     const modifierType = edge.node.__typename;
 
     acc[modifierId] = {
@@ -844,23 +841,25 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
 
   try {
     const { defaultLocale, availableLocales } = await getChannelLocales(context, channelId);
+    const selectedLocale = searchParams.get("locale") ?? (availableLocales?.[1]?.code || availableLocales[0].code);
     const { accessToken, storeHash } = await getSessionFromContext(context);
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     const gqlData = await graphQLClient.getProductLocaleData({
       pid: Number(pid),
       channelId: Number(channelId),
+      locale: selectedLocale,
       availableLocales,
       defaultLocale,
     });
 
-    if (!gqlData?.data?.store?.products?.edges?.[0]?.node) {
+    if (!gqlData.id) {
       return new Response(`Product ID ${pid} not found or invalid GraphQL response`, {
         status: 404,
       });
     }
 
-    const productNode = gqlData.data.store.products.edges[0].node;
+    const productNode = gqlData;
 
     const normalizedProductData = {
       name: productNode.basicInformation?.name,
@@ -938,41 +937,34 @@ export async function GET(request: NextRequest, props: { params: Promise<{ pid: 
       localeData: {} as { [key: string]: any },
     };
 
-    availableLocales.forEach((locale) => {
-      if (defaultLocale !== locale.code) {
-        const localeNode =
-          gqlData.data.store.products.edges[0].node[locale.code];
-        const options =
-          gqlData.data.store.products.edges[0].node?.options?.edges;
-        const modifiers =
-          gqlData.data.store.products.edges[0].node?.modifiers?.edges;
-        const customFields =
-          gqlData.data.store.products.edges[0].node?.customFields?.edges;
+    const localeNode =
+      gqlData.overridesForLocale;
+    const options =
+      gqlData?.options?.edges;
+    const modifiers =
+      gqlData?.modifiers?.edges;
+    const customFields =
+      gqlData?.customFields?.edges;
 
-        normalizedProductData.localeData[locale.code] = {
-          name: localeNode?.basicInformation?.name ?? null,
-          description: localeNode?.basicInformation?.description ?? null,
-          pageTitle: localeNode?.seoInformation?.pageTitle ?? null,
-          metaDescription: localeNode?.seoInformation?.metaDescription ?? null,
-          preOrderMessage: localeNode?.preOrderSettings?.message ?? null,
-          warranty: localeNode?.storefrontDetails?.warranty ?? null,
-          availabilityDescription: localeNode?.storefrontDetails?.availabilityDescription ?? null,
-          searchKeywords: localeNode?.storefrontDetails?.searchKeywords ?? null,
-          options: transformGraphQLOptionsDataToLocaleData(
-            options,
-            locale.code
-          ),
-          modifiers: transformGraphQLModifiersDataToLocaleData(
-            modifiers,
-            locale.code
-          ),
-          customFields: transformGraphQLCustomFieldsDataToLocaleData(
-            customFields,
-            locale.code
-          ),
-        };
-      }
-    });
+    normalizedProductData.localeData[selectedLocale] = {
+      name: localeNode?.basicInformation?.name ?? null,
+      description: localeNode?.basicInformation?.description ?? null,
+      pageTitle: localeNode?.seoInformation?.pageTitle ?? null,
+      metaDescription: localeNode?.seoInformation?.metaDescription ?? null,
+      preOrderMessage: localeNode?.preOrderSettings?.message ?? null,
+      warranty: localeNode?.storefrontDetails?.warranty ?? null,
+      availabilityDescription: localeNode?.storefrontDetails?.availabilityDescription ?? null,
+      searchKeywords: localeNode?.storefrontDetails?.searchKeywords ?? null,
+      options: transformGraphQLOptionsDataToLocaleData(
+        options
+      ),
+      modifiers: transformGraphQLModifiersDataToLocaleData(
+        modifiers
+      ),
+      customFields: transformGraphQLCustomFieldsDataToLocaleData(
+        customFields
+      ),
+    };
 
     return Response.json(normalizedProductData);
   } catch (error: any) {
@@ -1011,7 +1003,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
     const graphQLClient = createGraphQLClient(accessToken, storeHash);
 
     if (body["locale"] && body.locale !== defaultLocale) {
-      const productGraphData = createGraphFieldsFromPostData(
+      const basicInformationGraphData = createGraphFieldsFromPostData(
         body,
         "basicInformation"
       );
@@ -1036,183 +1028,211 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ pid: 
         "storefrontDetails"
       );
 
-      // Get fields to remove for each section
-      const basicInfoFieldsToRemove = getBasicInformationFieldsToRemove(productGraphData);
-      const seoFieldsToRemove = getSeoInformationFieldsToRemove(seoGraphData);
-      const storefrontFieldsToRemove = getStorefrontDetailsFieldsToRemove(storefrontGraphData);
-      const preOrderFieldsToRemove = getPreOrderSettingsFieldsToRemove(preOrderGraphData);
-      const customFieldsToRemove = getCustomFieldsToRemove(customFieldData);
+      // For advanced features like options, modifiers, and custom fields, we still use the legacy format
+      // (Note, using this for all updates currently because GraphQL Tada client approach did not pan out fully)
+      // if (optionData.options || modifierData.modifiers || customFieldData.customFields) {
+        // Get fields to remove for each section
+        const basicInfoFieldsToRemove = getBasicInformationFieldsToRemove(basicInformationGraphData);
+        const seoFieldsToRemove = getSeoInformationFieldsToRemove(seoGraphData);
+        const storefrontFieldsToRemove = getStorefrontDetailsFieldsToRemove(storefrontGraphData);
+        const preOrderFieldsToRemove = getPreOrderSettingsFieldsToRemove(preOrderGraphData);
+        const customFieldsToRemove = getCustomFieldsToRemove(customFieldData);
 
-      const graphVariables = {
-        channelId: `bc/store/channel/${channelId}`,
-        locale: body.locale,
-        input: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
-          },
-          data: productGraphData,
-        },
-        seoInput: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
-          },
-          data: seoGraphData,
-        },
-        preOrderInput: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
-          },
-          data: {
-            message: preOrderGraphData.preOrderMessage
-          }
-        },
-        storefrontInput: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
-          },
-          data: {
-            warranty: storefrontGraphData.warranty,
-            availabilityDescription: storefrontGraphData.availabilityDescription,
-            searchKeywords: storefrontGraphData.searchKeywords
-          }
-        },
-        ...(basicInfoFieldsToRemove.length > 0 && {
-          removedBasicInfoInput: {
+        const graphVariables = {
+          channelId: `bc/store/channel/${channelId}`,
+          locale: body.locale,
+          input: {
             productId: `bc/store/product/${pid}`,
             localeContext: {
               channelId: `bc/store/channel/${channelId}`,
               locale: body.locale,
             },
-            overridesToRemove: basicInfoFieldsToRemove
-          }
-        }),
-        ...(seoFieldsToRemove.length > 0 && {
-          removedSeoInput: {
+            data: basicInformationGraphData,
+          },
+          seoInput: {
             productId: `bc/store/product/${pid}`,
             localeContext: {
               channelId: `bc/store/channel/${channelId}`,
               locale: body.locale,
             },
-            overridesToRemove: seoFieldsToRemove
-          }
-        }),
-        ...(storefrontFieldsToRemove.length > 0 && {
-          removedStorefrontDetailsInput: {
+            data: seoGraphData,
+          },
+          preOrderInput: {
             productId: `bc/store/product/${pid}`,
             localeContext: {
               channelId: `bc/store/channel/${channelId}`,
               locale: body.locale,
             },
-            overridesToRemove: storefrontFieldsToRemove
-          }
-        }),
-        ...(preOrderFieldsToRemove.length > 0 && {
-          removedPreOrderInput: {
+            data: {
+              message: preOrderGraphData.preOrderMessage
+            }
+          },
+          storefrontInput: {
             productId: `bc/store/product/${pid}`,
             localeContext: {
               channelId: `bc/store/channel/${channelId}`,
               locale: body.locale,
             },
-            overridesToRemove: preOrderFieldsToRemove
-          }
-        }),
-        ...(customFieldsToRemove.length > 0 && {
-          removedCustomFieldsInput: {
+            data: {
+              warranty: storefrontGraphData.warranty,
+              availabilityDescription: storefrontGraphData.availabilityDescription,
+              searchKeywords: storefrontGraphData.searchKeywords
+            }
+          },
+          ...(basicInfoFieldsToRemove.length > 0 && {
+            removedBasicInfoInput: {
+              productId: `bc/store/product/${pid}`,
+              localeContext: {
+                channelId: `bc/store/channel/${channelId}`,
+                locale: body.locale,
+              },
+              overridesToRemove: basicInfoFieldsToRemove
+            }
+          }),
+          ...(seoFieldsToRemove.length > 0 && {
+            removedSeoInput: {
+              productId: `bc/store/product/${pid}`,
+              localeContext: {
+                channelId: `bc/store/channel/${channelId}`,
+                locale: body.locale,
+              },
+              overridesToRemove: seoFieldsToRemove
+            }
+          }),
+          ...(storefrontFieldsToRemove.length > 0 && {
+            removedStorefrontDetailsInput: {
+              productId: `bc/store/product/${pid}`,
+              localeContext: {
+                channelId: `bc/store/channel/${channelId}`,
+                locale: body.locale,
+              },
+              overridesToRemove: storefrontFieldsToRemove
+            }
+          }),
+          ...(preOrderFieldsToRemove.length > 0 && {
+            removedPreOrderInput: {
+              productId: `bc/store/product/${pid}`,
+              localeContext: {
+                channelId: `bc/store/channel/${channelId}`,
+                locale: body.locale,
+              },
+              overridesToRemove: preOrderFieldsToRemove
+            }
+          }),
+          ...(customFieldsToRemove.length > 0 && {
+            removedCustomFieldsInput: {
+              productId: `bc/store/product/${pid}`,
+              data: customFieldsToRemove.map(field => ({
+                customFieldId: field.customFieldId,
+                channelLocaleContextData: {
+                  context: {
+                    channelId: `bc/store/channel/${channelId}`,
+                    locale: body.locale
+                  },
+                  attributes: field.fields
+                }
+              }))
+            }
+          }),
+          removedOptionsInput: {
             productId: `bc/store/product/${pid}`,
-            data: customFieldsToRemove.map(field => ({
-              customFieldId: field.customFieldId,
-              channelLocaleContextData: {
-                context: {
-                  channelId: `bc/store/channel/${channelId}`,
-                  locale: body.locale
-                },
-                attributes: field.fields
-              }
-            }))
-          }
-        }),
-        removedOptionsInput: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            data: {
+              options: transformPostedOptionDataToGraphQLSchema(optionData).removedValues
+            }
           },
-          data: {
-            options: transformPostedOptionDataToGraphQLSchema(optionData).removedValues
-          }
-        },
-        optionsInput: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
+          optionsInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            data: {
+              options: transformPostedOptionDataToGraphQLSchema(optionData).options,
+            },
           },
-          data: {
-            options: transformPostedOptionDataToGraphQLSchema(optionData).options,
+          removedModifiersInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            data: {
+              modifiers: transformPostedModifierDataToGraphQLSchema(modifierData).removedValues
+            }
           },
-        },
-        removedModifiersInput: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
+          modifiersInput: {
+            productId: `bc/store/product/${pid}`,
+            localeContext: {
+              channelId: `bc/store/channel/${channelId}`,
+              locale: body.locale,
+            },
+            data: {
+              modifiers: transformPostedModifierDataToGraphQLSchema(modifierData).modifiers,
+            },
           },
-          data: {
-            modifiers: transformPostedModifierDataToGraphQLSchema(modifierData).removedValues
-          }
-        },
-        modifiersInput: {
-          productId: `bc/store/product/${pid}`,
-          localeContext: {
-            channelId: `bc/store/channel/${channelId}`,
-            locale: body.locale,
+          customFieldsInput: {
+            productId: `bc/store/product/${pid}`,
+            data: transformPostedCustomFieldDataToGraphQLSchema(
+              customFieldData,
+              channelId,
+              body.locale
+            ),
           },
-          data: {
-            modifiers: transformPostedModifierDataToGraphQLSchema(modifierData).modifiers,
-          },
-        },
-        customFieldsInput: {
-          productId: `bc/store/product/${pid}`,
-          data: transformPostedCustomFieldDataToGraphQLSchema(
-            customFieldData,
-            channelId,
-            body.locale
+        };
+
+        const gqlData: any = await graphQLClient.NOTADA_updateProductLocaleData(
+          graphVariables
+        );
+
+        result = {
+          ...gqlData?.data?.product?.setProductBasicInformation?.product
+            ?.overridesForLocale?.basicInformation,
+          ...gqlData?.data?.product?.setProductSeoInformation?.product
+            ?.overridesForLocale?.seoInformation,
+          preOrderMessage: gqlData?.data?.product?.setProductPreOrderSettings?.product
+            ?.overridesForLocale?.preOrderSettings?.message,
+          ...gqlData?.data?.product?.setProductStorefrontDetails?.product
+            ?.overridesForLocale?.storefrontDetails,
+          options: transformGraphQLOptionsResponse(
+            gqlData?.data?.product?.setProductOptionsInformation?.product?.options
           ),
-        },
-      };
+          modifiers: transformGraphQLModifiersResponse(
+            gqlData?.data?.product?.setProductModifiersInformation?.product?.modifiers
+          ),
+          customFields: transformGraphQLCustomFieldsResponse(
+            gqlData?.data?.product?.updateProductCustomFields?.product
+              ?.customFields
+          ),
+        };
+      // } else {
+      //   // For basic product information updates, use the new simplified interface
+      //   const gqlData = await graphQLClient.updateProductLocaleData({
+      //     locale: body.locale,
+      //     channelId: Number(channelId),
+      //     productId: Number(pid),
+      //     productData: {
+      //       name: basicInformationGraphData.name,
+      //       description: basicInformationGraphData.description,
+      //       pageTitle: seoGraphData.pageTitle,
+      //       metaDescription: seoGraphData.metaDescription,
+      //       preOrderMessage: preOrderGraphData.preOrderMessage,
+      //       warranty: storefrontGraphData.warranty,
+      //       availabilityDescription: storefrontGraphData.availabilityDescription,
+      //       searchKeywords: storefrontGraphData.searchKeywords
+      //     }
+      //   });
 
-      const gqlData = await graphQLClient.updateProductLocaleData(
-        graphVariables
-      );
-
-      result = {
-        ...gqlData?.data?.product?.setProductBasicInformation?.product
-          ?.overridesForLocale?.basicInformation,
-        ...gqlData?.data?.product?.setProductSeoInformation?.product
-          ?.overridesForLocale?.seoInformation,
-        preOrderMessage: gqlData?.data?.product?.setProductPreOrderSettings?.product
-          ?.overridesForLocale?.preOrderSettings?.message,
-        ...gqlData?.data?.product?.setProductStorefrontDetails?.product
-          ?.overridesForLocale?.storefrontDetails,
-        options: transformGraphQLOptionsResponse(
-          gqlData?.data?.product?.setProductOptionsInformation?.product?.options
-        ),
-        modifiers: transformGraphQLModifiersResponse(
-          gqlData?.data?.product?.setProductModifiersInformation?.product?.modifiers
-        ),
-        customFields: transformGraphQLCustomFieldsResponse(
-          gqlData?.data?.product?.updateProductCustomFields?.product
-            ?.customFields
-        ),
-      };
+      //   result = {
+      //     ...gqlData?.setProductBasicInformation?.product?.overridesForLocale?.basicInformation,
+      //     ...gqlData?.setProductSeoInformation?.product?.overridesForLocale?.seoInformation,
+      //     preOrderMessage: gqlData?.setProductPreOrderSettings?.product?.overridesForLocale?.preOrderSettings?.message,
+      //     ...gqlData?.setProductStorefrontDetails?.product?.overridesForLocale?.storefrontDetails,
+      //   };
+      // }
     } else {
       // This is for the default lang, so update the main product
       // (currently the front-end does not allow this)

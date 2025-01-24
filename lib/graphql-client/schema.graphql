@@ -1,0 +1,6608 @@
+input AddImagesToProductInput {
+  """The ID of the product."""
+  productId: ID!
+
+  """
+  The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+  """
+  context: ChannelLocaleContextInput
+
+  """
+  The unique identifier for the resource with which the product image is associated.
+  """
+  ids: [ID!]!
+}
+
+type AddImagesToProductResult {
+  """The images list with added and removed images."""
+  images(before: String, after: String, first: Int, last: Int): ProductImageConnection
+}
+
+"""Union type for all 'addLocale' mutation's errors."""
+union AddLocaleError = EntityNotFoundError | EntityAlreadyExistsError | ValidationError
+
+input AddLocaleInput {
+  """The ID of the channel."""
+  channelId: ID!
+
+  """The code of the locale."""
+  code: String!
+
+  """The status of the locale."""
+  status: LocaleStatusType
+}
+
+type AddLocaleResult {
+  """The locale that was added."""
+  locale: Locale
+
+  """The errors that occurred during the add locale mutation."""
+  errors: [AddLocaleError!]!
+}
+
+"""
+Error indicating that the result of the operation would cause duplicate.
+"""
+type AlreadyExistsError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""The label of the App Extension."""
+input AppExtensionLabelInput {
+  """
+  The link text that the user sees when the control panel language is English or not defined by the developer in `label.locales`. The `defaultValue` should be in English. Suggested length of ≤25 characters; limit 255 characters.
+  """
+  defaultValue: String!
+
+  """
+  A list of alternate link text values and their corresponding locale codes.
+  """
+  locales: [AppExtensionLabelLocaleInput!]!
+}
+
+"""
+A developer-defined list of alternate link text values and their corresponding locale codes.
+"""
+input AppExtensionLabelLocaleInput {
+  """
+  A locale code that corresponds with a control-panel supported language. For example, `de-DE` for German. See the App Extensions documentation for a list of currently supported languages and corresponding locale codes.
+  """
+  localeCode: String!
+
+  """
+  The link text value in the language of the locale code. Suggested length of ≤25 characters; limit 255 characters.
+  """
+  value: String!
+}
+
+"""Mutations that create, update, and delete App Extensions."""
+type AppExtensionMutations {
+  """
+  Registers a new App Extension to the store and associates it with the requesting API account.
+  """
+  createAppExtension(input: CreateAppExtensionInput!): CreateAppExtensionResult
+
+  """
+  Updates an existing App Extension registered to the store and associates it with the requesting API account.
+  """
+  updateAppExtension(input: UpdateAppExtensionInput!): UpdateAppExtensionResult
+
+  """
+  Deletes an App Extension that belongs to the store and requesting API account.
+  """
+  deleteAppExtension(input: DeleteAppExtensionInput!): DeleteAppExtensionResult
+}
+
+"""
+The storefront channel and locale that apply when you set overrides for a channel locale.
+"""
+input ChannelLocaleContextInput {
+  """Storefront channel ID."""
+  channelId: ID!
+
+  """Locale in a storefront channel."""
+  locale: String!
+}
+
+"""Channel mutations."""
+type ChannelMutations {
+  """Creates a channel."""
+  createChannel(input: CreateChannelInput!): CreateChannelResult
+}
+
+input CreateAppExtensionInput {
+  """
+  Defines the action that the control panel performs after the user clicks the App Extension label.
+  """
+  context: AppExtensionContext!
+
+  """
+  The locale-aware link text options for the App Extension's menu item. The control panel user sees this text value wherever they have the option to open the App Extension.
+  """
+  label: AppExtensionLabelInput!
+
+  """
+  The entity type to which the App Extension relates; for example, Orders. The model corresponds with the page on which the App Extension appears.
+  """
+  model: AppExtensionModel!
+
+  """
+  A relative path with some meaning to your app, most commonly an internally-defined GET route. The path should contain a path parameter that the app expects to be templated into its route, defined as a JavaScript string template expression. For example, `/customer/auth/${id}`. Currently, `id` is the only supported parameter. Limit 255 characters.
+  """
+  url: String!
+}
+
+type CreateAppExtensionResult {
+  """
+  The response object properties available after creating an App Extension.
+  """
+  appExtension: AppExtension
+}
+
+input CreateChannelInput {
+  """Associated ID within a system / platform outside of BC."""
+  externalId: String
+
+  """
+  Indicates if a channel can create listings from the BigCommerce UI. Default value for this field is based on the channel type and platform combination if not specified on create.
+  """
+  isListableFromUi: Boolean
+
+  """
+  Indicates if a channel is visible within the BigCommerce merchant admin UI (control panel). If false, the channel will not show in Channel Manager nor in any channels dropdown throughout the UI. Default value for this field is true if not specified on create.
+  """
+  isVisible: Boolean
+
+  """
+  Name of the channel as it will appear to merchants in the control panel.
+  """
+  name: String!
+
+  """
+  The name of the platform for the channel; channel platform and type must be a valid combination. Please visit https://developer.bigcommerce.com/api-reference/store-management/channels#platform to check for valid combination.
+  """
+  platform: String!
+
+  """
+  The status of the channel; channel type, platform, and status must be a valid combination. Please visit https://developer.bigcommerce.com/api-reference/store-management/channels#status to check for valid combination. terminated is not valid for CREATE or UPDATE requests. deleted is not valid for CREATE requests.
+  """
+  status: ChannelStatus
+
+  """
+  The type of channel; channel platform and type must be a valid combination. Please visit https://developer.bigcommerce.com/api-reference/store-management/channels#platform to check for valid combination.
+  """
+  type: String!
+}
+
+type CreateChannelResult {
+  """The Channel that is created as a result of mutation."""
+  channel: Channel
+}
+
+"""Error object for create Amazon EventBridge webhook mutation."""
+union CreateEventBridgeWebhookError = AlreadyExistsError | ValidationError | EventBridgeSourceNotFoundError | DestinationNotAllowedError
+
+input CreateEventBridgeWebhookInput {
+  """The fields used to create an Amazon EventBridge webhook."""
+  destination: String!
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilterUnionInput!]
+
+  """If webhook is active or not."""
+  isActive: Boolean
+
+  """The scope of the event subscription."""
+  scope: String!
+}
+
+type CreateEventBridgeWebhookResult {
+  """The result returned after creating an Amazon EventBridge webhook."""
+  webhook: EventBridgeWebhook
+
+  """
+  The list of errors that occurred while creating an Amazon EventBridge webhook.
+  """
+  errors: [CreateEventBridgeWebhookError!]!
+}
+
+"""Error object for create HTTPS webhook mutation."""
+union CreateHttpsWebhookError = AlreadyExistsError | ValidationError | DestinationNotAllowedError
+
+input CreateHttpsWebhookInput {
+  """URL must be active, return a 200 response, and be served on port 443."""
+  destination: String!
+
+  """Filters limiting events that trigger sending webhooks."""
+  eventFilters: [WebhookEventFilterUnionInput!]
+
+  """
+  You can define any number of custom headers to be attached to the event sent to the destination URL.
+  """
+  headers: [HttpsWebhookHeaderInput!]
+
+  """If webhook is active or not."""
+  isActive: Boolean
+
+  """The scope of the event subscription."""
+  scope: String!
+}
+
+type CreateHttpsWebhookResult {
+  """The webhook object returned as a result of a mutation."""
+  webhook: HttpsWebhook
+
+  """The list of errors that occurred while creating a HTTPS webhook."""
+  errors: [CreateHttpsWebhookError!]!
+}
+
+"""Union type for all 'createMetafield' mutation errors."""
+union CreateMetafieldErrors = AlreadyExistsError | ValidationError | MetafieldLimitExceededError
+
+input CreateMetafieldInput {
+  """Namespace for the metafield."""
+  namespace: String!
+
+  """
+  The unique identifier for the resource with which the metafield is associated.
+  """
+  resourceId: ID
+
+  """The name of the metafield."""
+  key: String!
+
+  """Value of the metafield."""
+  value: String!
+
+  """Description of the metafield."""
+  description: String
+
+  """
+  Determines the visibility and writeability of the field by other API consumers.
+  """
+  permissionSet: MetafieldsPermissionSet!
+}
+
+type CreateMetafieldResult {
+  """Metafield that was created as a result of mutation."""
+  metafield: Metafield
+
+  """The list of errors that occurred while creating a metafield."""
+  errors: [CreateMetafieldErrors!]!
+}
+
+"""Error object for create Google Cloud PubSub webhook mutation."""
+union CreatePubSubWebhookError = AlreadyExistsError | ValidationError | PubSubTopicNotFoundError | PubSubNoPermissionToPublishError | DestinationNotAllowedError
+
+input CreatePubSubWebhookInput {
+  """
+  The Google Cloud Pub/Sub topic where events will be delivered. The topic must have the BigCommerce service account principal & Pub/Sub Publish permission enabled.
+  """
+  destination: String!
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilterUnionInput!]
+
+  """If webhook is active or not."""
+  isActive: Boolean
+
+  """The scope of the event subscription."""
+  scope: String!
+}
+
+type CreatePubSubWebhookResult {
+  """The webhook object returned as a result of a mutation."""
+  webhook: PubSubWebhook
+
+  """
+  The list of errors that occurred while creating a Google Pub/Sub webhook.
+  """
+  errors: [CreatePubSubWebhookError!]!
+}
+
+"""Data solutions mutations."""
+type DataSolutionsMutations {
+  """Update data layer configuration."""
+  updateDataLayer(input: UpdateDataLayerInput!): UpdateDataLayerResult
+}
+
+input DeleteAppExtensionInput {
+  """The ID of the object."""
+  id: ID!
+}
+
+"""
+The response object property available after deleting an App Extension; the currently available property is the ID of the deleted App Extension.
+"""
+type DeleteAppExtensionResult {
+  """The ID of the object."""
+  deletedAppExtensionId: ID
+}
+
+"""Error object for delete locale mutation."""
+union DeleteLocaleError = EntityNotFoundError
+
+input DeleteLocaleInput {
+  """The ID of the channel."""
+  channelId: ID!
+
+  """The code of the locale."""
+  code: String!
+}
+
+type DeleteLocaleResult {
+  """The locale code that were deleted."""
+  code: String
+
+  """The errors that occurred during the delete locale mutation."""
+  errors: [DeleteLocaleError!]!
+}
+
+"""Union type for all 'deleteMetafield' mutation errors."""
+union DeleteMetafieldErrors = ValidationError | EntityNotFoundError | NotAuthorizedToDeleteMetafieldError
+
+"""Input for deleteMetafield mutation."""
+input DeleteMetafieldInput {
+  """The ID of metafield to delete."""
+  id: ID!
+}
+
+type DeleteMetafieldResult {
+  """The id of metafield that is deleted as a result of mutation."""
+  deletedMetafieldId: ID
+
+  """The list of errors that occurred while creating a metafield."""
+  errors: [DeleteMetafieldErrors!]!
+}
+
+"""The entity to delete translations for."""
+input DeleteTranslationEntity {
+  """The ID of the entity to delete translations for."""
+  resourceId: ID!
+
+  """The fields to delete translations for."""
+  fields: [String!]!
+}
+
+"""Union type for all 'deleteTranslations' mutation's errors."""
+union DeleteTranslationsError = InvalidTranslationEntityFieldsError | TranslationEntityNotFoundError
+
+input DeleteTranslationsInput {
+  """The type of resource that is being deleted."""
+  resourceType: TranslationResourceType!
+
+  """The channel ID to delete translations for."""
+  channelId: ID!
+
+  """The locale ID to delete translations for."""
+  localeId: ID!
+
+  """The resources to delete translations for."""
+  resources: [DeleteTranslationEntity!]!
+}
+
+type DeleteTranslationsResult {
+  """The errors that occurred during the delete translations mutation."""
+  errors: [DeleteTranslationsError!]!
+}
+
+"""Error object for delete webhook mutation."""
+union DeleteWebhookError = EntityNotFoundError
+
+input DeleteWebhookInput {
+  """The ID of the webhook to be deleted."""
+  webhookId: ID!
+}
+
+"""The webhook ID that is deleted as a result of a mutation."""
+type DeleteWebhookResult {
+  """The ID of the deleted webhook."""
+  id: ID
+
+  """The list of errors that occurred while deleting a webhook."""
+  errors: [DeleteWebhookError!]!
+}
+
+"""
+Error indicating that the destination has already been taken by other hook type.
+"""
+type DestinationNotAllowedError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""Error indicating that the result of mutation would cause duplicate."""
+type EntityAlreadyExistsError implements EntityError & Error {
+  """Id of an entity error is caused by."""
+  id: ID!
+
+  """Information about error."""
+  message: String!
+}
+
+"""Common interface for all entity related mutations errors."""
+interface EntityError implements Error {
+  """Id of an entity error is caused by."""
+  id: ID!
+
+  """Information about error."""
+  message: String!
+}
+
+"""Error indicating that requested entity was not found."""
+type EntityNotFoundError implements EntityError & Error {
+  """Id of an entity error is caused by."""
+  id: ID!
+
+  """Information about error."""
+  message: String!
+}
+
+"""Common interface for all errors."""
+interface Error {
+  """Information about error."""
+  message: String!
+}
+
+"""
+Error indicating that requested Amazon EventBridge source was not found.
+"""
+type EventBridgeSourceNotFoundError implements Error {
+  """Amazon EventBridge source arn."""
+  source: String!
+
+  """Information about error."""
+  message: String!
+}
+
+"""The input HTTP header to be sent with the event message."""
+input HttpsWebhookHeaderInput {
+  """The input key validates a returned webhook."""
+  key: String!
+
+  """The input value of the returned webhook."""
+  value: String!
+}
+
+"""Unsupported fields were provided for the translation entity."""
+type InvalidTranslationEntityFieldsError implements Error {
+  """The fields that were not supported for the translation entity."""
+  fields: [String!]!
+
+  """Information about error."""
+  message: String!
+}
+
+"""
+Operations that allow you to add, update, and delete locales on the server side.
+"""
+type LocaleMutations {
+  """Adds a locale to a channel."""
+  addLocale(input: AddLocaleInput!): AddLocaleResult
+
+  """Deletes a locale from a channel."""
+  deleteLocale(input: DeleteLocaleInput!): DeleteLocaleResult
+
+  """Updates a locale in a channel."""
+  updateLocale(input: UpdateLocaleInput!): UpdateLocaleResult
+}
+
+"""
+This operation exceeds one of metafield's limits. Check metafields documentation for more information.
+"""
+type MetafieldLimitExceededError implements Error {
+  """The maximum number of metafields allowed."""
+  limit: Int!
+
+  """Information about error."""
+  message: String!
+}
+
+"""Metafield mutations."""
+type MetafieldMutations {
+  """Create Metafield."""
+  createMetafield(input: CreateMetafieldInput!): CreateMetafieldResult
+
+  """Update Metafield."""
+  updateMetafield(input: UpdateMetafieldInput!): UpdateMetafieldResult
+
+  """Delete Metafield."""
+  deleteMetafield(input: DeleteMetafieldInput!): DeleteMetafieldResult
+
+  """Reassign metafields to new client."""
+  reassignMetafieldsOwner(input: ReassignMetafieldsOwnerInput!): ReassignMetafieldsOwnerResult
+}
+
+type Mutation {
+  """App Extension mutations."""
+  appExtension: AppExtensionMutations!
+
+  """Channel mutations."""
+  channel: ChannelMutations!
+
+  """Product mutations."""
+  product: ProductMutations!
+
+  """Shared product modifiers mutations."""
+  sharedProductModifiers: SharedProductModifiersMutations!
+
+  """Shared product options mutations."""
+  sharedProductOptions: SharedProductOptionsMutations!
+
+  """Store settings mutations."""
+  settings: StoreSettingsMutations
+
+  """Mutations for translations."""
+  translation: Translation!
+
+  """
+  Operations that allow you to add, update, and delete locales on the server side.
+  """
+  locale: LocaleMutations!
+
+  """Webhook mutations."""
+  webhook: WebhookMutations!
+
+  """Metafield mutations."""
+  metafield: MetafieldMutations!
+}
+
+"""
+One of provided on update fields cannot be updated. Only 'key', 'value', and 'namespace' fields can be updated by not an entity owner with the 'write' permissions.
+"""
+type NotAuthorizedFieldToUpdateMetafieldFieldError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""
+The metafield could not be deleted by you. You are not an owner and metafield's permission was set to read.
+"""
+type NotAuthorizedToDeleteMetafieldError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""
+The read-only metafield cannot be updated by not an owner. The metafield's permissions are set to 'read'.
+"""
+type NotAuthorizedToUpdateMetafieldError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""Product basic information field names"""
+enum ProductBasicInformationField {
+  """The description field."""
+  PRODUCT_DESCRIPTION_FIELD
+
+  """The name field."""
+  PRODUCT_NAME_FIELD
+}
+
+"""Product mutations."""
+type ProductMutations {
+  """Removes overrides for product basic information from a locale."""
+  removeProductBasicInformationOverrides(input: RemoveProductBasicInformationOverridesInput!): RemoveProductBasicInformationOverridesResult
+
+  """Removes overrides for product SEO information from a locale."""
+  removeProductSeoInformationOverrides(input: RemoveProductSeoInformationOverridesInput!): RemoveProductSeoInformationOverridesResult
+
+  """Removes product option overrides from a locale."""
+  removeProductOptionsOverrides(input: RemoveProductOptionsOverridesInput!): RemoveProductOptionsOverridesResult
+
+  """Removes overrides for product storefront details from a locale."""
+  removeProductStorefrontDetailsOverrides(input: RemoveProductStorefrontDetailsOverridesInput!): RemoveProductStorefrontDetailsOverridesResult
+
+  """Removes overrides for product pre-order settings from a locale."""
+  removeProductPreOrderSettingsOverrides(input: RemoveProductPreOrderSettingsOverridesInput!): RemoveProductPreOrderSettingsOverridesResult
+
+  """Sets product basic information."""
+  setProductBasicInformation(input: SetProductBasicInformationInput!): SetProductBasicInformationResult
+
+  """Sets whether a product is marked as featured."""
+  setProductIsFeatured(input: SetProductIsFeaturedInput!): SetProductIsFeaturedResult
+
+  """Removes overrides for whether a product is featured from a locale."""
+  removeProductIsFeaturedOverride(input: RemoveProductIsFeaturedOverrideInput!): RemoveProductIsFeaturedOverrideResult
+
+  """Sets product SEO information."""
+  setProductSeoInformation(input: SetProductSeoInformationInput!): SetProductSeoInformationResult
+
+  """Sets product storefront details."""
+  setProductStorefrontDetails(input: SetProductStorefrontDetailsInput!): SetProductStorefrontDetailsResult
+
+  """Sets product pre-order settings."""
+  setProductPreOrderSettings(input: SetProductPreOrderSettingsInput!): SetProductPreOrderSettingsResult
+
+  """Sets product option information."""
+  setProductOptionsInformation(input: SetProductOptionsInformationInput!): SetProductOptionsInformationResult
+
+  """Sets a product URL path."""
+  setProductUrlPath(input: SetProductUrlPathInput!): SetProductUrlPathResult
+
+  """Removes overrides for a product URL path from a locale."""
+  removeProductUrlPathOverride(input: RemoveProductUrlPathOverrideInput!): RemoveProductUrlPathOverrideResult
+
+  """Sets product modifier information."""
+  setProductModifiersInformation(input: SetProductModifiersInformationInput!): SetProductModifiersInformationResult
+
+  """Remove product modifier overrides from a locale."""
+  removeProductModifiersOverrides(input: RemoveProductModifiersOverridesInput!): RemoveProductModifiersOverridesResult
+
+  """
+  Removes overrides for product custom fields from a storefront channel locale.
+  """
+  removeProductCustomFieldsOverrides(input: RemoveProductCustomFieldsOverridesInput!): RemoveProductCustomFieldsOverridesResult
+
+  """Updates product's custom fields."""
+  updateProductCustomFields(input: UpdateProductCustomFieldsInput!): UpdateProductCustomFieldsResult
+
+  """Adds images to a product."""
+  addImagesToProduct(input: AddImagesToProductInput!): AddImagesToProductResult
+
+  """Removes images from a product images collection."""
+  removeImagesFromProduct(input: RemoveImagesFromProductInput!): RemoveImagesFromProductResult
+
+  """Updates product images."""
+  updateProductImageProperties(input: UpdateProductImagePropertiesInput!): UpdateProductImagePropertiesResult
+
+  """Removes overrides for product images in a channel locale."""
+  removeProductImagePropertiesOverrides(input: RemoveProductImagePropertiesOverridesInput!): RemoveProductImagePropertiesOverridesResult
+}
+
+"""Product pre-order settings field names"""
+enum ProductPreOrderSettingsField {
+  """The pre-order message."""
+  PRODUCT_PRE_ORDER_MESSAGE
+}
+
+"""Product SEO information field names."""
+enum ProductSeoInformationField {
+  """The meta description field."""
+  PRODUCT_META_DESCRIPTION_FIELD
+
+  """The page title field."""
+  PRODUCT_PAGE_TITLE_FIELD
+}
+
+"""Product storefront details field names"""
+enum ProductStorefrontDetailsField {
+  """The availability description."""
+  PRODUCT_AVAILABILITY_DESCRIPTION_FIELD
+
+  """The search keywords."""
+  PRODUCT_SEARCH_KEYWORDS
+
+  """The warranty."""
+  PRODUCT_WARRANTY
+}
+
+"""
+Error indicating that requested Google Cloud Pub/Sub topic does not have permission to publish.
+"""
+type PubSubNoPermissionToPublishError implements Error {
+  """Google Cloud Pub/Sub topic name."""
+  topic: String!
+
+  """Information about error."""
+  message: String!
+}
+
+"""
+Error indicating that requested Google Cloud Pub/Sub topic was not found.
+"""
+type PubSubTopicNotFoundError implements Error {
+  """Google Cloud Pub/Sub topic name."""
+  topic: String!
+
+  """Information about error."""
+  message: String!
+}
+
+"""
+Errors that can occure while reassigning metafields owner. One of: EntityNotFound or EntityAlreadyExists.
+"""
+union ReassignMetafieldOwnerError = EntityNotFoundError | EntityAlreadyExistsError | ValidationError
+
+"""Reassign metafields owner input."""
+input ReassignMetafieldsOwnerInput {
+  """Identifier of client to which metafields should be reassigned to."""
+  newClientId: String!
+
+  """Ids of metafields we want to reassign to new client."""
+  metafieldIds: [ID!]!
+}
+
+"""Result of reassigning metafields to new owner."""
+type ReassignMetafieldsOwnerResult {
+  """Ids of metafields that were successfully reassigned to new owner."""
+  metafieldIds: [ID!]
+
+  """Errors that occurred during metafields reassignment."""
+  errors: [ReassignMetafieldOwnerError!]!
+}
+
+"""Checkbox product modifier overrides field name"""
+enum RemoveCheckboxProductModifierOverridesField {
+  """The display name field."""
+  CHECKBOX_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+
+  """The value field."""
+  CHECKBOX_PRODUCT_MODIFIER_VALUE_FIELD
+}
+
+"""
+Input that removes overrides for the checkbox product modifier from a channel locale.
+"""
+input RemoveCheckboxProductModifierOverridesInput {
+  """Fields for the modifier."""
+  fields: [RemoveCheckboxProductModifierOverridesField!]
+}
+
+"""Date field product modifier overrides field name"""
+enum RemoveDateFieldProductModifierOverridesField {
+  """The display name field."""
+  DATE_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the date field product modifier from a channel locale.
+"""
+input RemoveDateFieldProductModifierOverridesInput {
+  """Fields for the modifier."""
+  fields: [RemoveDateFieldProductModifierOverridesField!]
+}
+
+"""Dropdown product modifier overrides field name"""
+enum RemoveDropdownProductModifierOverridesField {
+  """The display name field."""
+  DROPDOWN_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the dropdown product modifier from a channel locale.
+"""
+input RemoveDropdownProductModifierOverridesInput {
+  """Fields for the modifier."""
+  fields: [RemoveDropdownProductModifierOverridesField!]
+
+  """Values for the modifier."""
+  values: RemoveDropdownProductModifierValuesOverridesInput
+}
+
+"""
+Input that removes overrides for the values of a dropdown product modifier from a channel locale.
+"""
+input RemoveDropdownProductModifierValuesOverridesInput {
+  """IDs of the modifier values."""
+  ids: [ID!]!
+}
+
+"""Dropdown product option overrides field names"""
+enum RemoveDropdownProductOptionOverridesField {
+  """The display name field."""
+  DROPDOWN_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the dropdown product option from a channel locale.
+"""
+input RemoveDropdownProductOptionOverridesInput {
+  """Product option fields that have overrides you want to remove."""
+  fields: [RemoveDropdownProductOptionOverridesField!]
+
+  """Product option values that have overrides you want to remove. """
+  values: RemoveDropdownProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for the values of a dropdown product option from a channel locale.
+"""
+input RemoveDropdownProductOptionValuesOverridesInput {
+  """
+  IDs of the product option values that have overrides you want to remove. 
+  """
+  ids: [ID!]!
+}
+
+"""Dropdown shared product option overrides field names"""
+enum RemoveDropdownSharedProductOptionOverridesField {
+  """The display name field."""
+  DROPDOWN_SHARED_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the dropdown shared product option from a channel locale.
+"""
+input RemoveDropdownSharedProductOptionOverridesInput {
+  """Shared option fields that have overrides you want to remove."""
+  fields: [RemoveDropdownSharedProductOptionOverridesField!]
+
+  """Shared option values that have overrides you want to remove."""
+  values: RemoveDropdownSharedProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for the values of a dropdown shared product option from a channel locale.
+"""
+input RemoveDropdownSharedProductOptionValuesOverridesInput {
+  """
+  IDs of the shared option values that have overrides you want to remove. 
+  """
+  ids: [ID!]!
+}
+
+"""File upload product modifier overrides field name"""
+enum RemoveFileUploadProductModifierOverridesField {
+  """The display name field."""
+  FILE_UPLOAD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the file upload product modifier from a channel locale.
+"""
+input RemoveFileUploadProductModifierOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveFileUploadProductModifierOverridesField!]
+}
+
+input RemoveImagesFromProductInput {
+  """The ID of the product."""
+  productId: ID!
+
+  """
+  The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+  """
+  context: ChannelLocaleContextInput
+
+  """
+  The unique identifier for the resource with which the product image is associated.
+  """
+  ids: [ID!]!
+}
+
+type RemoveImagesFromProductResult {
+  """The images list with added and removed images."""
+  images(before: String, after: String, first: Int, last: Int): ProductImageConnection
+}
+
+"""MultiLine text field product modifier overrides field name"""
+enum RemoveMultiLineTextFieldProductModifierOverridesField {
+  """The field default value."""
+  MULTILINE_TEXT_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD
+
+  """The display name field."""
+  MULTILINE_TEXT_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the multiline text field product modifier from a channel locale.
+"""
+input RemoveMultiLineTextFieldProductModifierOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveMultiLineTextFieldProductModifierOverridesField!]
+}
+
+"""Number field product modifier overrides field name"""
+enum RemoveNumberFieldProductModifierOverridesField {
+  """The field value."""
+  NUMBER_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD
+
+  """The display name field."""
+  NUMBER_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the number-only text field product modifier from a channel locale.
+"""
+input RemoveNumberFieldProductModifierOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveNumberFieldProductModifierOverridesField!]
+}
+
+"""Pick list product modifier overrides field name."""
+enum RemovePickListProductModifierOverridesField {
+  """The display name field."""
+  PICK_LIST_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""Pick list product modifier overrides input"""
+input RemovePickListProductModifierOverridesInput {
+  """Pick list product modifier fields to remove overrides for"""
+  fields: [RemovePickListProductModifierOverridesField!]
+
+  """Pick list product modifier values to remove overrides for"""
+  values: RemovePickListProductModifierValueOverridesInput
+}
+
+"""Pick list product modifier values to remove overrides for"""
+input RemovePickListProductModifierValueOverridesInput {
+  """Pick list product modifier values ids to remove overrides for"""
+  ids: [ID!]!
+}
+
+input RemoveProductBasicInformationOverridesInput {
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """
+  A set of fields for basic product information with overrides you want to remove. An empty value means you will remove all overrides.
+  """
+  overridesToRemove: [ProductBasicInformationField!]
+
+  """The product that has overrides you want to remove."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that removes overrides for product basic information from a channel locale.
+"""
+type RemoveProductBasicInformationOverridesResult {
+  """The product that had its overrides removed."""
+  product: Product
+}
+
+"""
+The attributes of a custom field that you want to remove from an override.
+"""
+enum RemoveProductCustomFieldsOverridesAttribute {
+  """
+  The visibility flag of a custom field that you want to remove from an override.
+  """
+  IS_VISIBLE
+
+  """The name of a custom field that you want to remove from an override."""
+  NAME
+
+  """The value of a custom field that you want to remove from an override."""
+  VALUE
+}
+
+"""
+Input that removes overrides for product custom fields from a storefront channel locale.
+"""
+input RemoveProductCustomFieldsOverridesChannelLocaleContextDataInput {
+  """
+  The storefront channel and locale that apply when you remove overrides for product custom fields in a channel locale.
+  """
+  context: ChannelLocaleContextInput!
+
+  """
+  The attributes of a custom field that you want to remove from an override.
+  """
+  attributes: [RemoveProductCustomFieldsOverridesAttribute!]
+}
+
+"""
+Input that removes overrides for product custom fields from a storefront channel locale.
+"""
+input RemoveProductCustomFieldsOverridesDataInput {
+  """ID of the custom field that has overrides you want to remove."""
+  customFieldId: ID!
+
+  """
+  The data that applies when you remove overrides for product custom fields in a storefront channel locale.
+  """
+  channelLocaleContextData: RemoveProductCustomFieldsOverridesChannelLocaleContextDataInput!
+}
+
+input RemoveProductCustomFieldsOverridesInput {
+  """
+  ID of the product that has the custom field overrides you want to remove.
+  """
+  productId: ID!
+  data: [RemoveProductCustomFieldsOverridesDataInput!]!
+}
+
+type RemoveProductCustomFieldsOverridesResult {
+  """The product that has the custom field overrides that you removed."""
+  product: Product
+}
+
+"""
+The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+"""
+input RemoveProductImagePropertiesOverridesContextsInput {
+  """
+  The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+  """
+  channelLocaleContext: ChannelLocaleContextInput
+}
+
+"""The input data for removing product images in contexts."""
+input RemoveProductImagePropertiesOverridesDataInput {
+  """The ID of the product image."""
+  imageId: ID!
+
+  """The input data for removing product images in contexts."""
+  contexts: [RemoveProductImagePropertiesOverridesContextsInput!]!
+}
+
+input RemoveProductImagePropertiesOverridesInput {
+  """The ID of the product."""
+  productId: ID!
+  data: [RemoveProductImagePropertiesOverridesDataInput!]!
+}
+
+type RemoveProductImagePropertiesOverridesResult {
+  """The images list with added and removed images."""
+  images(before: String, after: String, first: Int, last: Int): ProductImageConnection
+}
+
+input RemoveProductIsFeaturedOverrideInput {
+  """Channel context."""
+  channelId: ID!
+
+  """The product which information should be modified."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that removes overrides for whether a product is featured in a channel locale.
+"""
+type RemoveProductIsFeaturedOverrideResult {
+  """The product that had its override removed."""
+  product: Product
+}
+
+"""
+Input that removes overrides for product modifiers from a channel locale.
+"""
+input RemoveProductModifierOverridesDataInput {
+  """Modifier overrides that you want to remove."""
+  modifiers: [RemoveProductModifierOverridesInput!]!
+}
+
+"""Input that has the product modifier overrides you want to remove."""
+input RemoveProductModifierOverridesInput {
+  """Product modifier ID."""
+  modifierId: ID!
+
+  """Product modifier override."""
+  data: RemoveProductModifierOverridesUnionDataInput!
+}
+
+"""
+Input that has product modifier overrides data. You can only use one type of modifier in a request.
+"""
+input RemoveProductModifierOverridesUnionDataInput {
+  """Overrides for checkbox product modifiers."""
+  checkbox: RemoveCheckboxProductModifierOverridesInput
+
+  """Overrides for date field product modifiers."""
+  dateField: RemoveDateFieldProductModifierOverridesInput
+
+  """Overrides for dropdown product modifiers."""
+  dropdown: RemoveDropdownProductModifierOverridesInput
+
+  """Overrides for file upload product modifiers."""
+  fileUpload: RemoveFileUploadProductModifierOverridesInput
+
+  """Overrides for multiline text field product modifiers."""
+  multiLineTextField: RemoveMultiLineTextFieldProductModifierOverridesInput
+
+  """Overrides for number field product modifiers."""
+  numberField: RemoveNumberFieldProductModifierOverridesInput
+
+  """Overrides for pick list product modifiers."""
+  pickList: RemovePickListProductModifierOverridesInput
+
+  """Overrides for radio buttons product modifiers."""
+  radioButtons: RemoveRadioButtonsProductModifierOverridesInput
+
+  """Overrides for rectangle list product modifiers."""
+  rectangleList: RemoveRectangleListProductModifierOverridesInput
+
+  """Overrides for swatch product modifiers."""
+  swatch: RemoveSwatchProductModifierOverridesInput
+
+  """Overrides for text field product modifiers."""
+  textField: RemoveTextFieldProductModifierOverridesInput
+}
+
+"""
+Input that removes overrides for product modifiers from a channel locale.
+"""
+input RemoveProductModifiersOverridesInput {
+  """ID for the product that has overrides you want to remove."""
+  productId: ID!
+
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """Product modifier overrides you want to remove."""
+  data: RemoveProductModifierOverridesDataInput!
+}
+
+"""
+Result of a mutation that removes overrides for a product modifier from a channel locale.
+"""
+type RemoveProductModifiersOverridesResult {
+  """The product that had its overrides removed."""
+  product: Product
+}
+
+"""
+Input that removes overrides for product options from a channel locale.
+"""
+input RemoveProductOptionOverridesDataInput {
+  """ID for the option that has overrides you want to remove."""
+  optionId: ID!
+
+  """Product option overrides you want to remove."""
+  data: RemoveProductOptionOverridesUnionDataInput!
+}
+
+"""
+Input that removes overrides for product options from a channel locale.
+"""
+input RemoveProductOptionOverridesUnionDataInput {
+  """Dropdown product option that has overrides you want to remove."""
+  dropdown: RemoveDropdownProductOptionOverridesInput
+
+  """Radio button product option that has overrides you want to remove."""
+  radioButtons: RemoveRadioButtonsProductOptionOverridesInput
+
+  """Rectangle list product option that has overrides you want to remove."""
+  rectangleList: RemoveRectangleListProductOptionOverridesInput
+
+  """Swatch product option that has overrides you want to remove."""
+  swatch: RemoveSwatchProductOptionOverridesInput
+}
+
+"""
+Input that removes overrides for product options from a channel locale.
+"""
+input RemoveProductOptionsOverridesDataInput {
+  """Product option overrides that you want to remove."""
+  options: [RemoveProductOptionOverridesDataInput!]!
+}
+
+input RemoveProductOptionsOverridesInput {
+  """Product options overrides you want to remove."""
+  data: RemoveProductOptionsOverridesDataInput!
+
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """The ID of the product that has overrides you want to remove."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that removes overrides for a product option from a channel locale.
+"""
+type RemoveProductOptionsOverridesResult {
+  """The product that had its overrides removed."""
+  product: Product
+}
+
+input RemoveProductPreOrderSettingsOverridesInput {
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """
+  Set of fields for product pre-order settings that have overrides you want to remove. Empty value means you will remove all overrides.
+  """
+  overridesToRemove: [ProductPreOrderSettingsField!]
+
+  """The ID of the product that has overrides you want to remove."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that removes overrides for product pre-order settings from a channel locale.
+"""
+type RemoveProductPreOrderSettingsOverridesResult {
+  """The product that had its overrides removed."""
+  product: Product
+}
+
+input RemoveProductSeoInformationOverridesInput {
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """
+  Set of fields for product SEO information that have overrides you want to remove. Empty value means you will remove all overrides.
+  """
+  overridesToRemove: [ProductSeoInformationField!]
+
+  """The product which information should be modified."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that removes overrides for product SEO information from a channel locale.
+"""
+type RemoveProductSeoInformationOverridesResult {
+  """
+  The product which seo information overrides was removed as a result of mutation.
+  """
+  product: Product
+}
+
+input RemoveProductStorefrontDetailsOverridesInput {
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """
+  Set of fields for product storefront details that has overrides you want to remove. Empty value means you will remove all overrides.
+  """
+  overridesToRemove: [ProductStorefrontDetailsField!]
+
+  """The product which information should be modified."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that removes overrides for product storefront details from a channel locale.
+"""
+type RemoveProductStorefrontDetailsOverridesResult {
+  """The product that had its overrides removed."""
+  product: Product
+}
+
+input RemoveProductUrlPathOverrideInput {
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """ID for the product that has a URL path override you want to remove."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that removes overrides for a product url path from a channel locale.
+"""
+type RemoveProductUrlPathOverrideResult {
+  """The product that had its overrides removed."""
+  product: Product
+}
+
+"""Radio buttons product modifier overrides field name"""
+enum RemoveRadioButtonsProductModifierOverridesField {
+  """The display name field."""
+  RADIO_BUTTONS_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the radio button product modifier from a channel locale.
+"""
+input RemoveRadioButtonsProductModifierOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveRadioButtonsProductModifierOverridesField!]
+
+  """Values for the modifier that have overrides you want to remove. """
+  values: RemoveRadioButtonsProductModifierValueOverridesInput
+}
+
+"""
+Input that removes overrides for values of the radio button product modifier from a channel locale.
+"""
+input RemoveRadioButtonsProductModifierValueOverridesInput {
+  """IDs of the values that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Radio buttons product option overrides field names"""
+enum RemoveRadioButtonsProductOptionOverridesField {
+  """The display name field."""
+  RADIO_BUTTONS_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the radio buttons product option from a channel locale.
+"""
+input RemoveRadioButtonsProductOptionOverridesInput {
+  """Fields for the option that have overrides you want to remove."""
+  fields: [RemoveRadioButtonsProductOptionOverridesField!]
+
+  """Values for the option that have overrides you want to remove."""
+  values: RemoveRadioButtonsProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the radio button product option from a channel locale.
+"""
+input RemoveRadioButtonsProductOptionValuesOverridesInput {
+  """IDs of the option values that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Radio buttons shared product option overrides field names"""
+enum RemoveRadioButtonsSharedProductOptionOverridesField {
+  """The display name field."""
+  RADIO_BUTTONS_SHARED_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the radio button shared product option from a channel locale.
+"""
+input RemoveRadioButtonsSharedProductOptionOverridesInput {
+  """Fields for the option that have overrides you want to remove."""
+  fields: [RemoveRadioButtonsSharedProductOptionOverridesField!]
+
+  """Values for the option that have overrides you want to remove."""
+  values: RemoveRadioButtonsSharedProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the radio buttons shared product option from a channel locale.
+"""
+input RemoveRadioButtonsSharedProductOptionValuesOverridesInput {
+  """IDs of the option values that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Rectangle list product modifier overrides field name"""
+enum RemoveRectangleListProductModifierOverridesField {
+  """The display name field."""
+  RECTANGLE_LIST_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the rectangle list product modifier from a channel locale.
+"""
+input RemoveRectangleListProductModifierOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveRectangleListProductModifierOverridesField!]
+
+  """Values for the option that have overrides you want to remove."""
+  values: RemoveRectangleListProductModifierValueOverridesInput
+}
+
+"""
+Input that removes overrides for values of the rectangle list product modifier from a channel locale.
+"""
+input RemoveRectangleListProductModifierValueOverridesInput {
+  """IDs of the modifier values that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Rectangle list product option overrides field names"""
+enum RemoveRectangleListProductOptionOverridesField {
+  """The display name field."""
+  RECTANGLE_LIST_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the rectangle list product option from a channel locale.
+"""
+input RemoveRectangleListProductOptionOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveRectangleListProductOptionOverridesField!]
+
+  """Values for the option that have overrides you want to remove."""
+  values: RemoveRectangleListProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the rectangle list product option from a channel locale.
+"""
+input RemoveRectangleListProductOptionValuesOverridesInput {
+  """IDs of the option values that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Rectangle list shared product option overrides field names"""
+enum RemoveRectangleListSharedProductOptionOverridesField {
+  """The display name field."""
+  RECTANGLE_LIST_SHARED_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the rectangle list shared product option from a channel locale.
+"""
+input RemoveRectangleListSharedProductOptionOverridesInput {
+  """Fields for the shared option that have overrides you want to remove."""
+  fields: [RemoveRectangleListSharedProductOptionOverridesField!]
+
+  """Values for the shared option that have overrides you want to remove."""
+  values: RemoveRectangleListSharedProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the rectangle list shared product option from a channel locale.
+"""
+input RemoveRectangleListSharedProductOptionValuesOverridesInput {
+  """
+  IDs of the shared option values that have overrides you want to remove.
+  """
+  ids: [ID!]!
+}
+
+"""Shared checkbox product modifier overrides field name"""
+enum RemoveSharedCheckboxProductModifierOverridesField {
+  """The display name field."""
+  SHARED_CHECKBOX_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+
+  """The value field."""
+  SHARED_CHECKBOX_PRODUCT_MODIFIER_VALUE_FIELD
+}
+
+"""
+Input that removes overrides for the checkbox shared product modifier from a channel locale.
+"""
+input RemoveSharedCheckboxProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedCheckboxProductModifierOverridesField!]
+}
+
+"""Shared date field product modifier overrides field name"""
+enum RemoveSharedDateFieldProductModifierOverridesField {
+  """The display name field."""
+  SHARED_DATE_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the date field shared product modifier from a channel locale.
+"""
+input RemoveSharedDateFieldProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedDateFieldProductModifierOverridesField!]
+}
+
+"""Shared dropdown product modifier overrides field name"""
+enum RemoveSharedDropdownProductModifierOverridesField {
+  """The display name field."""
+  SHARED_DROPDOWN_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the dropdown shared product modifier from a channel locale.
+"""
+input RemoveSharedDropdownProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedDropdownProductModifierOverridesField!]
+
+  """Values for the shared modifier that have overrides you want to remove."""
+  values: RemoveSharedDropdownProductModifierValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the dropdown shared product modifier from a channel locale.
+"""
+input RemoveSharedDropdownProductModifierValuesOverridesInput {
+  """
+  IDs of the shared modifier values that have overrides you want to remove.
+  """
+  ids: [ID!]!
+}
+
+"""Shared file upload product modifier overrides field name"""
+enum RemoveSharedFileUploadProductModifierOverridesField {
+  """The display name field."""
+  SHARED_FILE_UPLOAD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the file upload shared product modifier from a channel locale.
+"""
+input RemoveSharedFileUploadProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedFileUploadProductModifierOverridesField!]
+}
+
+"""Shared multiLine text field product modifier overrides field name"""
+enum RemoveSharedMultiLineTextFieldProductModifierOverridesField {
+  """The field default value."""
+  SHARED_MULTILINE_TEXT_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD
+
+  """The display name field."""
+  SHARED_MULTILINE_TEXT_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the multiline shared product modifier from a channel locale.
+"""
+input RemoveSharedMultiLineTextFieldProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedMultiLineTextFieldProductModifierOverridesField!]
+}
+
+"""Shared number field product modifier overrides field name"""
+enum RemoveSharedNumberFieldProductModifierOverridesField {
+  """The field value."""
+  SHARED_NUMBER_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD
+
+  """The display name field."""
+  SHARED_NUMBER_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the numbers-only text field shared product modifier from a channel locale.
+"""
+input RemoveSharedNumberFieldProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedNumberFieldProductModifierOverridesField!]
+}
+
+"""
+Input that removes overrides for shared product modifiers from a channel locale.
+"""
+input RemoveSharedProductModifierOverridesDataInput {
+  """Shared product modifiers that have overrides you want to remove."""
+  modifiers: [RemoveSharedProductModifierOverridesInput!]!
+}
+
+"""
+Input that removes overrides for the shared product modifier from a channel locale.
+"""
+input RemoveSharedProductModifierOverridesInput {
+  """ID of the shared modifiers that have overrides you want to remove."""
+  modifierId: ID!
+
+  """Shared product modifier overrides that you want to remove."""
+  data: RemoveSharedProductModifierOverridesUnionDataInput!
+}
+
+"""
+Input that has the shared product modifier overrides you want to remove. You can only use one type of shared modifier in a request.
+"""
+input RemoveSharedProductModifierOverridesUnionDataInput {
+  """Overrides for checkbox shared product modifiers."""
+  checkbox: RemoveSharedCheckboxProductModifierOverridesInput
+
+  """Overrides for date field shared product modifiers."""
+  dateField: RemoveSharedDateFieldProductModifierOverridesInput
+
+  """Overrides for dropdown shared product modifiers."""
+  dropdown: RemoveSharedDropdownProductModifierOverridesInput
+
+  """Overrides for file upload shared product modifiers."""
+  fileUpload: RemoveSharedFileUploadProductModifierOverridesInput
+
+  """Overrides for multiline text field shared product modifiers."""
+  multiLineTextField: RemoveSharedMultiLineTextFieldProductModifierOverridesInput
+
+  """Overrides for number field shared product modifiers."""
+  numberField: RemoveSharedNumberFieldProductModifierOverridesInput
+
+  """Overrides for radio button shared product modifiers."""
+  radioButtons: RemoveSharedRadioButtonsProductModifierOverridesInput
+
+  """Overrides for rectangle list shared product modifiers."""
+  rectangleList: RemoveSharedRectangleListProductModifierOverridesInput
+
+  """Overrides for swatch shared product modifiers."""
+  swatch: RemoveSharedSwatchProductModifierOverridesInput
+
+  """Overrides for text field shared product modifiers."""
+  textField: RemoveSharedTextFieldProductModifierOverridesInput
+}
+
+"""
+Input that removes overrides for the shared product modifier from a channel locale.
+"""
+input RemoveSharedProductModifiersOverridesInput {
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+
+  """Shared product modifier override."""
+  data: RemoveSharedProductModifierOverridesDataInput!
+}
+
+"""
+Result of a mutation that removes overrides for shared product modifiers from a channel locale.
+"""
+type RemoveSharedProductModifiersOverridesResult {
+  """List of shared product modifiers."""
+  sharedProductModifiers: [SharedProductModifier!]
+}
+
+"""Input that removes overrides for shared options from a channel locale."""
+input RemoveSharedProductOptionOverridesDataInput {
+  """ID of the shared option that has overrides you want to remove."""
+  optionId: ID!
+
+  """Shared option overrides that you want to remove."""
+  data: RemoveSharedProductOptionOverridesUnionDataInput!
+}
+
+"""
+Input that has the shared product option overrides you want to remove. You can only use one type of modifier in a request.
+"""
+input RemoveSharedProductOptionOverridesUnionDataInput {
+  """Overrides for dropdown shared options."""
+  dropdown: RemoveDropdownSharedProductOptionOverridesInput
+
+  """Overrides for radio button shared options."""
+  radioButtons: RemoveRadioButtonsSharedProductOptionOverridesInput
+
+  """Overrides for rectangle list shared options."""
+  rectangleList: RemoveRectangleListSharedProductOptionOverridesInput
+
+  """Overrides for swatch shared options."""
+  swatch: RemoveSwatchSharedProductOptionOverridesInput
+}
+
+"""
+Input that removes overrides for shared product options from a channel locale.
+"""
+input RemoveSharedProductOptionsOverridesDataInput {
+  """Shared options that have overrides you want to remove."""
+  options: [RemoveSharedProductOptionOverridesDataInput!]!
+}
+
+input RemoveSharedProductOptionsOverridesInput {
+  """Shared option override that you want to remove."""
+  data: RemoveSharedProductOptionsOverridesDataInput!
+
+  """
+  The channel and locale that apply when you remove overrides from a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput!
+}
+
+"""
+Result of a mutation that removes overrides for shared product options from a channel locale.
+"""
+type RemoveSharedProductOptionsOverridesResult {
+  """List of shared product options."""
+  sharedProductOptions: [SharedProductOption!]
+}
+
+"""Shared radio buttons product modifier overrides field name"""
+enum RemoveSharedRadioButtonsProductModifierOverridesField {
+  """The display name field."""
+  SHARED_RADIO_BUTTONS_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for the radio button shared modifier from a channel locale.
+"""
+input RemoveSharedRadioButtonsProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedRadioButtonsProductModifierOverridesField!]
+
+  """Values of the shared modifier that have overrides you want to remove."""
+  values: RemoveSharedRadioButtonsProductModifierValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the radio button shared modifier from a channel locale.
+"""
+input RemoveSharedRadioButtonsProductModifierValuesOverridesInput {
+  """Values of the shared modifier that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Shared rectangle list product modifier overrides field name"""
+enum RemoveSharedRectangleListProductModifierOverridesField {
+  """The display name field."""
+  SHARED_RECTANGLE_LIST_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for rectangle list shared modifiers from a channel locale.
+"""
+input RemoveSharedRectangleListProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedRectangleListProductModifierOverridesField!]
+
+  """Values of the shared modifier that have overrides you want to remove."""
+  values: RemoveSharedRectangleListProductModifierValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the rectangle list shared modifiers from a channel locale.
+"""
+input RemoveSharedRectangleListProductModifierValuesOverridesInput {
+  """
+  IDs of the shared modifier values that have overrides you want to remove.
+  """
+  ids: [ID!]!
+}
+
+"""Shared swatch product modifier overrides field name"""
+enum RemoveSharedSwatchProductModifierOverridesField {
+  """The display name field."""
+  SHARED_SWATCH_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for swatch shared modifiers from a channel locale.
+"""
+input RemoveSharedSwatchProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedSwatchProductModifierOverridesField!]
+
+  """Values of the shared modifier that have overrides you want to remove."""
+  values: RemoveSharedSwatchProductModifierValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the swatch shared modifier from a channel locale.
+"""
+input RemoveSharedSwatchProductModifierValuesOverridesInput {
+  """
+  IDs of the shared modifier values that have overrides you want to remove.
+  """
+  ids: [ID!]!
+}
+
+"""Shared text field product modifier overrides field name"""
+enum RemoveSharedTextFieldProductModifierOverridesField {
+  """The field default value."""
+  SHARED_TEXT_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD
+
+  """The display name field."""
+  SHARED_TEXT_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for text field shared modifiers from a channel locale.
+"""
+input RemoveSharedTextFieldProductModifierOverridesInput {
+  """Fields for the shared modifier that have overrides you want to remove."""
+  fields: [RemoveSharedTextFieldProductModifierOverridesField!]
+}
+
+"""Swatch product modifier overrides field name"""
+enum RemoveSwatchProductModifierOverridesField {
+  """The display name field."""
+  SWATCH_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for swatch product modifiers from a channel locale.
+"""
+input RemoveSwatchProductModifierOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveSwatchProductModifierOverridesField!]
+
+  """Values of the modifier that have overrides you want to remove."""
+  values: RemoveSwatchProductModifierValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the swatch product modifier from a channel locale.
+"""
+input RemoveSwatchProductModifierValuesOverridesInput {
+  """IDs of the modifier values that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Swatch product option overrides field names"""
+enum RemoveSwatchProductOptionOverridesField {
+  """The display name field."""
+  SWATCH_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for swatch product options from a channel locale.
+"""
+input RemoveSwatchProductOptionOverridesInput {
+  """Fields for the product option that have overrides you want to remove."""
+  fields: [RemoveSwatchProductOptionOverridesField!]
+
+  """Values for the product option that have overrides you want to remove."""
+  values: RemoveSwatchProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the swatch product option from a channel locale.
+"""
+input RemoveSwatchProductOptionValuesOverridesInput {
+  """IDs of the option values that have overrides you want to remove."""
+  ids: [ID!]!
+}
+
+"""Swatch shared product option overrides field names"""
+enum RemoveSwatchSharedProductOptionOverridesField {
+  """The display name field."""
+  SWATCH_SHARED_PRODUCT_OPTION_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for swatch shared product options from a channel locale.
+"""
+input RemoveSwatchSharedProductOptionOverridesInput {
+  """Fields for the shared option that have overrides you want to remove."""
+  fields: [RemoveSwatchSharedProductOptionOverridesField!]
+
+  """Values for the shared option that have overrides you want to remove."""
+  values: RemoveSwatchSharedProductOptionValuesOverridesInput
+}
+
+"""
+Input that removes overrides for values of the swatch shared product option from a channel locale.
+"""
+input RemoveSwatchSharedProductOptionValuesOverridesInput {
+  """
+  IDs of the shared option values that have overrides you want to remove.
+  """
+  ids: [ID!]!
+}
+
+"""Text field product modifier overrides field name"""
+enum RemoveTextFieldProductModifierOverridesField {
+  """The field default value."""
+  TEXT_FIELD_PRODUCT_MODIFIER_DEFAULT_VALUE_FIELD
+
+  """The display name field."""
+  TEXT_FIELD_PRODUCT_MODIFIER_DISPLAY_NAME_FIELD
+}
+
+"""
+Input that removes overrides for text field product modifier from a channel locale.
+"""
+input RemoveTextFieldProductModifierOverridesInput {
+  """Fields for the modifier that have overrides you want to remove."""
+  fields: [RemoveTextFieldProductModifierOverridesField!]
+}
+
+"""
+Error indicating that the scope change is not allowed for this webhook.
+"""
+type ScopeChangeNotAllowedError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""Input that sets checkbox product modifier information."""
+input SetCheckboxProductModifierInformationInput {
+  """Display name for the checkbox product modifier."""
+  displayName: String
+
+  """Field value for the checkbox product modifier."""
+  value: String
+}
+
+"""Input that sets date field product modifier information."""
+input SetDateFieldProductModifierInformationInput {
+  """Display name for the date field product modifier."""
+  displayName: String
+}
+
+"""Input that sets dropdown product modifier information."""
+input SetDropdownProductModifierInformationInput {
+  """Display name for the dropdown product modifier."""
+  displayName: String
+
+  """Dropdown modifier values information"""
+  values: [SetDropdownProductModifierValueInformationInput!]
+}
+
+"""Input that sets information for dropdown product modifier values."""
+input SetDropdownProductModifierValueInformationInput {
+  """
+  ID of the value for the dropdown product modifier that you want to modify.
+  """
+  valueId: ID!
+
+  """Label for the dropdown product modifier value."""
+  label: String!
+}
+
+"""Input that sets information for dropdown product options."""
+input SetDropdownProductOptionInformationInput {
+  """Display name for the dropdown product option."""
+  displayName: String
+
+  """Dropdown product option values."""
+  values: [SetDropdownProductOptionValueInformationInput!]
+}
+
+"""Input that sets values for the dropdown product option."""
+input SetDropdownProductOptionValueInformationInput {
+  """
+  ID of the value for the dropdown product option that you want to modify.
+  """
+  valueId: ID!
+
+  """Label for the dropdown product option value."""
+  label: String!
+}
+
+"""Input that sets information for the file upload product modifier."""
+input SetFileUploadProductModifierInformationInput {
+  """Display name for the file upload product modifier."""
+  displayName: String
+}
+
+"""Input that sets information for the multiline text product modifier."""
+input SetMultiLineTextFieldProductModifierInformationInput {
+  """Display name for the product modifier."""
+  displayName: String
+
+  """Default value for the product modifier."""
+  defaultValue: String
+}
+
+"""
+Input that sets information for the numbers-only text field product modifier.
+"""
+input SetNumberFieldProductModifierInformationInput {
+  """Default value for the product modifier."""
+  defaultValue: Float
+
+  """Display name for the product modifier."""
+  displayName: String
+}
+
+"""Input that sets information for the pick list product modifier."""
+input SetPickListProductModifierInformationInput {
+  """Display name for the product modifier."""
+  displayName: String
+
+  """Pick list modifier values."""
+  values: [SetPickListProductModifierValueInformationInput!]
+}
+
+"""Input that sets information for the pick list product modifier."""
+input SetPickListProductModifierValueInformationInput {
+  """ID of the value for the product modifier that you want to modify."""
+  valueId: ID!
+
+  """Label for the product modifier value."""
+  label: String!
+}
+
+input SetProductBasicInformationDataInput {
+  """Input that sets information for the description of the product."""
+  description: String
+
+  """Name of the product."""
+  name: String
+}
+
+input SetProductBasicInformationInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+  data: SetProductBasicInformationDataInput!
+
+  """ID of the product that has basic product information you want to set."""
+  productId: ID!
+}
+
+"""Result of a mutation that sets product basic information."""
+type SetProductBasicInformationResult {
+  """The product that had its overrides updated."""
+  product: Product
+}
+
+input SetProductIsFeaturedDataInput {
+  """Product isFeatured flag."""
+  isFeatured: Boolean!
+}
+
+input SetProductIsFeaturedInput {
+  """
+  ID of the channel where you want to set whether a product is marked as featured.
+  """
+  channelId: ID
+  data: SetProductIsFeaturedDataInput!
+
+  """ID of the product that has information you want to set."""
+  productId: ID!
+}
+
+"""
+Result of a mutation that sets whether a product is marked as featured on the storefront.
+"""
+type SetProductIsFeaturedResult {
+  """The product that had its isFeatured flag updated."""
+  product: Product
+}
+
+"""Product modifiers information data"""
+input SetProductModifierInformationDataInput {
+  """Product modifiers information data"""
+  modifiers: [SetProductModifierInformationInput!]!
+}
+
+"""Product modifier information"""
+input SetProductModifierInformationInput {
+  """The product modifier id which data should be modified."""
+  modifierId: ID!
+
+  """Product modifier information of specific type"""
+  data: SetProductModifierInformationUnionDataInput!
+}
+
+"""
+Input that has the product modifier information you want to set. You can only use one type of modifier in a request.
+"""
+input SetProductModifierInformationUnionDataInput {
+  """Checkbox product modifier information."""
+  checkbox: SetCheckboxProductModifierInformationInput
+
+  """Date field product modifier information."""
+  dateField: SetDateFieldProductModifierInformationInput
+
+  """Dropdown product modifier information."""
+  dropdown: SetDropdownProductModifierInformationInput
+
+  """File upload product modifier information."""
+  fileUpload: SetFileUploadProductModifierInformationInput
+
+  """Multiline text field product modifier information."""
+  multiLineTextField: SetMultiLineTextFieldProductModifierInformationInput
+
+  """Number field product modifier information."""
+  numberField: SetNumberFieldProductModifierInformationInput
+
+  """Pick list product modifier information."""
+  pickList: SetPickListProductModifierInformationInput
+
+  """Radio buttons product modifier information."""
+  radioButtons: SetRadioButtonsProductModifierInformationInput
+
+  """Rectangle list product modifier information."""
+  rectangleList: SetRectangleListProductModifierInformationInput
+
+  """Swatch product modifier information."""
+  swatch: SetSwatchProductModifierInformationInput
+
+  """Text field product modifier information."""
+  textField: SetTextFieldProductModifierInformationInput
+}
+
+"""Input that has the product modifier information you want to set."""
+input SetProductModifiersInformationInput {
+  """ID of the product that has modifier information you want to set. """
+  productId: ID!
+
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+
+  """Product modifiers information."""
+  data: SetProductModifierInformationDataInput!
+}
+
+"""Result of a mutation that sets product modifier information."""
+type SetProductModifiersInformationResult {
+  """The product that had its modifiers set."""
+  product: Product
+}
+
+"""Input that has the product option information you want to set."""
+input SetProductOptionInformationInput {
+  """ID of the product option that has information you want to set. """
+  optionId: ID!
+
+  """Product option information of a specific type."""
+  data: SetProductOptionInformationUnionDataInput!
+}
+
+"""
+Input that has the product option information you want to set. You can only use one type of modifier in a request.
+"""
+input SetProductOptionInformationUnionDataInput {
+  """Dropdown product option information."""
+  dropdown: SetDropdownProductOptionInformationInput
+
+  """Radio buttons product option information."""
+  radioButtons: SetRadioButtonsProductOptionInformationInput
+
+  """Rectangle list product option information."""
+  rectangleList: SetRectangleListProductOptionInformationInput
+
+  """Swatch product option information."""
+  swatch: SetSwatchProductOptionInformationInput
+}
+
+"""Input that sets information for product options."""
+input SetProductOptionsInformationDataInput {
+  """Product option information that you want to set."""
+  options: [SetProductOptionInformationInput!]!
+}
+
+"""Input that has the product options information you want to set."""
+input SetProductOptionsInformationInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+
+  """Product options information."""
+  data: SetProductOptionsInformationDataInput!
+
+  """
+  ID of the product that has product options information you want to set. 
+  """
+  productId: ID!
+}
+
+"""Result of a mutation that sets product options information."""
+type SetProductOptionsInformationResult {
+  """The product that had its options set."""
+  product: Product
+}
+
+input SetProductPreOrderSettingsDataInput {
+  """Product pre-order message."""
+  message: String
+}
+
+input SetProductPreOrderSettingsInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+
+  """Data for the pre-order settings of a product."""
+  data: SetProductPreOrderSettingsDataInput!
+
+  """ID of the product that has pre-order settings you want to set."""
+  productId: ID!
+}
+
+"""Result of a mutation that sets product pre-order settings."""
+type SetProductPreOrderSettingsResult {
+  """The product that had its pre-order settings set."""
+  product: Product
+}
+
+input SetProductSeoInformationDataInput {
+  """Meta description for the product."""
+  metaDescription: String
+
+  """Page title for the product."""
+  pageTitle: String
+}
+
+input SetProductSeoInformationInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+  data: SetProductSeoInformationDataInput!
+
+  """ID of the product that has SEO information you want to set."""
+  productId: ID!
+}
+
+"""Result of a mutation that sets product SEO information."""
+type SetProductSeoInformationResult {
+  """The product that had its SEO information set."""
+  product: Product
+}
+
+input SetProductStorefrontDetailsDataInput {
+  """Product availability description."""
+  availabilityDescription: String
+
+  """Product search keywords."""
+  searchKeywords: String
+
+  """Product warranty."""
+  warranty: String
+}
+
+input SetProductStorefrontDetailsInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+
+  """Data for the storefront details of a product."""
+  data: SetProductStorefrontDetailsDataInput!
+
+  """ID of the product that has storefront details you want to set."""
+  productId: ID!
+}
+
+"""Result of a mutation that sets product storefront details."""
+type SetProductStorefrontDetailsResult {
+  """The product that had its storefront details set."""
+  product: Product
+}
+
+input SetProductUrlPathDataInput {
+  """Product URL path."""
+  path: String!
+}
+
+input SetProductUrlPathInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+
+  """Data for the product URL path."""
+  data: SetProductUrlPathDataInput!
+
+  """ID of the product that has the URL path you want to set."""
+  productId: ID!
+}
+
+"""Result of a mutation that sets the product URL path."""
+type SetProductUrlPathResult {
+  """The product that had its URL path set."""
+  product: Product
+}
+
+"""
+Input that has information for the radio button product modifier you want to set. 
+"""
+input SetRadioButtonsProductModifierInformationInput {
+  """Display name for the product modifier."""
+  displayName: String
+
+  """
+  Values for the radio buttons modifier that has information you want to set.
+  """
+  values: [SetRadioButtonsProductModifierValueInformationInput!]
+}
+
+"""
+Input that has the values for the radio buttons product modifier you want to set.
+"""
+input SetRadioButtonsProductModifierValueInformationInput {
+  """ID of the value for the product modifier that you want to set."""
+  valueId: ID!
+
+  """Label for the product modifier value that you want to set."""
+  label: String!
+}
+
+"""Input that has the radio buttons product options you want to set."""
+input SetRadioButtonsProductOptionInformationInput {
+  """Display name for the product option that you want to set."""
+  displayName: String
+
+  """Values for the product option you want to set."""
+  values: [SetRadioButtonsProductOptionValueInformationInput!]
+}
+
+"""
+Input that has the values for the radio buttons product option you want to set. 
+"""
+input SetRadioButtonsProductOptionValueInformationInput {
+  """ID of the value for the product option that you want to set."""
+  valueId: ID!
+
+  """Label for the product option value that you want to set."""
+  label: String!
+}
+
+"""Input that has the rectangle list product modifier you want to set."""
+input SetRectangleListProductModifierInformationInput {
+  """Display name for the product modifier that you want to set."""
+  displayName: String
+
+  """Values for the product modifier that you want to set."""
+  values: [SetRectangleListProductModifierValueInformationInput!]
+}
+
+"""
+Input that has the values for the rectangle list product modifier you want to set.
+"""
+input SetRectangleListProductModifierValueInformationInput {
+  """ID of the value for the product modifier that you want to set."""
+  valueId: ID!
+
+  """Label for the product modifier value that you want to set."""
+  label: String!
+}
+
+"""Input that has the rectangle list product option you want to set."""
+input SetRectangleListProductOptionInformationInput {
+  """Display name for the product option that you want to set."""
+  displayName: String
+
+  """Values for the product options that you want to set."""
+  values: [SetRectangleListProductOptionValueInformationInput!]
+}
+
+"""
+Input that has the rectangle list product option values you want to set.
+"""
+input SetRectangleListProductOptionValueInformationInput {
+  """ID of the value for the product option that you want to set."""
+  valueId: ID!
+
+  """Label for the product option value you want to set."""
+  label: String!
+}
+
+"""Input that has the shared checkbox modifier you want to set."""
+input SetSharedCheckboxProductModifierInformationInput {
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+
+  """Field value for the shared modifier you want to set."""
+  value: String
+}
+
+"""Input that has the shared date field modifier you want to set."""
+input SetSharedDateFieldProductModifierInformationInput {
+  """Display name for the product modifier you want to set."""
+  displayName: String
+}
+
+"""Input that has the shared dropdown modifier you want to set."""
+input SetSharedDropdownProductModifierInformationInput {
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+
+  """Values for the shared modifier you want to set."""
+  values: [SetSharedDropdownProductModifierValueInformationInput!]
+}
+
+"""
+Input that has the values for the shared dropdown modifier you want to set.
+"""
+input SetSharedDropdownProductModifierValueInformationInput {
+  """ID of the shared modifier value that you want to set."""
+  valueId: ID!
+
+  """Label for the values of the shared dropdown modifier you want to set."""
+  label: String!
+}
+
+"""Input that has the shared dropdown option you want to set."""
+input SetSharedDropdownProductOptionInformationInput {
+  """Display name for the shared option you want to set."""
+  displayName: String
+
+  """Values for the shared option you want to set."""
+  values: [SetSharedDropdownProductOptionValueInformationInput!]
+}
+
+"""
+Input that has the values for the shared dropdown option you want to set.
+"""
+input SetSharedDropdownProductOptionValueInformationInput {
+  """ID of the shared option value that you want to set."""
+  valueId: ID!
+
+  """Label for the shared option value you want to set."""
+  label: String!
+}
+
+"""Input that has the shared file upload modifier you want to set."""
+input SetSharedFileUploadProductModifierInformationInput {
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+}
+
+"""Input that has the shared multiline text modifier you want to set."""
+input SetSharedMultiLineTextFieldProductModifierInformationInput {
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+
+  """Default value for the shared modifier you want to set."""
+  defaultValue: String
+}
+
+"""Input that has the shared number field modifier you want to set."""
+input SetSharedNumberFieldProductModifierInformationInput {
+  """Default value for the shared modifier you want to set."""
+  defaultValue: Float
+
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+}
+
+"""Input that sets information for shared product modifiers."""
+input SetSharedProductModifierInformationDataInput {
+  """Shared product modifiers that you want to set."""
+  modifiers: [SetSharedProductModifierInformationInput!]!
+}
+
+"""Input that has the shared product modifiers you want to set."""
+input SetSharedProductModifierInformationInput {
+  """ID of the shared product modifier you want to set."""
+  modifierId: ID!
+
+  """Shared product modifier information of a specific type."""
+  data: SetSharedProductModifierInformationUnionDataInput!
+}
+
+"""
+Input that has the shared product modifier information you want to set. You can only use one type of modifier in a request.
+"""
+input SetSharedProductModifierInformationUnionDataInput {
+  """Checkbox shared product modifier information."""
+  checkbox: SetSharedCheckboxProductModifierInformationInput
+
+  """Date field shared product modifier information."""
+  dateField: SetSharedDateFieldProductModifierInformationInput
+
+  """Dropdown shared product modifier information."""
+  dropdown: SetSharedDropdownProductModifierInformationInput
+
+  """File upload shared product modifier information."""
+  fileUpload: SetSharedFileUploadProductModifierInformationInput
+
+  """Multiline text field shared product modifier information."""
+  multiLineTextField: SetSharedMultiLineTextFieldProductModifierInformationInput
+
+  """Number field shared product modifier information."""
+  numberField: SetSharedNumberFieldProductModifierInformationInput
+
+  """Radio buttons shared product modifier information."""
+  radioButtons: SetSharedRadioButtonsProductModifierInformationInput
+
+  """Rectangle list shared product modifier information."""
+  rectangleList: SetSharedRectangleListProductModifierInformationInput
+
+  """Swatch shared product modifier information."""
+  swatch: SetSharedSwatchProductModifierInformationInput
+
+  """Text field shared product modifier information."""
+  textField: SetSharedTextFieldProductModifierInformationInput
+}
+
+"""
+Input that has the shared product modifiers information you want to set.
+"""
+input SetSharedProductModifiersInformationInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+
+  """Shared product modifiers information."""
+  data: SetSharedProductModifierInformationDataInput!
+}
+
+"""
+Result of a mutation that sets information for shared product modifiers.
+"""
+type SetSharedProductModifiersInformationResult {
+  """List of shared product modifiers."""
+  sharedProductModifiers: [SharedProductModifier!]
+}
+
+"""Input that has the shared options you want to set."""
+input SetSharedProductOptionInformationInput {
+  """ID of the shared option you want to set."""
+  optionId: ID!
+
+  """Shared product option information of a specific type."""
+  data: SetSharedProductOptionInformationUnionDataInput!
+}
+
+"""
+Input that has the shared option information you want to set. You can only use one type of option in a request.
+"""
+input SetSharedProductOptionInformationUnionDataInput {
+  """Dropdown product option information."""
+  dropdown: SetSharedDropdownProductOptionInformationInput
+
+  """Radio buttons product option information."""
+  radioButtons: SetSharedRadioButtonsProductOptionInformationInput
+
+  """Rectangle list product option information."""
+  rectangleList: SetSharedRectangleListProductOptionInformationInput
+
+  """Swatch product option information."""
+  swatch: SetSharedSwatchProductOptionInformationInput
+}
+
+"""Input that sets shared options for a channel locale."""
+input SetSharedProductOptionsInformationDataInput {
+  """List of shared options."""
+  options: [SetSharedProductOptionInformationInput!]!
+}
+
+"""Shared product options information"""
+input SetSharedProductOptionsInformationInput {
+  """
+  The channel and locale that apply when you set overrides for a channel locale.
+  """
+  localeContext: ProductOverridesLocaleContextInput
+
+  """Shared product options information"""
+  data: SetSharedProductOptionsInformationDataInput!
+}
+
+"""Result of a mutation that sets information for shared product options."""
+type SetSharedProductOptionsInformationResult {
+  """List of shared product options."""
+  sharedProductOptions: [SharedProductOption!]
+}
+
+"""Input that has the shared radio button modifier you want to set."""
+input SetSharedRadioButtonsProductModifierInformationInput {
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+
+  """Shared modifier values you want to set."""
+  values: [SetSharedRadioButtonsProductModifierValueInformationInput!]
+}
+
+"""
+Input that has the values for the shared radio buttons modifier you want to set.
+"""
+input SetSharedRadioButtonsProductModifierValueInformationInput {
+  """ID of the shared modifier value that you want to set."""
+  valueId: ID!
+
+  """Label for the shared modifier value you want to set."""
+  label: String!
+}
+
+"""Input that has the shared radio buttons option you want to set."""
+input SetSharedRadioButtonsProductOptionInformationInput {
+  """Display name for the shared option you want to set."""
+  displayName: String
+
+  """Shared option values you want to set."""
+  values: [SetSharedRadioButtonsProductOptionValueInformationInput!]
+}
+
+"""
+Input that has the values for the shared radio buttons option you want to set.
+"""
+input SetSharedRadioButtonsProductOptionValueInformationInput {
+  """ID of the value for the shared option that you want to set."""
+  valueId: ID!
+
+  """Label for the value of the shared option you want to set."""
+  label: String!
+}
+
+"""Input that has the shared rectangle list modifier you want to set."""
+input SetSharedRectangleListProductModifierInformationInput {
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+
+  """Shared modifier values you want to set."""
+  values: [SetSharedRectangleListProductModifierValueInformationInput!]
+}
+
+"""
+Input that has values for the shared rectangle list modifier you want to set.
+"""
+input SetSharedRectangleListProductModifierValueInformationInput {
+  """ID of the value for the shared modifier you want to set."""
+  valueId: ID!
+
+  """Label for the shared modifier value."""
+  label: String!
+}
+
+"""Input that has the shared rectangle list option you want to set."""
+input SetSharedRectangleListProductOptionInformationInput {
+  """Display name for the shared option you want to set."""
+  displayName: String
+
+  """Shared option values you want to set."""
+  values: [SetSharedRectangleListProductOptionValueInformationInput!]
+}
+
+"""
+Input that has the values for the shared rectangle list option you want to set.
+"""
+input SetSharedRectangleListProductOptionValueInformationInput {
+  """
+  ID of the value for the shared rectangle list option that you want to set.
+  """
+  valueId: ID!
+
+  """Label for the rectangle list shared option value you want to set."""
+  label: String!
+}
+
+"""Input that has the shared swatch product modifier you want to set."""
+input SetSharedSwatchProductModifierInformationInput {
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+
+  """Shared modifier values you want to set."""
+  values: [SetSharedSwatchProductModifierValueInformationInput!]
+}
+
+"""
+Input that has the values for the shared swatch modifier you want to set.
+"""
+input SetSharedSwatchProductModifierValueInformationInput {
+  """ID of the shared modifier value you want to set."""
+  valueId: ID!
+
+  """Label for the shared modifier value."""
+  label: String!
+}
+
+"""Input that has the shared swatch option you want to set."""
+input SetSharedSwatchProductOptionInformationInput {
+  """Display name for the shared option you want to set."""
+  displayName: String
+
+  """Values for the shared option you want to set."""
+  values: [SetSharedSwatchProductOptionValueInformationInput!]
+}
+
+"""Input that has the shared swatch product option you want to set."""
+input SetSharedSwatchProductOptionValueInformationInput {
+  """ID of the shared option value that you want to set."""
+  valueId: ID!
+
+  """Label for the shared option value you want to set."""
+  label: String!
+}
+
+"""Input that has the shared text field modifier you want to set."""
+input SetSharedTextFieldProductModifierInformationInput {
+  """Default value for the shared modifier you want to set."""
+  defaultValue: String
+
+  """Display name for the shared modifier you want to set."""
+  displayName: String
+}
+
+"""Input that has the swatch product modifier you want to set."""
+input SetSwatchProductModifierInformationInput {
+  """Display name for the product modifier you want to set."""
+  displayName: String
+
+  """Modifier values you want to set."""
+  values: [SetSwatchProductModifierValueInformationInput!]
+}
+
+"""
+Input that has the values for the swatch product modifier you want to set.
+"""
+input SetSwatchProductModifierValueInformationInput {
+  """ID of the product modifier value you want to set."""
+  valueId: ID!
+
+  """Label for the product modifier value you want to set."""
+  label: String!
+}
+
+"""Input that has the swatch product option you want to set."""
+input SetSwatchProductOptionInformationInput {
+  """Display name for the product option you want to set."""
+  displayName: String
+
+  """Product option values you want to set."""
+  values: [SetSwatchProductOptionValueInformationInput!]
+}
+
+"""Input that has values for the swatch product option you want to set."""
+input SetSwatchProductOptionValueInformationInput {
+  """ID of the product option value you want to set."""
+  valueId: ID!
+
+  """Label for the product option value you want to set."""
+  label: String!
+}
+
+"""Input that has the text field product modifier you want to set."""
+input SetTextFieldProductModifierInformationInput {
+  """Default value for the product modifier you want to set."""
+  defaultValue: String
+
+  """Display name for the product modifier you want to set."""
+  displayName: String
+}
+
+"""Shared product modifier mutations."""
+type SharedProductModifiersMutations {
+  """Sets information for shared product modifiers."""
+  setSharedProductModifiersInformation(input: SetSharedProductModifiersInformationInput!): SetSharedProductModifiersInformationResult
+
+  """Remove overrides for shared product modifiers from a channel locale."""
+  removeSharedProductModifiersOverrides(input: RemoveSharedProductModifiersOverridesInput!): RemoveSharedProductModifiersOverridesResult
+}
+
+"""Shared product option mutations."""
+type SharedProductOptionsMutations {
+  """Sets shared product option information."""
+  setSharedProductOptionsInformation(input: SetSharedProductOptionsInformationInput!): SetSharedProductOptionsInformationResult
+
+  """Removes overrides for shared product options from a channel locale."""
+  removeSharedProductOptionsOverrides(input: RemoveSharedProductOptionsOverridesInput!): RemoveSharedProductOptionsOverridesResult
+}
+
+"""Store settings mutations."""
+type StoreSettingsMutations {
+  """Data solutions mutations."""
+  dataSolutions: DataSolutionsMutations!
+}
+
+"""Translation."""
+type Translation {
+  """Mutation to update translations."""
+  updateTranslations(input: UpdateTranslationsInput!): UpdateTranslationsResult
+
+  """Mutation to delete translations."""
+  deleteTranslations(input: DeleteTranslationsInput!): DeleteTranslationsResult
+}
+
+"""The translation entity was not found."""
+type TranslationEntityNotFoundError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""The translation text is invalid."""
+type TranslationValidationError implements Error {
+  """The error message for the invalid translation."""
+  error: String!
+
+  """Information about error."""
+  message: String!
+}
+
+input UpdateAppExtensionDataInput {
+  """
+  An object that contains all of the desired locale-aware link text options for an App Extension, including new link text options.
+  """
+  label: UpdateAppExtensionLabelInput
+
+  """
+  A new relative path containing a supported path parameter that the app expects to be templated into its route, defined as a JavaScript string template expression. Currently, `id` is supported. Limit 255 characters.
+  See the AppExtension response object schema for more detail.
+  """
+  url: String
+}
+
+input UpdateAppExtensionInput {
+  """
+  The App Extension data to be changed. Currently, only the `url` and `label` properties can be updated. Changes to the `label` object overwrite existing values, rather than upserting. Be sure to send the whole label object you intend the App Extension to have, not just the changes.
+  """
+  data: UpdateAppExtensionDataInput!
+
+  """The ID of the object."""
+  id: ID!
+}
+
+"""The label of the App Extension."""
+input UpdateAppExtensionLabelInput {
+  """
+  The link text that the user sees when the control panel language is English or not defined by the developer in `label.locales`. The `defaultValue` should be in English.  Suggested length of ≤25 characters; limit 255 characters.
+  """
+  defaultValue: String
+
+  """
+  A list of alternate link text values and their corresponding locale codes.
+  """
+  locales: [AppExtensionLabelLocaleInput!]
+}
+
+type UpdateAppExtensionResult {
+  """
+  The response object properties available after updating an App Extension.
+  """
+  appExtension: AppExtension
+}
+
+input UpdateDataLayerInput {
+  """is data layer enabled"""
+  isDataLayerEnabled: Boolean!
+}
+
+"""Result of mutation."""
+type UpdateDataLayerResult {
+  """Data solutions object that is updated as a result of mutation."""
+  dataSolutions: DataSolutionsSettings
+}
+
+input UpdateEventBridgeWebhookDataInput {
+  """Amazon EventBridge source arn."""
+  destination: String
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilterUnionInput!]
+
+  """If webhook is active or not."""
+  isActive: Boolean
+
+  """The scope of the event subscription."""
+  scope: String
+}
+
+"""Error object for update Amazon EventBridge webhook mutation."""
+union UpdateEventBridgeWebhookError = AlreadyExistsError | ValidationError | EntityNotFoundError | EventBridgeSourceNotFoundError | DestinationNotAllowedError | ScopeChangeNotAllowedError
+
+input UpdateEventBridgeWebhookInput {
+  """The ID of an object."""
+  id: ID!
+  data: UpdateEventBridgeWebhookDataInput!
+}
+
+"""The result of mutation."""
+type UpdateEventBridgeWebhookResult {
+  """The webhook that is updated as a result of mutation."""
+  webhook: EventBridgeWebhook
+
+  """
+  The errors that occurred during the update Amazon EventBridge webhook mutation.
+  """
+  errors: [UpdateEventBridgeWebhookError!]!
+}
+
+input UpdateHttpsWebhookDataInput {
+  """URL must be active, return a 200 response, and be served on port 443."""
+  destination: String
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilterUnionInput!]
+
+  """
+  You can define any number of custom headers to be attached to the event sent to the destination URL.
+  """
+  headers: [HttpsWebhookHeaderInput!]
+
+  """If webhook is active or not."""
+  isActive: Boolean
+
+  """The scope of the event subscription."""
+  scope: String
+}
+
+"""Error object for update HTTPS webhook mutation."""
+union UpdateHttpsWebhookError = AlreadyExistsError | ValidationError | EntityNotFoundError | DestinationNotAllowedError | ScopeChangeNotAllowedError
+
+input UpdateHttpsWebhookInput {
+  """The ID of webhook to be updated."""
+  id: ID!
+  data: UpdateHttpsWebhookDataInput!
+}
+
+"""Result of mutation."""
+type UpdateHttpsWebhookResult {
+  """The Webhook that is updated as a result of mutation."""
+  webhook: HttpsWebhook
+
+  """The errors that occurred during the update HTTPS webhook mutation."""
+  errors: [UpdateHttpsWebhookError!]!
+}
+
+"""Union type for all 'updateLocale' mutation's errors."""
+union UpdateLocaleError = EntityNotFoundError | ValidationError
+
+input UpdateLocaleInput {
+  """The ID of the channel."""
+  channelId: ID!
+
+  """The code of the locale."""
+  code: String!
+
+  """The status of the locale."""
+  status: LocaleStatusType
+
+  """Indicates whether the locale is the default."""
+  isDefault: Boolean
+}
+
+type UpdateLocaleResult {
+  """The locale that was updated."""
+  locale: Locale
+
+  """The errors that occurred during the update locale mutation."""
+  errors: [UpdateLocaleError!]!
+}
+
+input UpdateMetafieldDataInput {
+  """Namespace for the metafield."""
+  namespace: String
+
+  """The name of the metafield."""
+  key: String
+
+  """Value of the metafield."""
+  value: String
+
+  """Description of the metafield."""
+  description: String
+
+  """
+  Determines the visibility and writeability of the field by other API consumers.
+  """
+  permissionSet: MetafieldsPermissionSet
+}
+
+"""Union type for all 'updateMetafield' mutation's errors."""
+union UpdateMetafieldErrors = ValidationError | EntityNotFoundError | AlreadyExistsError | NotAuthorizedFieldToUpdateMetafieldFieldError | NotAuthorizedToUpdateMetafieldError
+
+input UpdateMetafieldInput {
+  """Id of metafield to update."""
+  id: ID!
+
+  """Data to update."""
+  data: UpdateMetafieldDataInput!
+}
+
+type UpdateMetafieldResult {
+  """Updated metafield."""
+  metafield: Metafield
+
+  """The list of errors that occurred while updating a metafield."""
+  errors: [UpdateMetafieldErrors!]!
+}
+
+"""
+Input that updates the overrides for product custom fields in a storefront channel locale.
+"""
+input UpdateProductCustomFieldChannelLocaleOverridesInput {
+  """
+  The storefront channel and locale that apply when you update overrides for product custom fields in a channel locale.
+  """
+  context: ChannelLocaleContextInput!
+  data: UpdateProductCustomFieldsChannelLocaleDataInput!
+}
+
+"""
+Input that updates the overrides for product custom fields in a storefront channel locale.
+"""
+input UpdateProductCustomFieldOverridesInput {
+  """
+  The data that applies when you update overrides for product custom fields in a storefront channel locale.
+  """
+  channelLocaleOverrides: UpdateProductCustomFieldChannelLocaleOverridesInput
+}
+
+input UpdateProductCustomFieldsChannelLocaleDataInput {
+  """Name of the product's custom field in a storefront channel locale."""
+  name: String
+
+  """Value of the product's custom field in a storefront channel locale."""
+  value: String
+
+  """
+  Indicates whether the product custom field is visible in a storefront channel locale.
+  """
+  isVisible: Boolean
+}
+
+"""Input that updates information for product custom fields."""
+input UpdateProductCustomFieldsDataInput {
+  """ID of a product's custom field."""
+  customFieldId: ID!
+
+  """Name of the product's custom field."""
+  name: String
+
+  """Value of a product's custom field."""
+  value: String
+
+  """Overrides for product custom fields in a storefront channel locale."""
+  overrides: [UpdateProductCustomFieldOverridesInput!]
+}
+
+input UpdateProductCustomFieldsInput {
+  """ID of the product that has the custom fields you want to update."""
+  productId: ID!
+  data: [UpdateProductCustomFieldsDataInput!]!
+}
+
+type UpdateProductCustomFieldsResult {
+  """Result of updating product custom fields."""
+  product: Product
+}
+
+input UpdateProductImagePropertiesChannelLocaleOverridesDataInput {
+  """The order number of the image."""
+  sortOrder: Long
+
+  """The image description."""
+  altText: String
+
+  """Indicates whether the image is a thumbnail."""
+  isThumbnail: Boolean
+}
+
+"""
+The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+"""
+input UpdateProductImagePropertiesChannelLocaleOverridesInput {
+  """
+  The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+  """
+  context: ChannelLocaleContextInput!
+  data: UpdateProductImagePropertiesChannelLocaleOverridesDataInput!
+}
+
+"""The input data for updating product images."""
+input UpdateProductImagePropertiesDataInput {
+  """The ID of the product image."""
+  imageId: ID!
+
+  """The order number of the image."""
+  sortOrder: Long
+
+  """The image description."""
+  altText: String
+
+  """Indicates whether the image is a thumbnail."""
+  isThumbnail: Boolean
+
+  """The input data for updating product images in contexts."""
+  overrides: [UpdateProductImagePropertiesOverridesInput!]
+}
+
+input UpdateProductImagePropertiesInput {
+  """The ID of the product."""
+  productId: ID!
+  data: [UpdateProductImagePropertiesDataInput!]!
+}
+
+"""The input data for updating product images in contexts."""
+input UpdateProductImagePropertiesOverridesInput {
+  """
+  The input data for updating product images in channel and locale context.
+  """
+  channelLocaleOverrides: UpdateProductImagePropertiesChannelLocaleOverridesInput
+}
+
+type UpdateProductImagePropertiesResult {
+  """The images list with added and removed images."""
+  images(before: String, after: String, first: Int, last: Int): ProductImageConnection
+}
+
+input UpdatePubSubWebhookDataInput {
+  """
+  The Google Cloud Pub/Sub topic where events will be delivered. The topic must have the BigCommerce service account principal & Pub/Sub Publish permission enabled.
+  """
+  destination: String
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilterUnionInput!]
+
+  """If webhook is active or not."""
+  isActive: Boolean
+
+  """The scope of the event subscription."""
+  scope: String
+}
+
+"""Error object for update Google Cloud PubSub webhook mutation."""
+union UpdatePubSubWebhookError = AlreadyExistsError | ValidationError | EntityNotFoundError | PubSubTopicNotFoundError | PubSubNoPermissionToPublishError | DestinationNotAllowedError | ScopeChangeNotAllowedError
+
+input UpdatePubSubWebhookInput {
+  """The ID of webhook to update."""
+  id: ID!
+  data: UpdatePubSubWebhookDataInput!
+}
+
+"""Result of mutation."""
+type UpdatePubSubWebhookResult {
+  """The Google PubSub webhook that is updated as a result of mutation."""
+  webhook: PubSubWebhook
+
+  """
+  The errors that occurred during the update Google Pub/Sub webhook mutation.
+  """
+  errors: [UpdatePubSubWebhookError!]!
+}
+
+"""The entity to update translations for."""
+input UpdateTranslationEntity {
+  """The ID of the entity to update translations for."""
+  resourceId: ID!
+
+  """The fields to update translations for."""
+  fields: [UpdateTranslationField!]!
+}
+
+"""The field to update translations for."""
+input UpdateTranslationField {
+  """The name of the field to update."""
+  fieldName: String!
+
+  """The translated text for the field."""
+  value: String!
+}
+
+"""Union type for all 'updateTranslations' mutation's errors."""
+union UpdateTranslationsError = InvalidTranslationEntityFieldsError | TranslationEntityNotFoundError | TranslationValidationError
+
+input UpdateTranslationsInput {
+  """The type of resource that is being translated."""
+  resourceType: TranslationResourceType!
+
+  """The channel ID to update translations for."""
+  channelId: ID!
+
+  """The locale ID to update translations for."""
+  localeId: ID!
+
+  """The entities to update translations for."""
+  entities: [UpdateTranslationEntity!]!
+}
+
+type UpdateTranslationsResult {
+  """The errors that occurred during the update translations mutation."""
+  errors: [UpdateTranslationsError!]!
+}
+
+"""Error indicating that the input is invalid."""
+type ValidationError implements Error {
+  """Information about error."""
+  message: String!
+}
+
+"""Filter for webhook events based on 'data' field in payload."""
+input WebhookEventDataFilterInput {
+  """
+  Path to the field relatively to data field. Could point only on nested field.
+  """
+  path: [String!]!
+
+  """Values of the field to filter."""
+  values: WebhookEventDataFilterValuesInput!
+
+  """Values of the field to filter."""
+  delivery: WebhookEventFilterOperationType!
+}
+
+"""
+Wrapper for all possible value wrappers. Only one of fields should be set.
+"""
+input WebhookEventDataFilterValuesInput {
+  """String values."""
+  stringValues: [String!]
+
+  """Double values."""
+  doubleValues: [Float!]
+
+  """Long (int64) values."""
+  longValues: [Long!]
+}
+
+"""Input for webhook's filters. Currently only clientIdFilter available."""
+input WebhookEventFilterUnionInput {
+  """
+  Filter that limits webhooks to send events only for given values for given field.
+  """
+  dataFilter: WebhookEventDataFilterInput
+}
+
+"""
+Operations that allow you to create, update, and delete webhooks on the server side.
+"""
+type WebhookMutations {
+  """Creates an Amazon EventBridge webhook."""
+  createEventBridgeWebhook(input: CreateEventBridgeWebhookInput!): CreateEventBridgeWebhookResult
+
+  """Creates Google Cloud PubSub webhook."""
+  createPubSubWebhook(input: CreatePubSubWebhookInput!): CreatePubSubWebhookResult
+
+  """Update a Google Cloud PubSub webhook."""
+  updatePubSubWebhook(input: UpdatePubSubWebhookInput!): UpdatePubSubWebhookResult
+
+  """Update an Amazon EventBridge webhook."""
+  updateEventBridgeWebhook(input: UpdateEventBridgeWebhookInput!): UpdateEventBridgeWebhookResult
+
+  """Creates an HTTPS webhook."""
+  createHttpsWebhook(input: CreateHttpsWebhookInput!): CreateHttpsWebhookResult
+
+  """Deletes a webhook."""
+  deleteWebhook(input: DeleteWebhookInput!): DeleteWebhookResult
+
+  """Update an https webhook."""
+  updateHttpsWebhook(input: UpdateHttpsWebhookInput!): UpdateHttpsWebhookResult
+}
+
+"""An account."""
+type Account {
+  """The ID of the object."""
+  id: ID!
+}
+
+"""
+The response object for any query or mutation that returns an App Extension.
+"""
+type AppExtension {
+  """The ID of the object."""
+  id: ID!
+
+  """
+  Defines the action that the control panel performs after the user clicks the App Extension label.
+  """
+  context: AppExtensionContext
+
+  """The locale-aware options for the App Extension menu item link text."""
+  label: AppExtensionLabel!
+
+  """
+  The entity type to which the App Extension relates; for example, Orders.
+  """
+  model: AppExtensionModel
+
+  """
+  A relative path with some meaning to your app, most commonly an internally-defined GET route. The path should contain a supported path parameter that the app expects to be templated into its route, defined as a JavaScript string template literal. For example, '/customer/auth/${id}'. Currently, `id` is the only supported parameter. Limit 255 characters.
+  """
+  url: String!
+}
+
+"""
+Defines the action that the control panel performs after the user clicks the App Extension label.
+"""
+enum AppExtensionContext {
+  """
+  The control panel navigates the user away from their current page to the parent app's page, where the app can render App Extension-specific content.
+  """
+  LINK
+
+  """
+  The control panel opens a side panel on the user's current page, where the app can render content without navigating away.
+  """
+  PANEL
+}
+
+"""
+An object that contains locale-aware link text for the App Extension URL. The control panel user sees this link text wherever they have the option to open the App Extension.
+"""
+type AppExtensionLabel {
+  """
+  The link text that the user sees when the control panel language is English or a language for which the developer has not defined a label in `label.locales`. The `defaultValue` should be in English.  Suggested length of ≤25 characters; limit 255 characters.
+  """
+  defaultValue: String!
+
+  """
+  The list of locale-aware link text options for an App Extension, excluding the defaultValue.
+  """
+  locales: [AppExtensionLabelLocale!]!
+}
+
+"""
+The locale-specific link text and corresponding locales for an App Extension.
+"""
+type AppExtensionLabelLocale {
+  """
+  The locale code for the link text; for example, `pt-BR` for Portuguese. The locale code should correspond with a control panel-supported language. See the App Extensions documentation for a list of currently supported languages and corresponding locale codes.
+  """
+  localeCode: String!
+
+  """
+  The link text that the user sees when the control panel language corresponds with the accompanying locale code.  Suggested length of ≤25 characters; limit 255 characters.
+  """
+  value: String!
+}
+
+"""
+The entity type to which an App Extension relates. The path parameter templated into the App Extension URL takes a model property as its argument. For example, an App Extension active on the CUSTOMERS model converts `/auth/${id}` into `/auth/227` for the customer whose ID value is 227.
+"""
+enum AppExtensionModel {
+  """
+  The App Extension appears on the supported customer-related pages and takes Customer properties as arguments.
+  """
+  CUSTOMERS
+
+  """
+  The App Extension appears on the supported orders-related pages and takes Orders properties as arguments.
+  """
+  ORDERS
+
+  """
+  The App Extension appears on the supported products-related pages and takes Products properties as arguments.
+  """
+  PRODUCTS
+
+  """
+  The App Extension appears on the description field on supported Edit Products pages and takes Products properties as arguments.
+  """
+  PRODUCT_DESCRIPTION
+}
+
+"""A connection to a list of items."""
+type AppExtensionsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [AppExtensionsEdge]
+}
+
+"""An edge in a connection."""
+type AppExtensionsEdge {
+  """The item at the end of the edge."""
+  node: AppExtension!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Redirect to blog posts."""
+type BlogPostEntityRedirect {
+  """The ID of the object."""
+  blogPostId: ID!
+}
+
+"""Redirect to brand."""
+type BrandEntityRedirect {
+  """The ID of the object."""
+  brandId: ID!
+}
+
+"""Redirect to category."""
+type CategoryEntityRedirect {
+  """The ID of the object."""
+  categoryId: ID!
+}
+
+"""A channel."""
+type Channel implements Node {
+  """The ID of the object."""
+  id: ID!
+
+  """Currency Assignments for the channel."""
+  currencies: ChannelCurrencyCodes
+
+  """Date on which the channel was first created."""
+  dateCreated: DateTime
+
+  """Date on which the channel was most recently changed."""
+  dateModified: DateTime
+
+  """Associated ID within a system / platform outside of BC."""
+  externalId: String!
+
+  """Link to the platform icon."""
+  iconUrl: String!
+
+  """
+  Indicates if a channel can create listings from the BigCommerce UI. Default value for this field is based on the channel type and platform combination if not specified on create.
+  """
+  isListableFromUi: Boolean!
+
+  """
+  Indicates if a channel is visible within the BigCommerce merchant admin UI (control panel). If false, the channel will not show in Channel Manager nor in any channels dropdown throughout the UI. Default value for this field is true if not specified on create.
+  """
+  isVisible: Boolean!
+
+  """
+  Name of the channel as it will appear to merchants in the control panel.
+  """
+  name: String!
+
+  """
+  The name of the platform for the channel; channel platform and type must be a valid combination. Please visit https://developer.bigcommerce.com/api-reference/store-management/channels#platform to check for valid combination.
+  """
+  platform: String!
+
+  """Channel-level settings."""
+  settings: ChannelSettings
+
+  """A site."""
+  site: Site
+
+  """
+  The status of the channel; channel type, platform, and status must be a valid combination. Please visit https://developer.bigcommerce.com/api-reference/store-management/channels#status to check for valid combination.
+  """
+  status: ChannelStatus
+
+  """
+  The type of channel; channel platform and type must be a valid combination. Please visit https://developer.bigcommerce.com/api-reference/store-management/channels#platform to check for valid combination.
+  """
+  type: String!
+}
+
+"""Channel-level currency assignments"""
+type ChannelCurrencyCodes {
+  """
+  Default currency for the channel in ISO 4217 three character alphabetic format. Will be used on storefront when other currencies cannot.
+  """
+  defaultCurrencyCode: CurrencyCode
+
+  """
+  Currencies that are enabled for the given channel in ISO 4217 three character alphabetic format.
+  """
+  enabledCurrencyCodes: [CurrencyCode!]!
+}
+
+"""
+The storefront channel and locale that apply when you override or retrieve product custom fields from a channel locale.
+"""
+type ChannelLocaleContext {
+  """Storefront channel ID."""
+  channelId: ID!
+
+  """Locale in a storefront channel."""
+  locale: String!
+}
+
+"""Channel-level settings."""
+type ChannelSettings {
+  """Store name."""
+  storeName: String
+}
+
+"""Status of the channel."""
+enum ChannelStatus {
+  """Channel is active."""
+  ACTIVE
+
+  """Channel is archived."""
+  ARCHIVED
+
+  """Channel is connected."""
+  CONNECTED
+
+  """Channel is deleted."""
+  DELETED
+
+  """Channel is disconnected."""
+  DISCONNECTED
+
+  """Channel is inactive."""
+  INACTIVE
+
+  """Channel is in pre-launch mode."""
+  PRELAUNCH
+
+  """Channel is terminated."""
+  TERMINATED
+}
+
+"""A connection to a list of items."""
+type ChannelsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ChannelsEdge]
+}
+
+"""An edge in a connection."""
+type ChannelsEdge {
+  """The item at the end of the edge."""
+  node: Channel!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+input ChannelsFiltersInput {
+  """
+  Filter items based on whether the channel is currently available for integration. Setting this query parameter to true will return channels with the status of prelaunch, active, inactive, and connected. Setting this query parameter to false will return channels with the status of disconnected, archived, deleted, and terminated.
+  """
+  available: Boolean
+
+  """Filter items by date created."""
+  dateCreated: DateFiltersInput
+
+  """Filter items by date modified."""
+  dateModified: DateFiltersInput
+
+  """The IDs of channels."""
+  ids: [ID!]
+
+  """
+  Filter items by a list of platforms. For a list of supported platforms, see https://developer.bigcommerce.com/api-reference/store-management/channels#platform.
+  """
+  platforms: [String!]
+
+  """Filter items by a list of statuses."""
+  statuses: [ChannelStatus!]
+
+  """Filter items by a list of types."""
+  types: [String!]
+}
+
+"""Checkbox product modifier."""
+type CheckboxProductModifier implements ProductModifier {
+  """Indicates whether the modifier is checked by default."""
+  checkedByDefault: Boolean!
+
+  """Checkbox modifier field value."""
+  fieldValue: String
+
+  """Overrides for the checkbox product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): CheckboxProductModifierForLocale
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Override for a checkbox product modifier in a channel locale."""
+type CheckboxProductModifierForLocale {
+  """Display name for the product modifier."""
+  displayName: String
+
+  """Value of the product modifier field."""
+  fieldValue: String
+}
+
+"""Checkbox shared product modifier."""
+type CheckboxSharedProductModifier implements SharedProductModifier {
+  """Indicates whether shared product modifier is checked by default."""
+  checkedByDefault: Boolean!
+
+  """Checkbox shared product modifier field value."""
+  fieldValue: String
+
+  """
+  Overrides for the checkbox shared product modifier in a channel locale.
+  """
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): CheckboxSharedProductModifierForLocale
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for the checkbox shared product modifier in a channel locale.
+"""
+type CheckboxSharedProductModifierForLocale {
+  """Display name for the shared product modifier."""
+  displayName: String
+
+  """Field value for the shared product modifier."""
+  fieldValue: String
+}
+
+"""A client."""
+type Client {
+  """Identifier of a client."""
+  clientId: String
+
+  """List of client scopes."""
+  scopes(before: String, after: String, first: Int, last: Int): ScopeConnection
+}
+
+"""Collection information."""
+type CollectionInfo {
+  """Total number of items in the collection."""
+  totalItems: Long
+}
+
+"""Currency Code."""
+enum CurrencyCode {
+  AED
+  AFN
+  ALL
+  AMD
+  ANG
+  AOA
+  ARS
+  AUD
+  AWG
+  AZN
+  BAM
+  BBD
+  BDT
+  BGN
+  BHD
+  BIF
+  BMD
+  BND
+  BOB
+  BOV
+  BRL
+  BSD
+  BTN
+  BWP
+  BYN
+  BYR
+  BZD
+  CAD
+  CDF
+  CHE
+  CHF
+  CHW
+  CLF
+  CLP
+  CNY
+  COP
+  COU
+  CRC
+  CUC
+  CUP
+  CVE
+  CZK
+  DJF
+  DKK
+  DOP
+  DZD
+  EGP
+  ERN
+  ETB
+  EUR
+  FJD
+  FKP
+  GBP
+  GEL
+  GHS
+  GIP
+  GMD
+  GNF
+  GTQ
+  GYD
+  HKD
+  HNL
+  HRK
+  HTG
+  HUF
+  IDR
+  ILS
+  INR
+  IQD
+  IRR
+  ISK
+  JMD
+  JOD
+  JPY
+  KES
+  KGS
+  KHR
+  KMF
+  KPW
+  KRW
+  KWD
+  KYD
+  KZT
+  LAK
+  LBP
+  LKR
+  LRD
+  LSL
+  LYD
+  MAD
+  MDL
+  MGA
+  MKD
+  MMK
+  MNT
+  MOP
+  MRO
+  MRU
+  MUR
+  MVR
+  MWK
+  MXN
+  MYR
+  MZN
+  NAD
+  NGN
+  NIO
+  NOK
+  NPR
+  NZD
+  OMR
+  PAB
+  PEN
+  PGK
+  PHP
+  PKR
+  PLN
+  PYG
+  QAR
+  RON
+  RSD
+  RUB
+  RWF
+  SAR
+  SBD
+  SCR
+  SDG
+  SEK
+  SGD
+  SHP
+  SLL
+  SOS
+  SRD
+  SSP
+  STD
+  STN
+  SVC
+  SYP
+  SZL
+  THB
+  TJS
+  TMT
+  TND
+  TOP
+  TRY
+  TTD
+  TWD
+  TZS
+  UAH
+  UGX
+  USD
+  USN
+  UYI
+  UYU
+  UZS
+  VEF
+  VES
+  VND
+  VUV
+  WST
+  XAF
+  XAG
+  XAU
+  XBA
+  XBB
+  XBC
+  XBD
+  XCD
+  XDR
+  XOF
+  XPD
+  XPF
+  XPT
+  XSU
+  XTS
+  XUA
+  XXX
+  YER
+  ZAR
+  ZMW
+  ZWL
+}
+
+"""Data solutions settings."""
+type DataSolutionsSettings {
+  """Indicates if a data layer(bodl) object is enabled for all storefronts."""
+  isDataLayerEnabled: Boolean!
+}
+
+"""Date field product modifier."""
+type DateFieldProductModifier implements ProductModifier {
+  """Overrides for the date field product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): DateFieldProductModifierForLocale
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Override for a date field product modifier in a channel locale."""
+type DateFieldProductModifierForLocale {
+  """Display name for the product modifier in a channel locale."""
+  displayName: String
+}
+
+"""Date field shared product modifier."""
+type DateFieldSharedProductModifier implements SharedProductModifier {
+  """
+  Overrides for the date field shared product modifier in a channel locale.
+  """
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): DateFieldSharedProductModifierForLocale
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for the date field shared product modifier in a channel locale.
+"""
+type DateFieldSharedProductModifierForLocale {
+  """Display name for the shared product modifier."""
+  displayName: String
+}
+
+"""Filters for date."""
+input DateFiltersInput {
+  """Filter items with date equal to."""
+  eq: DateTime
+
+  """Filter items with date greater than."""
+  gt: DateTime
+
+  """Filter items with date less than."""
+  lt: DateTime
+
+  """Filter items with date greater than or equal to."""
+  gte: DateTime
+
+  """Filter items with date less than or equal to."""
+  lte: DateTime
+}
+
+"""ISO-8601 formatted date in UTC"""
+scalar DateTime
+
+"""Dropdown product option value"""
+type DropdownOptionValue implements ProductOptionValue {
+  """ID of the product option value."""
+  id: ID!
+
+  """Indicates whether this value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Override for a dropdown product option value in a channel locale."""
+type DropdownOptionValueForLocale implements ProductOptionValueForLocale {
+  """ID of the product option value."""
+  id: ID!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Dropdown product modifier."""
+type DropdownProductModifier implements ProductModifier {
+  """Overrides for the dropdown product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): DropdownProductModifierForLocale
+
+  """Dropdown product modifiers values."""
+  values: [DropdownProductModifierValue!]!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Override for a dropdown product modifier in a channel locale."""
+type DropdownProductModifierForLocale {
+  """Display name for the product modifier in a channel locale."""
+  displayName: String
+
+  """Modifier values for a dropdown product modifier in a channel locale."""
+  values: [DropdownProductModifierValueForLocale!]!
+}
+
+"""Dropdown product modifier value."""
+type DropdownProductModifierValue {
+  """The ID of the product modifier value."""
+  id: ID!
+
+  """
+  Indicates whether the dropdown product modifier value is selected by default.
+  """
+  isDefault: Boolean!
+
+  """Label for the dropdown product modifier value."""
+  label: String!
+}
+
+"""Override for a dropdown product modifier value in a channel locale."""
+type DropdownProductModifierValueForLocale {
+  """ID of the product modifier value in a channel locale."""
+  id: ID!
+
+  """Label for the product modifier value in a channel locale."""
+  label: String!
+}
+
+"""Dropdown product option."""
+type DropdownProductOption implements ProductOption {
+  """Display name for the option."""
+  displayName: String!
+
+  """Indicates whether product option is shared or local."""
+  isShared: Boolean!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): ProductOptionForLocale
+
+  """List of product option values."""
+  values: [ProductOptionValue!]!
+}
+
+"""Override for the dropdown product option in a channel locale."""
+type DropdownProductOptionForLocale implements ProductOptionForLocale {
+  """Display name for the product option."""
+  displayName: String
+
+  """List of product option values."""
+  values: [ProductOptionValueForLocale!]!
+}
+
+"""Dropdown shared option value."""
+type DropdownSharedOptionValue implements SharedProductOptionValue {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Indicates whether this value is the chosen default value."""
+  isDefault: Boolean!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""Overrides for the dropdown shared option values in a channel locale."""
+type DropdownSharedOptionValueForLocale implements SharedProductOptionValueForLocale {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""Dropdown shared product modifier."""
+type DropdownSharedProductModifier implements SharedProductModifier {
+  """
+  Overrides for the dropdown shared product modifier in a channel locale.
+  """
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): DropdownSharedProductModifierForLocale
+
+  """Dropdown shared product modifier values."""
+  values: [DropdownSharedProductModifierValue!]!
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for the dropdown shared product modifier in a channel locale.
+"""
+type DropdownSharedProductModifierForLocale {
+  """Display name for the shared product modifier."""
+  displayName: String
+
+  """Shared product modifier values."""
+  values: [DropdownSharedProductModifierValueForLocale!]!
+}
+
+"""Dropdown shared product modifier value."""
+type DropdownSharedProductModifierValue {
+  """ID of the shared product modifier value."""
+  id: ID!
+
+  """
+  Indicates whether the shared product modifier value is selected by default.
+  """
+  isDefault: Boolean!
+
+  """Label for the shared product modifier value."""
+  label: String!
+}
+
+"""
+Overrides for values of the dropdown shared product modifier in a channel locale.
+"""
+type DropdownSharedProductModifierValueForLocale {
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Label for the shared product modifier."""
+  label: String!
+}
+
+"""Dropdown shared option."""
+type DropdownSharedProductOption implements SharedProductOption {
+  """Display name for the shared option."""
+  displayName: String!
+
+  """ID of the shared option."""
+  id: ID!
+
+  """Shared option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): SharedProductOptionForLocale
+
+  """List of shared option values."""
+  values: [SharedProductOptionValue!]!
+}
+
+"""Overrides for the dropdown shared option in a channel locale."""
+type DropdownSharedProductOptionForLocale implements SharedProductOptionForLocale {
+  """Display name for a shared option."""
+  displayName: String
+
+  """List of shared option values."""
+  values: [SharedProductOptionValueForLocale!]!
+}
+
+"""An Amazon EventBridge webhook."""
+type EventBridgeWebhook implements Webhook & Node {
+  """Amazon EventBridge source arn."""
+  destination: String!
+
+  """ID of client application owning the webhook."""
+  clientId: String!
+
+  """The date and time of webhook creation."""
+  createdAt: DateTime
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilter!]!
+
+  """The ID of a webhook object."""
+  id: ID!
+
+  """The scope of the event subscription."""
+  scope: String!
+
+  """The status of a webhook."""
+  status: WebhookStatus!
+
+  """The date and time of the last webhook update."""
+  updatedAt: DateTime
+}
+
+"""File upload product modifier."""
+type FileUploadProductModifier implements ProductModifier {
+  """Overrides for the file upload product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product information for a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): FileUploadProductModifierForLocale
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Override for a file upload product modifier in a channel locale."""
+type FileUploadProductModifierForLocale {
+  """Display name for the file upload product modifier in a channel locale."""
+  displayName: String
+}
+
+"""File upload shared product modifier."""
+type FileUploadSharedProductModifier implements SharedProductModifier {
+  """
+  Overrides for a file upload shared product modifier in a channel locale.
+  """
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): FileUploadSharedProductModifierForLocale
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for a file upload shared product modifier in a channel locale.
+"""
+type FileUploadSharedProductModifierForLocale {
+  """Display name for the shared product modifier."""
+  displayName: String
+}
+
+"""An https webhook."""
+type HttpsWebhook implements Webhook & Node {
+  """URL must be active, return a 200 response, and be served on port 443."""
+  destination: String!
+
+  """You can pass custom headers to validate webhooks being returned."""
+  headers: [HttpsWebhookHeader!]!
+
+  """ID of client application owning the webhook."""
+  clientId: String!
+
+  """The date and time of webhook creation."""
+  createdAt: DateTime
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilter!]!
+
+  """The ID of a webhook object."""
+  id: ID!
+
+  """The scope of the event subscription."""
+  scope: String!
+
+  """The status of a webhook."""
+  status: WebhookStatus!
+
+  """The date and time of the last webhook update."""
+  updatedAt: DateTime
+}
+
+"""The HTTP header to include with webhook event messages."""
+type HttpsWebhookHeader {
+  """Name of the custom header."""
+  key: String!
+
+  """The input value of the returned webhook."""
+  value: String!
+}
+
+"""Internationalization data."""
+type I18n {
+  """List of supported locales."""
+  supportedLocales(before: String, after: String, first: Int, last: Int): SupportedLocaleConnection!
+}
+
+"""Locale represents a specific locale."""
+type Locale {
+  """The code of the locale."""
+  code: String!
+
+  """The status of the locale."""
+  status: LocaleStatusType!
+
+  """Indicates whether the locale is the default."""
+  isDefault: Boolean!
+}
+
+"""LocaleConnection represents a connection type for locales."""
+type LocaleConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [LocaleEdge]
+}
+
+"""LocaleEdge represents an edge in a connection."""
+type LocaleEdge {
+  """The item at the end of the edge."""
+  node: Locale!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""The status of the locale."""
+enum LocaleStatusType {
+  """The locale is active."""
+  ACTIVE
+
+  """The locale is inactive."""
+  INACTIVE
+}
+
+input LocalesContextInput {
+  """The ID of the channel."""
+  channelId: ID!
+}
+
+"""A metafield."""
+type Metafield {
+  """The ID of the metafield."""
+  id: ID!
+
+  """Metafield description."""
+  description: String!
+
+  """Metafield key."""
+  key: String!
+
+  """Metafield namespace."""
+  namespace: String!
+
+  """Metafield permission set."""
+  permissionSet: MetafieldsPermissionSet!
+
+  """Resource id of an entity metafield related to."""
+  resourceId: ID!
+
+  """Metafield value."""
+  value: String!
+
+  """Identifier of metafields owner."""
+  ownerClientId: String!
+
+  """Date and time when the metafield was created."""
+  createdAt: DateTime
+
+  """Date and time when the metafield was last updated."""
+  updatedAt: DateTime
+}
+
+"""A connection to a list of items."""
+type MetafieldsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [MetafieldsEdge]
+}
+
+"""An edge in a connection."""
+type MetafieldsEdge {
+  """The item at the end of the edge."""
+  node: Metafield!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+input MetafieldsFiltersInput {
+  """Namespace for the metafield."""
+  namespace: String
+
+  """Filter by create date of the metafield."""
+  createdAt: DateFiltersInput
+
+  """Filter by update date of the metafield."""
+  updatedAt: DateFiltersInput
+
+  """
+  The unique identifier for the resource with which the metafield is associated.
+  """
+  resourceIds: [ID!]
+
+  """The type of resource with which the metafield is associated."""
+  resourceType: MetafieldsResourceType
+}
+
+"""
+Determines the visibility and writeability of the field by other API consumers.
+"""
+enum MetafieldsPermissionSet {
+  """Private to the app that owns the field."""
+  APP_ONLY
+
+  """Visible to other API consumers."""
+  READ
+
+  """Visible to other API consumers, including on storefront."""
+  READ_AND_SF_ACCESS
+
+  """Open for reading and writing by other API consumers."""
+  WRITE
+
+  """
+  Open for reading and writing by other API consumers, including on storefront.
+  """
+  WRITE_AND_SF_ACCESS
+}
+
+"""The type of resource with which the metafield is associated."""
+enum MetafieldsResourceType {
+  """Metafield is associated with brand."""
+  BRAND
+
+  """Metafield is associated with cart."""
+  CART
+
+  """Metafield is associated with category."""
+  CATEGORY
+
+  """Metafield is associated with channel."""
+  CHANNEL
+
+  """Metafield is associated with customer."""
+  CUSTOMER
+
+  """Metafield is associated with location."""
+  LOCATION
+
+  """Metafield is associated with order."""
+  ORDER
+
+  """Metafield is associated with product."""
+  PRODUCT
+
+  """Metafield is associated with store."""
+  STORE
+
+  """Metafield is associated with variant."""
+  VARIANT
+}
+
+"""Multiline text field product modifier."""
+type MultilineTextFieldProductModifier implements ProductModifier {
+  """Default value for the product modifier."""
+  defaultValue: String
+
+  """Overrides for the product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): MultilineTextFieldProductModifierForLocale
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""
+Override for a multiline text field product modifier in a channel locale.
+"""
+type MultilineTextFieldProductModifierForLocale {
+  """Default value for the product modifier in a channel locale."""
+  defaultValue: String
+
+  """Display name for the product modifier in a channel locale."""
+  displayName: String
+}
+
+"""Multiline text field shared product modifier."""
+type MultilineTextFieldSharedProductModifier implements SharedProductModifier {
+  """Default value for the shared product modifier."""
+  defaultValue: String
+
+  """
+  Overrides for the multiline text field shared product modifier in a channel locale.
+  """
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): MultilineTextFieldSharedProductModifierForLocale
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for the multiline text field shared product modifier in a channel locale.
+"""
+type MultilineTextFieldSharedProductModifierForLocale {
+  """Default value for the shared product modifier."""
+  defaultValue: String
+
+  """Display name for the shared product modifier."""
+  displayName: String
+}
+
+"""An object with an ID."""
+interface Node {
+  """The ID of the object."""
+  id: ID!
+}
+
+"""Numbers-only text field product modifier."""
+type NumbersOnlyTextFieldProductModifier implements ProductModifier {
+  """Default value for the product modifier."""
+  defaultValue: Float
+
+  """Overrides for the product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): NumbersOnlyTextFieldProductModifierForLocale
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""
+Override for a numbers-only text field product modifier in a channel locale.
+"""
+type NumbersOnlyTextFieldProductModifierForLocale {
+  """Default value for the product modifier."""
+  defaultValue: Float
+
+  """Display name for the product modifier."""
+  displayName: String
+}
+
+"""Numbers-only text field shared product modifier."""
+type NumbersOnlyTextFieldSharedProductModifier implements SharedProductModifier {
+  """Default value for the shared product modifier."""
+  defaultValue: Float
+
+  """Overrides for the shared product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): NumbersOnlyTextFieldSharedProductModifierForLocale
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for the numbers-only text field shared product modifier in a channel locale.
+"""
+type NumbersOnlyTextFieldSharedProductModifierForLocale {
+  """Default value for the shared product modifier."""
+  defaultValue: Float
+
+  """Display name for the shared product modifier."""
+  displayName: String
+}
+
+"""Redirect to page."""
+type PageEntityRedirect {
+  """The ID of the object."""
+  pageId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """Indicates whether there are more items when paginating forwards."""
+  hasNextPage: Boolean!
+
+  """Indicates whether there are more items when paginating backward."""
+  hasPreviousPage: Boolean!
+
+  """The starting cursor when paginating backward."""
+  startCursor: String
+
+  """The ending cursor when paginating forwards."""
+  endCursor: String
+}
+
+"""Pick list product modifier value."""
+type PickListModifierValue {
+  """ID of the product modifier."""
+  id: ID!
+
+  """Indicates whether the product modifier value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for product modifier value."""
+  label: String!
+}
+
+"""
+Overrides for the pick list product modifier value in a channel locale.
+"""
+type PickListModifierValueForLocale {
+  """ID of the product modifier value."""
+  id: ID!
+
+  """Label for product modifier value."""
+  label: String!
+}
+
+"""Pick list product modifier."""
+type PickListProductModifier implements ProductModifier {
+  """Overrides for the pick list product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): PickListProductModifierForLocale
+
+  """Values for the product modifier."""
+  values: [PickListModifierValue!]!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Overrides for the pick list product modifier in a channel locale."""
+type PickListProductModifierForLocale {
+  """Display name for the product modifier."""
+  displayName: String
+
+  """Values for the product modifier."""
+  values: [PickListModifierValueForLocale!]!
+}
+
+"""Product pre-order settings."""
+type PreOrderSettings {
+  """Message about a pre-order for a product."""
+  message: String
+}
+
+"""Overrides for pre-order settings in a channel locale."""
+type PreOrderSettingsOverridesForLocale {
+  """Pre-order message in a channel locale."""
+  message: String
+}
+
+"""A product."""
+type Product {
+  """The ID of the product."""
+  id: ID!
+
+  """Basic product information."""
+  basicInformation: ProductBasicInformation!
+
+  """Indicates whether a product is marked as a featured product."""
+  isFeatured: Boolean!
+
+  """Product path."""
+  urlPath: ProductUrlPath!
+
+  """Overrides for the product in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product information from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): ProductOverridesForLocale
+
+  """Product overrides for a specific channel."""
+  overridesForChannel(
+    """Channel ID."""
+    channelId: ID!
+  ): ProductOverridesForChannel
+
+  """Product SEO information."""
+  seoInformation: ProductSeoInformation!
+
+  """Product storefront details."""
+  storefrontDetails: StorefrontDetails!
+
+  """Product pre-order settings."""
+  preOrderSettings: PreOrderSettings!
+
+  """List of product custom fields."""
+  customFields(before: String, after: String, first: Int, last: Int): ProductCustomFieldConnection!
+
+  """List of product options."""
+  options(before: String, after: String, first: Int, last: Int): ProductOptionConnection!
+
+  """List of product modifiers."""
+  modifiers(before: String, after: String, first: Int, last: Int): ProductModifierConnection!
+
+  """List of product images."""
+  images(before: String, after: String, first: Int, last: Int, filters: ProductImagesFiltersInput, sort: ProductImagesSortInput): ProductImageConnection!
+
+  """List of product images overrides."""
+  imagesOverrides(before: String, after: String, first: Int, last: Int, filters: ProductImagesFiltersInput, sort: ProductImagesSortInput, context: ProductImagesOverridesContextInput!): ProductImagesOverridesItemConnection!
+}
+
+"""The basic information about the product."""
+type ProductBasicInformation {
+  """Description of the product."""
+  description: String
+
+  """Name of the product."""
+  name: String!
+}
+
+"""Overrides for basic product information in a channel locale."""
+type ProductBasicInformationOverridesForLocale {
+  """Description for the product in a channel locale."""
+  description: String
+
+  """Name for the product in a channel locale."""
+  name: String
+}
+
+"""A connection to a list of items."""
+type ProductConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductEdge]
+}
+
+"""A product custom field."""
+type ProductCustomField {
+  """The ID of the product custom field."""
+  id: ID!
+
+  """Name of a product custom field."""
+  name: String!
+
+  """The value of a product custom field."""
+  value: String!
+
+  """Overrides for product custom fields in a storefront channel locale."""
+  overrides(
+    """
+    The storefront channel and locale that apply when you override or retrieve product custom fields from a channel locale.
+    """
+    context: ProductCustomFieldOverridesContextInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): ProductCustomFieldOverridesConnection!
+}
+
+"""A connection to a list of product custom fields."""
+type ProductCustomFieldConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductCustomFieldEdge]
+}
+
+"""An edge in a connection."""
+type ProductCustomFieldEdge {
+  """The item at the end of the edge."""
+  node: ProductCustomField!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Overrides for product custom fields in a storefront channel locale."""
+union ProductCustomFieldOverrides = ProductCustomFieldOverridesForChannelLocale
+
+"""A connection to a list of items."""
+type ProductCustomFieldOverridesConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductCustomFieldOverridesEdge]
+}
+
+"""
+The storefront channel and locale that apply when you override or retrieve product options from a channel locale.
+"""
+input ProductCustomFieldOverridesContextInput {
+  """Storefront channel ID."""
+  channelId: ID
+
+  """Locale in a storefront channel."""
+  locale: String
+}
+
+"""An edge in a connection."""
+type ProductCustomFieldOverridesEdge {
+  """The item at the end of the edge."""
+  node: ProductCustomFieldOverrides!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Overrides for product custom fields in a storefront channel locale."""
+type ProductCustomFieldOverridesForChannelLocale {
+  """Name of a product custom field in a storefront channel locale."""
+  name: String
+
+  """Value of a product custom field in a storefront channel locale."""
+  value: String
+
+  """
+  Indicates whether a custom field is visible in a storefront channel locale.
+  """
+  isVisible: Boolean
+
+  """
+  The storefront channel and locale that apply when you override or retrieve product custom fields from a channel locale.
+  """
+  context: ChannelLocaleContext!
+}
+
+"""An edge in a connection."""
+type ProductEdge {
+  """The item at the end of the edge."""
+  node: Product!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Redirect to product."""
+type ProductEntityRedirect {
+  """The ID of the object."""
+  productId: ID!
+}
+
+"""A product image."""
+type ProductImage {
+  """The ID of the product image."""
+  id: ID!
+
+  """The image description."""
+  altText: String
+
+  """Indicates whether the image is a thumbnail."""
+  isThumbnail: Boolean!
+
+  """The order number of the image."""
+  sortOrder: Long!
+
+  """The date the image was created."""
+  dateCreated: String!
+
+  """The date the image was modified."""
+  dateModified: String!
+
+  """The image file name."""
+  imageFile: String!
+
+  """The URL of the zoom image."""
+  urlZoom: String!
+
+  """The URL of the standard image."""
+  urlStandard: String!
+
+  """
+  Indicates whether the image is added to the product and displayed on storefront.
+  """
+  addedToProduct: Boolean!
+
+  """
+  Collection of image overrides for a product in a context of channel and locale.
+  """
+  overrides(
+    """Filter by channel or locale."""
+    context: ProductImagesOverridesInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): ProductImagesOverridesConnection!
+}
+
+"""A connection to a list of images."""
+type ProductImageConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductImageEdge]
+
+  """Information about the collection."""
+  collectionInfo: CollectionInfo
+}
+
+"""An edge in a connection."""
+type ProductImageEdge {
+  """The item at the end of the edge."""
+  node: ProductImage!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""The sort field for product images."""
+enum ProductImageSortFieldInput {
+  """Sort by the date the image was created."""
+  DATE_CREATED
+
+  """Sort by the image ID."""
+  ID
+
+  """Sort by the order number of the image."""
+  SORT_ORDER
+}
+
+input ProductImagesFiltersInput {
+  """
+  The unique identifier for the resource with which the product image is associated.
+  """
+  ids: [ID!]
+
+  """
+  Indicates whether the image is added to the product and displayed on storefront. 
+  """
+  addedToProduct: Boolean
+}
+
+"""
+Collection of image overrides for a product in a context of channel and locale.
+"""
+union ProductImagesOverrides = ProductImagesOverridesForChannelLocale
+
+"""A connection to a list of image overrides."""
+type ProductImagesOverridesConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductImagesOverridesEdge]
+}
+
+"""
+The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+"""
+input ProductImagesOverridesContextInput {
+  """Storefront channel ID."""
+  channelId: ID!
+
+  """Locale in a storefront channel."""
+  locale: String!
+}
+
+"""An edge in a connection."""
+type ProductImagesOverridesEdge {
+  """The item at the end of the edge."""
+  node: ProductImagesOverrides!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Overrides for product images in a context of channel and locale."""
+type ProductImagesOverridesForChannelLocale {
+  """
+  The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+  """
+  context: ChannelLocaleContext!
+
+  """Override of the image description."""
+  altText: String
+
+  """Override of indicator whether the image is a thumbnail."""
+  isThumbnail: Boolean
+
+  """Override of the image sort order."""
+  sortOrder: Long
+
+  """Override of the image sort order."""
+  addedToProduct: Boolean
+}
+
+"""
+The storefront channel and locale that apply when you override or retrieve product images from a channel locale.
+"""
+input ProductImagesOverridesInput {
+  """Storefront channel ID."""
+  channelId: ID
+
+  """Locale in a storefront channel."""
+  locale: String
+}
+
+"""A product image override."""
+type ProductImagesOverridesItem {
+  """The ID of the product image."""
+  id: ID!
+
+  """The image description."""
+  altText: String
+
+  """Indicates whether the image is a thumbnail."""
+  isThumbnail: Boolean!
+
+  """The order number of the image."""
+  sortOrder: Long!
+
+  """The date the image was created."""
+  dateCreated: String!
+
+  """The date the image was modified."""
+  dateModified: String!
+
+  """The image file name."""
+  imageFile: String!
+
+  """The URL of the zoom image."""
+  urlZoom: String!
+
+  """The URL of the standard image."""
+  urlStandard: String!
+
+  """
+  Indicates whether the image is added to the product and displayed on storefront.
+  """
+  addedToProduct: Boolean!
+}
+
+"""A connection to a list of images."""
+type ProductImagesOverridesItemConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductImagesOverridesItemEdge]
+
+  """Information about the collection."""
+  collectionInfo: CollectionInfo
+}
+
+"""An edge in a connection."""
+type ProductImagesOverridesItemEdge {
+  """The item at the end of the edge."""
+  node: ProductImagesOverridesItem!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""The sort field for product images."""
+input ProductImagesSortInput {
+  """The sort field for product images."""
+  field: ProductImageSortFieldInput
+
+  """The sort direction for product images."""
+  direction: SortDirectionInput
+}
+
+"""A product modifier."""
+interface ProductModifier {
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""A connection to a list of items."""
+type ProductModifierConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductModifierEdge]
+}
+
+"""An edge in a connection."""
+type ProductModifierEdge {
+  """The item at the end of the edge."""
+  node: ProductModifier!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Product option"""
+interface ProductOption {
+  """Display name for the option."""
+  displayName: String!
+
+  """Indicates whether product option is shared or local."""
+  isShared: Boolean!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): ProductOptionForLocale
+
+  """List of product option values."""
+  values: [ProductOptionValue!]!
+}
+
+"""A connection to a list of items."""
+type ProductOptionConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ProductOptionEdge]
+}
+
+"""An edge in a connection."""
+type ProductOptionEdge {
+  """The item at the end of the edge."""
+  node: ProductOption!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Product option overrides in a channel locale."""
+interface ProductOptionForLocale {
+  """Display name for the product option."""
+  displayName: String
+
+  """List of product option values."""
+  values: [ProductOptionValueForLocale!]!
+}
+
+"""Product option value."""
+interface ProductOptionValue {
+  """ID of the product option value."""
+  id: ID!
+
+  """Indicates whether this value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Override for the product option value in a channel locale."""
+interface ProductOptionValueForLocale {
+  """ID of the product option value."""
+  id: ID!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Product overrides for a channel."""
+type ProductOverridesForChannel {
+  """Product isFeatured override for a specific channel."""
+  isFeatured: Boolean
+}
+
+"""Product overrides for a channel locale."""
+type ProductOverridesForLocale {
+  """Basic information override of the product for a channel locale."""
+  basicInformation: ProductBasicInformationOverridesForLocale
+
+  """Override for product SEO information in a channel locale."""
+  seoInformation: ProductSeoInformationOverridesForLocale
+
+  """Product storefront details."""
+  storefrontDetails: StorefrontDetailsOverridesForLocale
+
+  """Product path override."""
+  urlPath: ProductUrlPathOverridesForLocale
+
+  """Pre-order settings override of the product for a channel locale."""
+  preOrderSettings: PreOrderSettingsOverridesForLocale
+}
+
+"""Input for the context of a product override."""
+input ProductOverridesLocaleContextInput {
+  """Storefront channel."""
+  channelId: ID!
+
+  """Locale in the channel."""
+  locale: String!
+}
+
+"""Product SEO information about the product."""
+type ProductSeoInformation {
+  """Meta description for the product."""
+  metaDescription: String
+
+  """Page title for the product."""
+  pageTitle: String
+}
+
+"""Product SEO information overrides in a channel locale."""
+type ProductSeoInformationOverridesForLocale {
+  """Override for a product meta description in a channel locale."""
+  metaDescription: String
+
+  """Override for a product page title in a channel locale."""
+  pageTitle: String
+}
+
+"""Product URL path."""
+type ProductUrlPath {
+  """Value for the product URL path."""
+  path: String!
+}
+
+"""Product path overrides in a channel locale."""
+type ProductUrlPathOverridesForLocale {
+  """Path override value in a channel locale."""
+  path: String
+}
+
+input ProductsFiltersInput {
+  """The unique identifiers of the products."""
+  ids: [ID!]
+}
+
+"""A Google Cloud PubSub webhook."""
+type PubSubWebhook implements Webhook & Node {
+  """
+  The Google Cloud PubSub topic that’s been enabled with Publisher permissions. See the PubSub config narrative page and https://cloud.google.com/pubsub/docs/create-topic#resource_names for more info.
+  """
+  destination: String!
+
+  """ID of client application owning the webhook."""
+  clientId: String!
+
+  """The date and time of webhook creation."""
+  createdAt: DateTime
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilter!]!
+
+  """The ID of a webhook object."""
+  id: ID!
+
+  """The scope of the event subscription."""
+  scope: String!
+
+  """The status of a webhook."""
+  status: WebhookStatus!
+
+  """The date and time of the last webhook update."""
+  updatedAt: DateTime
+}
+
+type Query {
+  """A client."""
+  client: Client
+
+  """A store."""
+  store: Store!
+
+  """System information."""
+  system: System!
+
+  """Fetches an object given its ID."""
+  node(
+    """The ID of the object."""
+    id: ID!
+  ): Node
+
+  """Fetches objects given their IDs."""
+  nodes(
+    """The IDs of the objects."""
+    ids: [ID!]!
+  ): [Node]!
+
+  """Internationalization data."""
+  i18n: I18n!
+}
+
+"""Value of the radio buttons product modifier."""
+type RadioButtonsModifierValue {
+  """The ID of the product modifier."""
+  id: ID!
+
+  """Indicates whether the product modifier value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the product modifier value."""
+  label: String!
+}
+
+"""
+Overrides for a radio button product modifier value in a channel locale.
+"""
+type RadioButtonsModifierValueForLocale {
+  """The ID of the product modifier value in a channel locale."""
+  id: ID!
+
+  """Label for the product modifier value override in a channel locale."""
+  label: String!
+}
+
+"""Radio buttons product option value"""
+type RadioButtonsOptionValue implements ProductOptionValue {
+  """ID of the product option value."""
+  id: ID!
+
+  """Indicates whether this value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Override for a radio button product option value in a channel locale."""
+type RadioButtonsOptionValueForLocale implements ProductOptionValueForLocale {
+  """ID of the product option value."""
+  id: ID!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Radio buttons product modifier."""
+type RadioButtonsProductModifier implements ProductModifier {
+  """Overrides for the product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): RadioButtonsProductModifierForLocale
+
+  """Product modifier values."""
+  values: [RadioButtonsModifierValue!]!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Overrides for the radio buttons product modifier in a channel locale."""
+type RadioButtonsProductModifierForLocale {
+  """Override for the product modifier display name in a channel locale."""
+  displayName: String
+
+  """Override for the product modifier values in a channel locale."""
+  values: [RadioButtonsModifierValueForLocale!]!
+}
+
+"""Radio buttons product option."""
+type RadioButtonsProductOption implements ProductOption {
+  """Display name for the option."""
+  displayName: String!
+
+  """Indicates whether product option is shared or local."""
+  isShared: Boolean!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): ProductOptionForLocale
+
+  """List of product option values."""
+  values: [ProductOptionValue!]!
+}
+
+"""Override for the radio buttons product option in a channel locale."""
+type RadioButtonsProductOptionForLocale implements ProductOptionForLocale {
+  """Display name for the product option."""
+  displayName: String
+
+  """List of product option values."""
+  values: [ProductOptionValueForLocale!]!
+}
+
+"""Radio buttons shared option value"""
+type RadioButtonsSharedOptionValue implements SharedProductOptionValue {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Indicates whether this value is the chosen default value."""
+  isDefault: Boolean!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""
+Overrides for values of the radio buttons shared option in a channel locale.
+"""
+type RadioButtonsSharedOptionValueForLocale implements SharedProductOptionValueForLocale {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""Radio buttons shared product modifier."""
+type RadioButtonsSharedProductModifier implements SharedProductModifier {
+  """
+  Overrides for radio buttons shared product modifiers in a channel locale.
+  """
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): RadioButtonsSharedProductModifierForLocale
+
+  """Radio buttons shared product modifier values."""
+  values: [RadioButtonsSharedProductModifierValue!]!
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for radio buttons shared product modifiers in a channel locale.
+"""
+type RadioButtonsSharedProductModifierForLocale {
+  """Display name for the shared product modifier."""
+  displayName: String
+
+  """Shared product modifier values."""
+  values: [RadioButtonsSharedProductModifierValueForLocale!]!
+}
+
+"""Radio buttons shared product modifier value."""
+type RadioButtonsSharedProductModifierValue {
+  """ID of the shared product modifier value."""
+  id: ID!
+
+  """
+  Indicates whether the shared product modifier value is selected by default.
+  """
+  isDefault: Boolean!
+
+  """Label for the shared product modifier value."""
+  label: String!
+}
+
+"""
+Overrides for values of the radio buttons shared product modifier in a channel locale.
+"""
+type RadioButtonsSharedProductModifierValueForLocale {
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Label for the shared product modifier."""
+  label: String!
+}
+
+"""Radio buttons shared option."""
+type RadioButtonsSharedProductOption implements SharedProductOption {
+  """Display name for the shared option."""
+  displayName: String!
+
+  """ID of the shared option."""
+  id: ID!
+
+  """Shared option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): SharedProductOptionForLocale
+
+  """List of shared option values."""
+  values: [SharedProductOptionValue!]!
+}
+
+"""Override for the radio buttons shared option in a channel locale."""
+type RadioButtonsSharedProductOptionForLocale implements SharedProductOptionForLocale {
+  """Display name for a shared option."""
+  displayName: String
+
+  """List of shared option values."""
+  values: [SharedProductOptionValueForLocale!]!
+}
+
+"""Value for the rectangle list product modifier."""
+type RectangleListModifierValue {
+  """ID of the product modifier value."""
+  id: ID!
+
+  """Indicates whether the product modifier value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the product modifier value."""
+  label: String!
+}
+
+"""
+Overrides for the rectangle list product modifier value in a channel locale.
+"""
+type RectangleListModifierValueForLocale {
+  """ID for the product modifier value."""
+  id: ID!
+
+  """Label for the product modifier value."""
+  label: String!
+}
+
+"""Rectangle list product option value"""
+type RectangleListOptionValue implements ProductOptionValue {
+  """ID of the product option value."""
+  id: ID!
+
+  """Indicates whether this value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""
+Overrides for the rectangle list product option value in a channel locale.
+"""
+type RectangleListOptionValueForLocale implements ProductOptionValueForLocale {
+  """ID of the product option value."""
+  id: ID!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Rectangle list product modifier."""
+type RectangleListProductModifier implements ProductModifier {
+  """Overrides for a rectangle list product modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): RectangleListProductModifierForLocale
+
+  """Values for a rectangle list product modifier."""
+  values: [RectangleListModifierValue!]!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Overrides for a rectangle list product modifier in a channel locale."""
+type RectangleListProductModifierForLocale {
+  """Display name for the product modifier."""
+  displayName: String
+
+  """Values for the rectangle list product modifier."""
+  values: [RectangleListModifierValueForLocale!]!
+}
+
+"""Rectangle list product option."""
+type RectangleListProductOption implements ProductOption {
+  """Display name for the option."""
+  displayName: String!
+
+  """Indicates whether product option is shared or local."""
+  isShared: Boolean!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): ProductOptionForLocale
+
+  """List of product option values."""
+  values: [ProductOptionValue!]!
+}
+
+"""Override for a rectangle list product option in a channel locale."""
+type RectangleListProductOptionForLocale implements ProductOptionForLocale {
+  """Display name for the product option."""
+  displayName: String
+
+  """List of product option values."""
+  values: [ProductOptionValueForLocale!]!
+}
+
+"""Rectangle list shared product option value"""
+type RectangleListSharedOptionValue implements SharedProductOptionValue {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Indicates whether this value is the chosen default value."""
+  isDefault: Boolean!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""
+Overrides for a rectangle list shared option value in a channel locale.
+"""
+type RectangleListSharedOptionValueForLocale implements SharedProductOptionValueForLocale {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""Rectangle list shared product modifier."""
+type RectangleListSharedProductModifier implements SharedProductModifier {
+  """
+  Overrides for the rectangle list shared product modifier in a channel locale.
+  """
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): RectangleListSharedProductModifierForLocale
+
+  """Rectangle list shared product modifiers values."""
+  values: [RectangleListSharedProductModifierValue!]!
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for rectangle list shared product modifiers in a channel locale.
+"""
+type RectangleListSharedProductModifierForLocale {
+  """Display name for the shared product modifier."""
+  displayName: String
+
+  """Shared product modifier values."""
+  values: [RectangleListSharedProductModifierValueForLocale!]!
+}
+
+"""Rectangle list shared product modifier value."""
+type RectangleListSharedProductModifierValue {
+  """The ID of the object."""
+  id: ID!
+
+  """
+  Indicates whether rectangle list shared product modifier value is selected by default.
+  """
+  isDefault: Boolean!
+
+  """Rectangle list shared product modifier value label."""
+  label: String!
+}
+
+"""
+Overrides for rectangle list shared product modifier value in a channel locale.
+"""
+type RectangleListSharedProductModifierValueForLocale {
+  """ID of the shared product modifier value."""
+  id: ID!
+
+  """
+  Rectangle list shared product modifier value label override for a channel locale.
+  """
+  label: String!
+}
+
+"""Rectangle list shared product option"""
+type RectangleListSharedProductOption implements SharedProductOption {
+  """Display name for the shared option."""
+  displayName: String!
+
+  """ID of the shared option."""
+  id: ID!
+
+  """Shared option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): SharedProductOptionForLocale
+
+  """List of shared option values."""
+  values: [SharedProductOptionValue!]!
+}
+
+"""Overrides for a rectangle list shared option in a channel locale."""
+type RectangleListSharedProductOptionForLocale implements SharedProductOptionForLocale {
+  """Display name for a shared option."""
+  displayName: String
+
+  """List of shared option values."""
+  values: [SharedProductOptionValueForLocale!]!
+}
+
+"""A connection to a list of items."""
+type ScopeConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ScopeEdge]
+}
+
+"""An edge in a connection."""
+type ScopeEdge {
+  """The item at the end of the edge."""
+  node: String!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Shared product modifier."""
+interface SharedProductModifier {
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""A connection to a list of items."""
+type SharedProductModifierConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SharedProductModifierEdge]
+}
+
+"""An edge in a connection."""
+type SharedProductModifierEdge {
+  """The item at the end of the edge."""
+  node: SharedProductModifier!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+input SharedProductModifiersFiltersInput {
+  """The unique identifiers of the shared product modifiers."""
+  ids: [ID!]
+}
+
+"""Shared options."""
+interface SharedProductOption {
+  """Display name for the shared option."""
+  displayName: String!
+
+  """ID of the shared option."""
+  id: ID!
+
+  """Shared option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): SharedProductOptionForLocale
+
+  """List of shared option values."""
+  values: [SharedProductOptionValue!]!
+}
+
+"""A connection to a list of items."""
+type SharedProductOptionConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SharedProductOptionEdge]
+}
+
+"""An edge in a connection."""
+type SharedProductOptionEdge {
+  """The item at the end of the edge."""
+  node: SharedProductOption!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Overrides for shared options in a channel locale."""
+interface SharedProductOptionForLocale {
+  """Display name for a shared option."""
+  displayName: String
+
+  """List of shared option values."""
+  values: [SharedProductOptionValueForLocale!]!
+}
+
+"""Shared option value."""
+interface SharedProductOptionValue {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Indicates whether this value is the chosen default value."""
+  isDefault: Boolean!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""Overrides for shared option values in a locale."""
+interface SharedProductOptionValueForLocale {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+input SharedProductOptionsFiltersInput {
+  """The unique identifiers of the shared product options."""
+  ids: [ID!]
+}
+
+"""Site information."""
+type Site {
+  """The ID of the object."""
+  id: ID!
+
+  """Time when site was created."""
+  createdAt: DateTime!
+
+  """Site's redirects."""
+  redirects(
+    """Filters for redirects."""
+    filters: SiteRedirectsFiltersInput
+
+    """Sorter for redirects."""
+    sort: SiteRedirectsSortInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): SiteRedirectConnection!
+
+  """Time when site was updated last time."""
+  updatedAt: DateTime!
+
+  """Site urls."""
+  urls: SiteUrls!
+}
+
+"""Canonical Url."""
+type SiteCanonicalUrl {
+  """Time url was created at."""
+  createdAt: DateTime!
+
+  """Time url was updated at."""
+  updatedAt: DateTime!
+
+  """Url of the site."""
+  url: String!
+}
+
+"""Checkout Url."""
+type SiteCheckoutUrl {
+  """Time url was created at."""
+  createdAt: DateTime!
+
+  """Whether url is customized."""
+  isCustomized: Boolean!
+
+  """Time url was updated at."""
+  updatedAt: DateTime!
+
+  """Url of the site."""
+  url: String!
+}
+
+"""Redirect to manually input url."""
+type SiteManualRedirect {
+  """Url."""
+  url: String!
+}
+
+"""Primary Url."""
+type SitePrimaryUrl {
+  """Time url was created at."""
+  createdAt: DateTime!
+
+  """Time url was updated at."""
+  updatedAt: DateTime!
+
+  """Url of the site."""
+  url: String!
+}
+
+"""Site's redirect."""
+type SiteRedirect {
+  """The ID of the object."""
+  id: ID!
+
+  """Redirected url."""
+  fromPath: String!
+
+  """Additional information about redirect."""
+  to: SiteRedirectTo
+
+  """Full destination URL for the redirect."""
+  toUrl: String!
+}
+
+"""A connection to a list of items."""
+type SiteRedirectConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SiteRedirectEdge]
+}
+
+"""An edge in a connection."""
+type SiteRedirectEdge {
+  """The item at the end of the edge."""
+  node: SiteRedirect!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Type of the redirect."""
+union SiteRedirectTo = SiteManualRedirect | ProductEntityRedirect | BrandEntityRedirect | CategoryEntityRedirect | BlogPostEntityRedirect | PageEntityRedirect
+
+"""Filters for redirects"""
+input SiteRedirectsFiltersInput {
+  """Filter redirects based on given fromPath. Finds exact matches only."""
+  fromPath: String
+
+  """Filter items by a comma-separated list of redirect ids."""
+  ids: [ID!]
+
+  """
+  Filters redirects by the specified keyword. Will only search from the beginning of a URL path.
+  """
+  searchTerm: String
+}
+
+"""Sorting by field."""
+enum SiteRedirectsSortInput {
+  """Sorting by field type."""
+  FIELD_TYPE
+
+  """Sorting by fromPath field."""
+  FROM_PATH
+}
+
+"""Site urls"""
+type SiteUrls {
+  """Canonical url of the site."""
+  canonicalUrl: SiteCanonicalUrl!
+
+  """Checkout url of the site."""
+  checkoutUrl: SiteCheckoutUrl!
+
+  """Primary url of the site."""
+  primaryUrl: SitePrimaryUrl!
+}
+
+"""The sort direction for collections."""
+enum SortDirectionInput {
+  """Ascending sort direction."""
+  ASC
+
+  """Descending sort direction."""
+  DESC
+}
+
+"""A store."""
+type Store {
+  """An account."""
+  account: Account
+
+  """
+  A list of App Extensions that the requesting API account has installed on the store.
+  """
+  appExtensions(before: String, after: String, first: Int, last: Int): AppExtensionsConnection!
+
+  """A channel."""
+  channel(
+    """The ID of the object."""
+    id: ID!
+  ): Channel
+
+  """List of channels."""
+  channels(filters: ChannelsFiltersInput, before: String, after: String, first: Int, last: Int): ChannelsConnection!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Retrieves a list of locales for the store."""
+  locales(input: LocalesContextInput!, before: String, after: String, first: Int, last: Int): LocaleConnection!
+
+  """Single metafield."""
+  metafield(
+    """The id of the metafield."""
+    id: ID!
+  ): Metafield
+
+  """List of metafields."""
+  metafields(filters: MetafieldsFiltersInput, before: String, after: String, first: Int, last: Int): MetafieldsConnection!
+
+  """Single product."""
+  product(
+    """The ID of the object."""
+    id: ID!
+  ): Product
+
+  """List of products."""
+  products(filters: ProductsFiltersInput, before: String, after: String, first: Int, last: Int): ProductConnection!
+
+  """Store settings."""
+  settings: StoreSettings
+
+  """List of shared product modifiers."""
+  sharedProductModifiers(filters: SharedProductModifiersFiltersInput, before: String, after: String, first: Int, last: Int): SharedProductModifierConnection!
+
+  """List of shared product options."""
+  sharedProductOptions(filters: SharedProductOptionsFiltersInput, before: String, after: String, first: Int, last: Int): SharedProductOptionConnection!
+
+  """Store hash."""
+  storeHash: String!
+
+  """Store reference ID."""
+  storeReferenceId: String!
+
+  """List of store translations."""
+  translations(filters: TranslationFiltersInput!, before: String, after: String, first: Int, last: Int): TranslationsConnection!
+
+  """Webhook fetch request."""
+  webhook(
+    """The ID of the object."""
+    id: ID!
+  ): Webhook
+
+  """Webhooks list fetch request."""
+  webhooks(filters: WebhookFiltersInput, before: String, after: String, first: Int, last: Int): WebhooksConnection!
+}
+
+"""Store settings."""
+type StoreSettings {
+  """Data solutions."""
+  dataSolutions: DataSolutionsSettings!
+
+  """Store name."""
+  storeName: String!
+
+  """Webhooks store settings."""
+  webhooks: WebhooksSettings!
+}
+
+"""Storefront details."""
+type StorefrontDetails {
+  """Product warranty."""
+  warranty: String
+
+  """Description about product availability."""
+  availabilityDescription: String
+
+  """Product search keywords."""
+  searchKeywords: String
+}
+
+"""Overrides for storefront details in a channel locale."""
+type StorefrontDetailsOverridesForLocale {
+  """Product warranty."""
+  warranty: String
+
+  """Description about product availability."""
+  availabilityDescription: String
+
+  """Product search keywords."""
+  searchKeywords: String
+}
+
+"""A locale supported by the system."""
+type SupportedLocale {
+  """The code of the locale."""
+  code: String!
+
+  """The English name of the locale."""
+  englishName: String!
+
+  """Indicates if the locale has built-in translations."""
+  hasBuiltInTranslations: Boolean!
+}
+
+"""A connection to a list of supported locales."""
+type SupportedLocaleConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [SupportedLocaleEdge]
+}
+
+"""An edge in a connection."""
+type SupportedLocaleEdge {
+  """The item at the end of the edge."""
+  node: SupportedLocale!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Swatch product option value"""
+type SwatchOptionValue implements ProductOptionValue {
+  """ID of the product option value."""
+  id: ID!
+
+  """Indicates whether this value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Overrides for swatch product option value in a channel locale."""
+type SwatchOptionValueForLocale implements ProductOptionValueForLocale {
+  """ID of the product option value."""
+  id: ID!
+
+  """Label for the option value."""
+  label: String!
+}
+
+"""Swatch product modifier."""
+type SwatchProductModifier implements ProductModifier {
+  """Overrides for swatch product modifiers in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): SwatchProductModifierForLocale
+
+  """Swatch product modifiers values."""
+  values: [SwatchProductModifierValue!]!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Overrides for the swatch product modifier in a channel locale."""
+type SwatchProductModifierForLocale {
+  """Display name for the product modifier."""
+  displayName: String
+
+  """Product modifier values."""
+  values: [SwatchProductModifierValueForLocale!]!
+}
+
+"""Swatch product modifier value."""
+type SwatchProductModifierValue {
+  """ID of the modifier value."""
+  id: ID!
+
+  """Indicates whether the modifier value is selected by default."""
+  isDefault: Boolean!
+
+  """Label for the modifier value."""
+  label: String!
+}
+
+"""Overrides for the swatch product modifier value in a channel locale."""
+type SwatchProductModifierValueForLocale {
+  """ID of the modifier value."""
+  id: ID!
+
+  """Label for the modifier value."""
+  label: String!
+}
+
+"""Swatch product option."""
+type SwatchProductOption implements ProductOption {
+  """Display name for the option."""
+  displayName: String!
+
+  """Indicates whether product option is shared or local."""
+  isShared: Boolean!
+
+  """The ID of the object."""
+  id: ID!
+
+  """Option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): ProductOptionForLocale
+
+  """List of product option values."""
+  values: [ProductOptionValue!]!
+}
+
+"""Override for the swatch product option in a channel locale."""
+type SwatchProductOptionForLocale implements ProductOptionForLocale {
+  """Display name for the product option."""
+  displayName: String
+
+  """List of product option values."""
+  values: [ProductOptionValueForLocale!]!
+}
+
+"""Swatch shared product option value."""
+type SwatchSharedOptionValue implements SharedProductOptionValue {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Indicates whether this value is the chosen default value."""
+  isDefault: Boolean!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""Override for a swatch shared option value in a channel locale."""
+type SwatchSharedOptionValueForLocale implements SharedProductOptionValueForLocale {
+  """ID of the shared option value."""
+  id: ID!
+
+  """Label for the shared option value."""
+  label: String!
+}
+
+"""Swatch shared product modifier."""
+type SwatchSharedProductModifier implements SharedProductModifier {
+  """Swatch shared product modifier overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): SwatchSharedProductModifierForLocale
+
+  """Shared product modifier values."""
+  values: [SwatchSharedProductModifierValue!]!
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""Overrides for the swatch shared product modifier in a channel locale."""
+type SwatchSharedProductModifierForLocale {
+  """Display name for the shared product modifier."""
+  displayName: String
+
+  """Shared product modifier values."""
+  values: [SwatchSharedProductModifierValueForLocale!]!
+}
+
+"""Swatch shared product modifier value."""
+type SwatchSharedProductModifierValue {
+  """The ID of the shared product modifier value."""
+  id: ID!
+
+  """
+  Indicates whether the shared product modifier value is selected by default.
+  """
+  isDefault: Boolean!
+
+  """Label for the shared product modifier value."""
+  label: String!
+}
+
+"""Overrides for the swatch shared product modifier for a channel locale."""
+type SwatchSharedProductModifierValueForLocale {
+  """ID of the shared product modifier value."""
+  id: ID!
+
+  """Label for the shared product modifier value."""
+  label: String!
+}
+
+"""Swatch shared option."""
+type SwatchSharedProductOption implements SharedProductOption {
+  """Display name for the shared option."""
+  displayName: String!
+
+  """ID of the shared option."""
+  id: ID!
+
+  """Shared option overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared options from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): SharedProductOptionForLocale
+
+  """List of shared option values."""
+  values: [SharedProductOptionValue!]!
+}
+
+"""Override for a swatch shared option in a channel locale."""
+type SwatchSharedProductOptionForLocale implements SharedProductOptionForLocale {
+  """Display name for a shared option."""
+  displayName: String
+
+  """List of shared option values."""
+  values: [SharedProductOptionValueForLocale!]!
+}
+
+"""System settings."""
+type System {
+  """The current time."""
+  time: Long!
+}
+
+"""Text field product modifier."""
+type TextFieldProductModifier implements ProductModifier {
+  """Default value for the modifier."""
+  defaultValue: String
+
+  """Overrides for the modifier in a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): TextFieldProductModifierForLocale
+
+  """The ID of the object."""
+  id: ID!
+
+  """Product modifier display name."""
+  displayName: String!
+
+  """Indicates whether product modifier is required."""
+  isRequired: Boolean!
+
+  """Indicates whether product modifier is shared or local."""
+  isShared: Boolean!
+}
+
+"""Overrides for a text field product modifier in a channel locale."""
+type TextFieldProductModifierForLocale {
+  """Default value for the modifier."""
+  defaultValue: String
+
+  """Display name for the modifier."""
+  displayName: String
+}
+
+"""Text field shared product modifier."""
+type TextFieldSharedProductModifier implements SharedProductModifier {
+  """Text field shared product modifier default value."""
+  defaultValue: String
+
+  """Text field shared product modifier overrides for a channel locale."""
+  overridesForLocale(
+    """
+    The channel and locale that apply when you override or retrieve shared product modifiers from a channel locale.
+    """
+    localeContext: ProductOverridesLocaleContextInput!
+  ): TextFieldSharedProductModifierForLocale
+
+  """ID of the shared product modifier."""
+  id: ID!
+
+  """Display name for the shared product modifier."""
+  displayName: String!
+
+  """Indicates whether the shared product modifier is required."""
+  isRequired: Boolean!
+}
+
+"""
+Overrides for the text field shared product modifier in a channel locale.
+"""
+type TextFieldSharedProductModifierForLocale {
+  """Default value for the shared product modifier."""
+  defaultValue: String
+
+  """Display name for the shared product modifier."""
+  displayName: String
+}
+
+"""The fields of a translation."""
+type TranslationFields {
+  """The name of the field to update."""
+  fieldName: String!
+
+  """The original text for the field."""
+  original: String!
+
+  """The translated text for the field."""
+  translation: String
+}
+
+input TranslationFiltersInput {
+  """The type of resource that is being translated."""
+  resourceType: TranslationResourceType!
+
+  """The channel ID to list translations for."""
+  channelId: ID!
+
+  """The locale ID to list translations for."""
+  localeId: ID!
+
+  """Whether to display untranslated fields."""
+  displayUntranslated: Boolean
+}
+
+"""The type of resource that is being translated."""
+enum TranslationResourceType {
+  """Resource type for Order return reasons."""
+  RETURN_REASONS
+
+  """Resource type for Transactional emails."""
+  TRANSACTIONAL_EMAILS
+}
+
+"""The resources to update translations for."""
+type TranslationResources {
+  """The ID of the resource."""
+  resourceId: ID!
+
+  """List of resources."""
+  fields: [TranslationFields!]!
+}
+
+"""Represents a collection of translations."""
+type Translations {
+  """The resources associated with the translations."""
+  resources: [TranslationResources!]!
+}
+
+"""A connection to a list of translations."""
+type TranslationsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [TranslationsEdge]
+}
+
+"""An edge in a connection."""
+type TranslationsEdge {
+  """The item at the end of the edge."""
+  node: Translations!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""A webhook."""
+interface Webhook implements Node {
+  """ID of client application owning the webhook."""
+  clientId: String!
+
+  """The date and time of webhook creation."""
+  createdAt: DateTime
+
+  """Event filters for webhook."""
+  eventFilters: [WebhookEventFilter!]!
+
+  """The ID of a webhook object."""
+  id: ID!
+
+  """The scope of the event subscription."""
+  scope: String!
+
+  """The status of a webhook."""
+  status: WebhookStatus!
+
+  """The date and time of the last webhook update."""
+  updatedAt: DateTime
+}
+
+"""Filter for webhook events based on 'data' field in payload."""
+type WebhookEventDataFilter implements WebhookEventFilter {
+  """
+  Path to the field relatively to data field. Could point only on nested field.
+  """
+  path: [String!]!
+
+  """Values of the field to filter."""
+  values: WebhookEventDataFilterValuesUnion!
+
+  """Delivery of filter: INCLUDE or EXCLUDE given clientIds."""
+  delivery: WebhookEventFilterOperationType
+}
+
+"""Wrapper for double values of the field to filter."""
+type WebhookEventDataFilterDoubleValues {
+  """Double values of the field to filter."""
+  doubleValues: [Float!]!
+}
+
+"""Wrapper for long (int 64) values of the field to filter."""
+type WebhookEventDataFilterLongValues {
+  """Long (int 64) values of the field to filter."""
+  longValues: [Long!]!
+}
+
+"""Wrapper for string values of the field to filter."""
+type WebhookEventDataFilterStringValues {
+  """String values of the field to filter."""
+  stringValues: [String!]!
+}
+
+"""Union type for al possible value wrappers."""
+union WebhookEventDataFilterValuesUnion = WebhookEventDataFilterStringValues | WebhookEventDataFilterLongValues | WebhookEventDataFilterDoubleValues
+
+"""Filter for events that trigger sending webhook."""
+interface WebhookEventFilter {
+  """Delivery of filter: INCLUDE or EXCLUDE given clientIds."""
+  delivery: WebhookEventFilterOperationType
+}
+
+"""Delivery type of a filter. INCLUDE or EXCLUDE."""
+enum WebhookEventFilterOperationType {
+  """Include only events matching criteria."""
+  IN
+
+  """Include events that don't matching criteria."""
+  NOT_IN
+}
+
+input WebhookFiltersInput {
+  """The webhook channel ID."""
+  channelId: ID
+
+  """The destination URL or topic where the event messages will be sent."""
+  destination: String
+
+  """The status of a webhook."""
+  status: WebhookStatus
+
+  """The scope of the event subscription."""
+  scope: String
+}
+
+"""Status of a webhook."""
+enum WebhookStatus {
+  """Webhook is active."""
+  ACTIVE
+
+  """Webhook is disabled."""
+  DISABLED
+
+  """Webhook is inactive."""
+  INACTIVE
+}
+
+"""A connection to a list of items."""
+type WebhooksConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges with webhooks."""
+  edges: [WebhooksEdge]
+}
+
+"""An edge in a connection."""
+type WebhooksEdge {
+  """The item at the end of the edge."""
+  node: Webhook!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Webhooks store settings."""
+type WebhooksSettings {
+  """Url of GCP account."""
+  gcpDeliveryAccount: String!
+}
+
+"""
+The `Long` scalar type represents non-fractional signed whole numeric values. Long can represent values between -(2^63) and 2^63 - 1.
+"""
+scalar Long

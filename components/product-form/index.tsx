@@ -353,12 +353,48 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
   );
 
   const handleLocaleChange = useCallback(
-    (selectedLocale: string) => {
-      let newFormObject = getFormObjectForLocale(productData, selectedLocale);
-      dispatch({ type: "SET_FORM", payload: newFormObject });
-      dispatch({ type: "SET_LOCALE", payload: selectedLocale });
+    async (selectedLocale: string) => {
+      if (productData.localeData[selectedLocale] || selectedLocale === defaultLocale) {
+        let newFormObject = getFormObjectForLocale(productData, selectedLocale);
+        dispatch({ type: "SET_FORM", payload: newFormObject });
+        dispatch({ type: "SET_LOCALE", payload: selectedLocale });
+        return;
+      }
+
+      try {
+        dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: true });
+        const res = await fetch(
+          `/api/product/${productId}?context=${context}&channel_id=${currentChannel}&locale=${selectedLocale}`
+        );
+        
+        if (!res.ok) throw new Error('Failed to fetch locale data');
+        
+        const localeData: any = await res.json();
+
+        dispatch({
+          type: "SET_PRODUCT_DATA",
+          payload: {
+            ...productData,
+            localeData: {
+              ...productData.localeData,
+              [selectedLocale]: localeData.localeData?.[selectedLocale],
+            },
+          },
+        });
+        dispatch({ type: "SET_LOCALE", payload: selectedLocale });
+        dispatch({ type: "SET_FORM", payload: localeData.localeData?.[selectedLocale] });
+        dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: false });
+      } catch (error) {
+        console.error("Error fetching locale data:", error);
+        addAlert({
+          type: "error",
+          header: t("common.error"),
+          messages: [{ text: t("products.form.localeLoadingError") }],
+        });
+        dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: false });
+      }
     },
-    [productData]
+    [productData, productId, currentChannel, context, t]
   );
 
   const handleChannelChange = useCallback(

@@ -1,5 +1,5 @@
-export type AppExtensionContext = 'PANEL' | 'BUTTON' | 'FULL_PAGE';
-export type AppExtensionModel = 'PRODUCTS' | 'CATEGORIES' | 'ORDERS' | 'CUSTOMERS';
+export type AppExtensionContext = 'LINK' | 'PANEL' | 'BUTTON' | 'FULL_PAGE';
+export type AppExtensionModel = 'PRODUCTS' | 'CATEGORIES' | 'ORDERS' | 'CUSTOMERS' | 'PRODUCT_DESCRIPTION';
 
 export interface AppExtensionLabel {
   defaultValue: string;
@@ -18,10 +18,10 @@ export type CreateAppExtension = {
 
 export interface AppExtension {
   id: string;
-  context: AppExtensionContext;
-  model: AppExtensionModel;
+  context: AppExtensionContext | null;
+  model: AppExtensionModel | null;
   url: string;
-  label?: AppExtensionLabel;
+  label: AppExtensionLabel;
 }
 
 export interface AppExtensionResponse {

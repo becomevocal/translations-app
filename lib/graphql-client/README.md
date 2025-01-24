@@ -80,34 +80,96 @@ const productData = await client.getProductLocaleData({
 #### Updating Product Translations
 
 ```typescript
-const result = await client.updateProductLocaleData(
-  {
-    pid: 'product-id',
-    channelId: 'channel-id',
-    locale: 'es'
-  },
-  {
-    input: {
-      productId: 'product-id',
-      channelId: 'channel-id',
-      locale: 'es',
-      data: {
-        name: 'Nombre del producto',
-        description: 'Descripción del producto'
+// Basic product information
+const result = await client.updateProductLocaleData({
+  locale: 'es',
+  channelId: 123,
+  productId: 456,
+  productData: {
+    name: 'Producto Nuevo',
+    description: 'Descripción del producto',
+    pageTitle: 'Título de la página',
+    metaDescription: 'Meta descripción',
+    warranty: 'Garantía',
+    availabilityDescription: 'Disponibilidad',
+    searchKeywords: 'palabras clave',
+    preOrderMessage: 'Mensaje de pre-orden'
+  }
+});
+
+// With options and modifiers
+const result = await client.updateProductLocaleData({
+  locale: 'es',
+  channelId: 123,
+  productId: 456,
+  productData: {
+    name: 'Producto Nuevo',
+    // Options
+    options: {
+      'option-id-1': {
+        displayName: 'Color',
+        values: [
+          { valueId: 'value-1', label: 'Rojo' },
+          { valueId: 'value-2', label: 'Azul' }
+        ],
+        removeValues: ['value-3'] // Remove this value's translation
       }
     },
-    seoInput: {
-      productId: 'product-id',
-      channelId: 'channel-id',
-      locale: 'es',
-      data: {
-        pageTitle: 'Título de la página',
-        metaDescription: 'Meta descripción'
+    // Modifiers
+    modifiers: {
+      'modifier-id-1': {
+        displayName: 'Texto personalizado',
+        defaultValue: 'Escriba aquí'
+      },
+      'modifier-id-2': {
+        displayName: 'Opciones',
+        values: [
+          { valueId: 'value-1', label: 'Opción 1' },
+          { valueId: 'value-2', label: 'Opción 2' }
+        ]
       }
+    },
+    // Custom fields
+    customFields: {
+      'custom-field-1': {
+        customFieldId: 'custom-field-1',
+        name: 'Campo personalizado',
+        value: 'Valor personalizado'
+      }
+    },
+    // Remove translations
+    remove: {
+      options: ['option-id-2'],        // Remove all translations for this option
+      modifiers: ['modifier-id-3'],    // Remove all translations for this modifier
+      customFields: ['custom-field-2'] // Remove all translations for this custom field
     }
   }
-);
+});
 ```
+
+Any fields that are undefined will be ignored. Empty strings will remove the translation override.
+
+For advanced usage with more complex scenarios, you can still use the legacy format:
+
+```typescript
+const result = await client.updateProductLocaleData({
+  input: {
+    productId: 'bc/store/product/123',
+    localeContext: {
+      channelId: 'bc/store/channel/456',
+      locale: 'es'
+    },
+    data: {
+      name: 'Producto',
+      description: 'Descripción'
+    }
+  },
+  // ... other mutation inputs
+});
+```
+
+#### `getAllProducts(limit: number, cursor?: string)`
+Fetches all products with pagination support.
 
 ### App Extensions
 

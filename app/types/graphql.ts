@@ -18,9 +18,3 @@ export interface ProductLocaleQueryOptions {
   productId: string;
   localeContext: ProductLocaleContext;
 }
-
-export interface ProductLocaleMutationOptions {
-  pid: number;
-  channelId: number;
-  locale: string;
-} 

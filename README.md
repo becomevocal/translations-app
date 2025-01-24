@@ -40,7 +40,9 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Improve global "failed to load" design
 - [ ] Add import / export functionality (include ensuring uploads are private)
 - [ ] Move server side locale transforms in api route into graphql client
+- [ ] Add BC CP SDK to preview session timeouts
 - [ ] Finish 'start translations' flow
+- [ ] Find out why GraphQL Tada doesn't return nullable nodes like the customFields type from ResultOf<typeof GetProductLocaleDataDocument> (it would simplify creating type safe functions)
 
 ## Getting Started
 

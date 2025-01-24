@@ -179,21 +179,17 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
     await processBatch(records, async (record: TranslationRecord) => {
       try {
         console.log(`[Import] Updating product ${record.productId}`);
-        await graphqlClient.updateProductLocaleData(
-          {
-            input: {
-              productId: `bc/store/product/${record.productId}`,
-              localeContext: {
-                channelId: `bc/store/channel/${job.channelId}`,
-                locale: job.locale,
-              },
-              data: {
-                name: record.name,
-                description: record.description,
-              },
-            },
+
+        await graphqlClient.updateProductLocaleData({
+          locale: job.locale,
+          channelId: job.channelId,
+          productId: record.productId,
+          productData: {
+            name: record[`name_${job.locale}`],
+            description: record[`description_${job.locale}`]
           }
-        );
+        });
+
         console.log(`[Import] Successfully updated product ${record.productId}`);
       } catch (error) {
         console.error(`[Import] Error updating product ${record.productId}:`, error);
@@ -215,20 +211,17 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
   try {
     // Get products from channel
     console.log(`[Export] Fetching products for channel ${job.channelId}`);
-    const productsResponse = await graphqlClient.getAllProducts(CONFIG.PRODUCTS_PER_PAGE);
 
-    const productAssignments = await restClient.getChannelProductAssignments(job.channelId);
-    console.log("\n\nproductAssignments\n\n", JSON.stringify(productAssignments, null, 2));
-    const products = productsResponse?.data?.store?.products?.edges;  
+    const productAssignments = await restClient.getChannelProductAssignments(job.channelId); 
     
-    console.log(`[Export] Found ${products?.length || 0} products`);
+    console.log(`[Export] Found ${productAssignments.data?.length || 0} products`);
 
-    if (!products?.length) {
+    if (!productAssignments.data?.length) {
       throw new Error('No products found for export');
     }
 
     // Get translations for each product
-    console.log(`[Export] Fetching translations for ${products.length} products in locale ${job.locale}`);
+    console.log(`[Export] Fetching translations for ${productAssignments.data?.length} products in locale ${job.locale}`);
 
     // TODO: Get default locale from channel
     const defaultLocale = 'en'
@@ -241,14 +234,15 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
           const translation = await graphqlClient.getProductLocaleData({
             pid: productId,
             channelId: job.channelId,
+            locale: job.locale,
             availableLocales: [{ code: job.locale }],
             defaultLocale: defaultLocale
           });
           
           console.log(`[Export] Got translation for product ${productId}`);
 
-          const productNode = translation.data.store.products.edges[0].node;
-          const localeNode = productNode[job.locale];
+          const productNode = translation;
+          const localeNode = productNode.overridesForLocale;
 
           // TODO: make a shared function for this that proudcts GET route also can use
         // const options =
