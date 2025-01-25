@@ -38,10 +38,35 @@ async function parseCSV(text: string): Promise<TranslationRecord[]> {
 function stringifyCSV(records: TranslationRecord[], defaultLocale: string, targetLocale: string): string {
   const headers = [
     'productId',
+    // Basic Information
     `name_${defaultLocale}`,
     `name_${targetLocale}`,
     `description_${defaultLocale}`,
-    `description_${targetLocale}`
+    `description_${targetLocale}`,
+    // SEO Information
+    `pageTitle_${defaultLocale}`,
+    `pageTitle_${targetLocale}`,
+    `metaDescription_${defaultLocale}`,
+    `metaDescription_${targetLocale}`,
+    // Storefront Details
+    `warranty_${defaultLocale}`,
+    `warranty_${targetLocale}`,
+    `availabilityDescription_${defaultLocale}`,
+    `availabilityDescription_${targetLocale}`,
+    `searchKeywords_${defaultLocale}`,
+    `searchKeywords_${targetLocale}`,
+    // Pre-order Settings
+    `preOrderMessage_${defaultLocale}`,
+    `preOrderMessage_${targetLocale}`,
+    // Options - Dynamic headers will be added for each option
+    `options_${defaultLocale}`,
+    `options_${targetLocale}`,
+    // Modifiers - Dynamic headers will be added for each modifier
+    `modifiers_${defaultLocale}`,
+    `modifiers_${targetLocale}`,
+    // Custom Fields - Dynamic headers will be added for each custom field
+    `customFields_${defaultLocale}`,
+    `customFields_${targetLocale}`
   ];
   
   // Helper to escape and quote CSV cell content
@@ -185,8 +210,8 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
           channelId: job.channelId,
           productId: record.productId,
           productData: {
-            name: record[`name_${job.locale}`],
-            description: record[`description_${job.locale}`]
+            name: record[`name_${job.locale}`] as string,
+            description: record[`description_${job.locale}`] as string
           }
         });
 
@@ -202,6 +227,85 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
     console.error('[Import] Job failed:', error);
     throw error;
   }
+}
+
+// Helper function to format options data
+function formatOptionsData(options: any) {
+  if (!options?.edges) return '';
+  
+  return options.edges.map((edge: any) => {
+    const node = edge.node;
+    return {
+      id: node.id,
+      displayName: node.displayName,
+      values: node.values?.map((value: any) => ({
+        id: value.id,
+        label: value.label
+      }))
+    };
+  });
+}
+
+// Helper function to format modifiers data
+function formatModifiersData(modifiers: any) {
+  if (!modifiers?.edges) return '';
+  
+  return modifiers.edges.map((edge: any) => {
+    const node = edge.node;
+    const baseData = {
+      id: node.id,
+      displayName: node.displayName,
+      type: node.__typename
+    };
+
+    // Handle different modifier types
+    switch (node.__typename) {
+      case 'CheckboxProductModifier':
+        return {
+          ...baseData,
+          fieldValue: node.fieldValue
+        };
+      case 'TextFieldProductModifier':
+      case 'MultilineTextFieldProductModifier':
+        return {
+          ...baseData,
+          defaultValue: node.defaultValue
+        };
+      case 'NumbersOnlyTextFieldProductModifier':
+        return {
+          ...baseData,
+          defaultValue: node.defaultValueFloat
+        };
+      case 'DropdownProductModifier':
+      case 'RadioButtonsProductModifier':
+      case 'RectangleListProductModifier':
+      case 'SwatchProductModifier':
+      case 'PickListProductModifier':
+        return {
+          ...baseData,
+          values: node.values?.map((value: any) => ({
+            id: value.id,
+            label: value.label
+          }))
+        };
+      default:
+        return baseData;
+    }
+  });
+}
+
+// Helper function to format custom fields data
+function formatCustomFieldsData(customFields: any) {
+  if (!customFields?.edges) return '';
+  
+  return customFields.edges.map((edge: any) => {
+    const node = edge.node;
+    return {
+      id: node.id,
+      name: node.name,
+      value: node.value
+    };
+  });
 }
 
 // Process an export job
@@ -245,19 +349,50 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
           const localeNode = productNode.overridesForLocale;
 
           // TODO: make a shared function for this that proudcts GET route also can use
-        // const options =
-        //   gqlData.data.store.products.edges[0].node?.options?.edges;
-        // const modifiers =
-        //   gqlData.data.store.products.edges[0].node?.modifiers?.edges;
-        // const customFields =
-        //   gqlData.data.store.products.edges[0].node?.customFields?.edges;
+        const options =
+          productNode?.options?.edges;
+        const modifiers =
+          productNode?.modifiers?.edges;
+        const customFields =
+          productNode?.customFields?.edges;
 
           return {
             productId: productId,
-            [`name_${defaultLocale}`]: productNode?.basicInformation?.name,
-            [`name_${job.locale}`]: localeNode?.basicInformation?.name,
-            [`description_${defaultLocale}`]: productNode?.basicInformation?.description,
-            [`description_${job.locale}`]: localeNode?.basicInformation?.description
+            // Basic Information
+            [`name_${defaultLocale}`]: productNode?.basicInformation?.name || '',
+            [`name_${job.locale}`]: localeNode?.basicInformation?.name || '',
+            [`description_${defaultLocale}`]: productNode?.basicInformation?.description || '',
+            [`description_${job.locale}`]: localeNode?.basicInformation?.description || '',
+            
+            // SEO Information
+            [`pageTitle_${defaultLocale}`]: productNode?.seoInformation?.pageTitle || '',
+            [`pageTitle_${job.locale}`]: localeNode?.seoInformation?.pageTitle || '',
+            [`metaDescription_${defaultLocale}`]: productNode?.seoInformation?.metaDescription || '',
+            [`metaDescription_${job.locale}`]: localeNode?.seoInformation?.metaDescription || '',
+            
+            // Storefront Details
+            [`warranty_${defaultLocale}`]: productNode?.storefrontDetails?.warranty || '',
+            [`warranty_${job.locale}`]: localeNode?.storefrontDetails?.warranty || '',
+            [`availabilityDescription_${defaultLocale}`]: productNode?.storefrontDetails?.availabilityDescription || '',
+            [`availabilityDescription_${job.locale}`]: localeNode?.storefrontDetails?.availabilityDescription || '',
+            [`searchKeywords_${defaultLocale}`]: productNode?.storefrontDetails?.searchKeywords || '',
+            [`searchKeywords_${job.locale}`]: localeNode?.storefrontDetails?.searchKeywords || '',
+            
+            // Pre-order Settings
+            [`preOrderMessage_${defaultLocale}`]: productNode?.preOrderSettings?.message || '',
+            [`preOrderMessage_${job.locale}`]: localeNode?.preOrderSettings?.message || '',
+
+            // Options
+            [`options_${defaultLocale}`]: JSON.stringify(formatOptionsData(productNode?.options)),
+            [`options_${job.locale}`]: JSON.stringify(formatOptionsData(options)),
+
+            // Modifiers
+            [`modifiers_${defaultLocale}`]: JSON.stringify(formatModifiersData(productNode?.modifiers)),
+            [`modifiers_${job.locale}`]: JSON.stringify(formatModifiersData(modifiers)),
+
+            // Custom Fields
+            [`customFields_${defaultLocale}`]: JSON.stringify(formatCustomFieldsData(productNode?.customFields)),
+            [`customFields_${job.locale}`]: JSON.stringify(formatCustomFieldsData(customFields))
           };
         } catch (error) {
           console.error(`[Export] Error fetching translation for product ${productId}:`, error);
@@ -267,7 +402,25 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
             [`name_${defaultLocale}`]: "",
             [`name_${job.locale}`]: "",
             [`description_${defaultLocale}`]: "",
-            [`description_${job.locale}`]: ""
+            [`description_${job.locale}`]: "",
+            [`pageTitle_${defaultLocale}`]: "",
+            [`pageTitle_${job.locale}`]: "",
+            [`metaDescription_${defaultLocale}`]: "",
+            [`metaDescription_${job.locale}`]: "",
+            [`warranty_${defaultLocale}`]: "",
+            [`warranty_${job.locale}`]: "",
+            [`availabilityDescription_${defaultLocale}`]: "",
+            [`availabilityDescription_${job.locale}`]: "",
+            [`searchKeywords_${defaultLocale}`]: "",
+            [`searchKeywords_${job.locale}`]: "",
+            [`preOrderMessage_${defaultLocale}`]: "",
+            [`preOrderMessage_${job.locale}`]: "",
+            [`options_${defaultLocale}`]: "",
+            [`options_${job.locale}`]: "",
+            [`modifiers_${defaultLocale}`]: "",
+            [`modifiers_${job.locale}`]: "",
+            [`customFields_${defaultLocale}`]: "",
+            [`customFields_${job.locale}`]: ""
           };
         }
       })

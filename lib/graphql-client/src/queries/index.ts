@@ -1,3 +1,2 @@
-export * from './app-extension';
-export * from './product'; 
+export * from './app-extension.tada';
 export * from './product.tada'; 

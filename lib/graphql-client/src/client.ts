@@ -23,7 +23,6 @@ import {
   ProductLocaleQueryOptions,
   ProductLocaleUpdateOptions,
 } from "./types";
-import { productQueries } from "./queries";
 import {
   GetAppExtensionsDocument,
   CreateAppExtensionDocument,
@@ -409,7 +408,392 @@ export class GraphQLClient {
   }
 
   async NOTADA_updateProductLocaleData(variables: any) {
-    return this.request(productQueries.hardcodedQuery_updateProductLocaleData(variables));
+    const hasRemovedBasicInfo = variables.removedBasicInfoInput &&
+      variables.removedBasicInfoInput.overridesToRemove &&
+      variables.removedBasicInfoInput.overridesToRemove.length > 0;
+
+    const hasRemovedSeo = variables.removedSeoInput &&
+      variables.removedSeoInput.overridesToRemove &&
+      variables.removedSeoInput.overridesToRemove.length > 0;
+
+    const hasRemovedStorefrontDetails = variables.removedStorefrontDetailsInput &&
+      variables.removedStorefrontDetailsInput.overridesToRemove &&
+      variables.removedStorefrontDetailsInput.overridesToRemove.length > 0;
+
+    const hasRemovedPreOrder = variables.removedPreOrderInput &&
+      variables.removedPreOrderInput.overridesToRemove &&
+      variables.removedPreOrderInput.overridesToRemove.length > 0;
+    
+    const hasCustomFields = variables.customFieldsInput && 
+      variables.customFieldsInput.data && 
+      variables.customFieldsInput.data.length > 0;
+
+    const hasOptions = variables.optionsInput && 
+      variables.optionsInput.data && 
+      variables.optionsInput.data.options && 
+      variables.optionsInput.data.options.length > 0;
+
+    const hasRemovedOptions = variables.removedOptionsInput &&
+      variables.removedOptionsInput.data &&
+      variables.removedOptionsInput.data.options &&
+      variables.removedOptionsInput.data.options.length > 0;
+
+    const hasModifiers = variables.modifiersInput && 
+      variables.modifiersInput.data && 
+      variables.modifiersInput.data.modifiers && 
+      variables.modifiersInput.data.modifiers.length > 0;
+
+    const hasRemovedModifiers = variables.removedModifiersInput &&
+      variables.removedModifiersInput.data &&
+      variables.removedModifiersInput.data.modifiers &&
+      variables.removedModifiersInput.data.modifiers.length > 0;
+
+    const hasRemovedCustomFields = variables.removedCustomFieldsInput &&
+      variables.removedCustomFieldsInput.data &&
+      variables.removedCustomFieldsInput.data.length > 0;
+
+    const removalMutations = {
+      query: `
+        mutation (
+          ${hasRemovedBasicInfo ? '$removedBasicInfoInput: RemoveProductBasicInformationOverridesInput!,' : ''}
+          ${hasRemovedSeo ? '$removedSeoInput: RemoveProductSeoInformationOverridesInput!,' : ''}
+          ${hasRemovedStorefrontDetails ? '$removedStorefrontDetailsInput: RemoveProductStorefrontDetailsOverridesInput!,' : ''}
+          ${hasRemovedPreOrder ? '$removedPreOrderInput: RemoveProductPreOrderSettingsOverridesInput!,' : ''}
+          ${hasRemovedOptions ? '$removedOptionsInput: RemoveProductOptionsOverridesInput!,' : ''}
+          ${hasRemovedModifiers ? '$removedModifiersInput: RemoveProductModifiersOverridesInput!,' : ''}
+          ${hasRemovedCustomFields ? '$removedCustomFieldsInput: RemoveProductCustomFieldsOverridesInput!' : ''}
+        ) {
+          product {
+            ${hasRemovedBasicInfo ? `
+            removeProductBasicInformationOverrides(input: $removedBasicInfoInput) {
+              product { id }
+            }` : ''}
+            ${hasRemovedSeo ? `
+            removeProductSeoInformationOverrides(input: $removedSeoInput) {
+              product { id }
+            }` : ''}
+            ${hasRemovedStorefrontDetails ? `
+            removeProductStorefrontDetailsOverrides(input: $removedStorefrontDetailsInput) {
+              product { id }
+            }` : ''}
+            ${hasRemovedPreOrder ? `
+            removeProductPreOrderSettingsOverrides(input: $removedPreOrderInput) {
+              product { id }
+            }` : ''}
+            ${hasRemovedOptions ? `
+            removeProductOptionsOverrides(input: $removedOptionsInput) {
+              product { id }
+            }` : ''}
+            ${hasRemovedModifiers ? `
+            removeProductModifiersOverrides(input: $removedModifiersInput) {
+              product { id }
+            }` : ''}
+            ${hasRemovedCustomFields ? `
+            removeProductCustomFieldsOverrides(input: $removedCustomFieldsInput) {
+              product { id }
+            }` : ''}
+          }
+        }
+      `,
+      variables: {
+        ...(hasRemovedBasicInfo && { removedBasicInfoInput: variables.removedBasicInfoInput }),
+        ...(hasRemovedSeo && { removedSeoInput: variables.removedSeoInput }),
+        ...(hasRemovedStorefrontDetails && { removedStorefrontDetailsInput: variables.removedStorefrontDetailsInput }),
+        ...(hasRemovedPreOrder && { removedPreOrderInput: variables.removedPreOrderInput }),
+        ...(hasRemovedOptions && { removedOptionsInput: variables.removedOptionsInput }),
+        ...(hasRemovedModifiers && { removedModifiersInput: variables.removedModifiersInput }),
+        ...(hasRemovedCustomFields && { removedCustomFieldsInput: variables.removedCustomFieldsInput })
+      }
+    };
+
+    const updateMutations = {
+      query: `
+        mutation (
+          $channelId: ID!,
+          $locale: String!,
+          $input: SetProductBasicInformationInput!,
+          $seoInput: SetProductSeoInformationInput!,
+          $preOrderInput: SetProductPreOrderSettingsInput!,
+          $storefrontInput: SetProductStorefrontDetailsInput!
+          ${hasOptions ? '$optionsInput: SetProductOptionsInformationInput!,' : ''}
+          ${hasModifiers ? '$modifiersInput: SetProductModifiersInformationInput!,' : ''}
+          ${hasCustomFields ? '$customFieldsInput: UpdateProductCustomFieldsInput!' : ''}
+        ) {
+          product {
+            setProductBasicInformation(input: $input) {
+              product {
+                id
+                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                  basicInformation {
+                    name
+                    description
+                  }
+                }
+              }
+            }
+            setProductSeoInformation(input: $seoInput) {
+              product {
+                id
+                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                  seoInformation {
+                    pageTitle
+                    metaDescription
+                  }
+                }
+              }
+            }
+            setProductPreOrderSettings(input: $preOrderInput) {
+              product {
+                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                  preOrderSettings {
+                    message
+                  }
+                }
+              }
+            }
+            setProductStorefrontDetails(input: $storefrontInput) {
+              product {
+                overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
+                  storefrontDetails {
+                    warranty
+                    availabilityDescription
+                    searchKeywords
+                  }
+                }
+              }
+            }
+            ${hasOptions ? `
+            setProductOptionsInformation (input: $optionsInput) {
+              product {
+                id
+                options {
+                  edges {
+                    node {
+                      id
+                      overridesForLocale(
+                        localeContext: {
+                          channelId: $channelId,
+                          locale: $locale
+                        }
+                      ) {
+                        displayName
+                        values {
+                          id
+                          label
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            ` : ''}
+            ${hasModifiers ? `
+            setProductModifiersInformation (input: $modifiersInput) {
+              product {
+                id
+                modifiers {
+                  edges {
+                    node {
+                      __typename
+                      id
+                      ... on CheckboxProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          fieldValue
+                        }
+                      }
+                      ... on TextFieldProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          defaultValue
+                        }
+                      }
+                      ... on MultilineTextFieldProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          defaultValue
+                        }
+                      }
+                      ... on NumbersOnlyTextFieldProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          defaultValueFloat: defaultValue
+                        }
+                      }
+                      ... on DropdownProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          values {
+                            id
+                            label
+                          }
+                        }
+                      }
+                      ... on RadioButtonsProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          values {
+                            id
+                            label
+                          }
+                        }
+                      }
+                      ... on RectangleListProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          values {
+                            id
+                            label
+                          }
+                        }
+                      }
+                      ... on SwatchProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          values {
+                            id
+                            label
+                          }
+                        }
+                      }
+                      ... on PickListProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                          values {
+                            id
+                            label
+                          }
+                        }
+                      }
+                      ... on FileUploadProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                        }
+                      }
+                      ... on DateFieldProductModifier {
+                        overridesForLocale(
+                          localeContext: {
+                            channelId: $channelId,
+                            locale: $locale
+                          }
+                        ) {
+                          displayName
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            ` : ''}
+            ${hasCustomFields ? `
+            updateProductCustomFields(input: $customFieldsInput) {
+              product {
+                customFields {
+                  edges {
+                    node {
+                      id
+                      name
+                      value
+                      overrides(context: { channelId: $channelId, locale: $locale }) {
+                        edges {
+                          node {
+                            ... on ProductCustomFieldOverridesForChannelLocale {
+                              name
+                              value
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            ` : ''}
+          }
+        }
+      `,
+      variables: {
+        channelId: variables.channelId,
+        locale: variables.locale,
+        input: variables.input,
+        seoInput: variables.seoInput,
+        preOrderInput: variables.preOrderInput,
+        storefrontInput: variables.storefrontInput,
+        ...(hasOptions && { optionsInput: variables.optionsInput }),
+        ...(hasModifiers && { modifiersInput: variables.modifiersInput }),
+        ...(hasCustomFields && { customFieldsInput: variables.customFieldsInput })
+      }
+    };
+
+    // Run mutations in parallel if there are removal operations
+    const hasRemovals = Object.keys(removalMutations.variables).length > 0; 
+    const promises = [];
+    
+    if (hasRemovals) {
+      promises.push(this.request(removalMutations));
+    }
+    promises.push(this.request(updateMutations));
+
+    const results = await Promise.all(promises);
+    
+    // Combine the responses
+    return {
+      ...results[0],
+      ...results[results.length - 1]
+    };
   }
 
   async updateProductLocaleData(options: ProductLocaleUpdateOptions) {

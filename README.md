@@ -38,11 +38,11 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Separate auth and session code into client with it's own types so it can be a separate package
 - [x] Separate out Admin GraphQL client (including app extensions) into a separate package
 - [x] Improve global "failed to load" design
+- [x] Split up graphql queries to reduce complexity limits
 - [ ] Add import / export functionality (include ensuring uploads are private)
 - [ ] Move server side locale transforms in api route into graphql client
 - [ ] Add BC CP SDK to preview session timeouts
 - [ ] Finish 'start translations' flow
-- [ ] Find out why GraphQL Tada doesn't return nullable nodes like the customFields type from ResultOf<typeof GetProductLocaleDataDocument> (it would simplify creating type safe functions)
 
 ## Getting Started
 
