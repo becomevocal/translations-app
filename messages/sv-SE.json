@@ -144,7 +144,12 @@
       "status_processing": "Bearbetar",
       "status_completed": "Slutförd",
       "status_failed": "Misslyckades",
-      "refresh": "Uppdatera"
+      "refresh": "Uppdatera",
+      "cancel": "Avbryt",
+      "next": "Nästa",
+      "uploadFile": "Ladda upp fil",
+      "dragAndDrop": "Dra och släpp din översättningsfil här eller klicka för att välja en fil",
+      "fileRequirements": "Endast .csv-filer stöds"
     }
   }
 } 

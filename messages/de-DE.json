@@ -141,10 +141,15 @@
       "download": "Herunterladen",
       "view": "Datei anzeigen",
       "status_pending": "Ausstehend",
-      "status_processing": "Wird verarbeitet",
+      "status_processing": "In Bearbeitung",
       "status_completed": "Abgeschlossen",
       "status_failed": "Fehlgeschlagen",
-      "refresh": "Aktualisieren"
+      "refresh": "Aktualisieren",
+      "cancel": "Abbrechen",
+      "next": "Weiter",
+      "uploadFile": "Datei hochladen",
+      "dragAndDrop": "Ziehen Sie Ihre Übersetzungsdatei hierher oder klicken Sie, um eine Datei auszuwählen",
+      "fileRequirements": "Nur .csv-Dateien werden unterstützt"
     }
   }
 } 

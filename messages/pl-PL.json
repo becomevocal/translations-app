@@ -143,8 +143,13 @@
       "status_pending": "Oczekujące",
       "status_processing": "Przetwarzanie",
       "status_completed": "Zakończone",
-      "status_failed": "Nieudane",
-      "refresh": "Odśwież"
+      "status_failed": "Niepowodzenie",
+      "refresh": "Odśwież",
+      "cancel": "Anuluj",
+      "next": "Dalej",
+      "uploadFile": "Prześlij plik",
+      "dragAndDrop": "Przeciągnij i upuść plik tłumaczenia tutaj lub kliknij, aby wybrać plik",
+      "fileRequirements": "Obsługiwane są tylko pliki .csv"
     }
   }
 } 

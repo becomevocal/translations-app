@@ -144,7 +144,12 @@
       "status_processing": "Verwerken",
       "status_completed": "Voltooid",
       "status_failed": "Mislukt",
-      "refresh": "Vernieuwen"
+      "refresh": "Vernieuwen",
+      "cancel": "Annuleren",
+      "next": "Volgende",
+      "uploadFile": "Bestand uploaden",
+      "dragAndDrop": "Sleep je vertaalbestand hierheen of klik om een bestand te selecteren",
+      "fileRequirements": "Alleen .csv-bestanden worden ondersteund"
     }
   }
 } 

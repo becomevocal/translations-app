@@ -132,7 +132,6 @@
       "selectLocale": "Seleziona lingua",
       "import": "Importa traduzioni",
       "export": "Esporta traduzioni",
-      "refresh": "Aggiorna",
       "type": "Tipo",
       "status": "Stato",
       "channel": "Canale",
@@ -144,7 +143,13 @@
       "status_pending": "In attesa",
       "status_processing": "In elaborazione",
       "status_completed": "Completato",
-      "status_failed": "Fallito"
+      "status_failed": "Fallito",
+      "refresh": "Aggiorna",
+      "cancel": "Annulla",
+      "next": "Avanti",
+      "uploadFile": "Carica file",
+      "dragAndDrop": "Trascina qui il tuo file di traduzione o fai clic per selezionare un file",
+      "fileRequirements": "Sono supportati solo file .csv"
     }
   }
 } 

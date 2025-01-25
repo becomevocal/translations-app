@@ -132,19 +132,24 @@
       "selectLocale": "Sélectionner la langue",
       "import": "Importer les traductions",
       "export": "Exporter les traductions",
-      "refresh": "Actualiser",
       "type": "Type",
       "status": "Statut",
       "channel": "Canal",
       "locale": "Langue",
-      "created": "Créé le",
+      "created": "Créé",
       "actions": "Actions",
       "download": "Télécharger",
       "view": "Voir le fichier",
       "status_pending": "En attente",
       "status_processing": "En cours",
       "status_completed": "Terminé",
-      "status_failed": "Échoué"
+      "status_failed": "Échoué",
+      "refresh": "Actualiser",
+      "cancel": "Annuler",
+      "next": "Suivant",
+      "uploadFile": "Téléverser un fichier",
+      "dragAndDrop": "Glissez-déposez votre fichier de traduction ici, ou cliquez pour sélectionner un fichier",
+      "fileRequirements": "Seuls les fichiers .csv sont pris en charge"
     }
   }
 } 

@@ -1,14 +1,14 @@
 {
   "app": {
-    "title": "Traducciones Multi-idioma",
+    "title": "Traducciones Multiidioma",
     "getStarted": {
       "title": "Comenzar",
       "description": "Seleccione un canal y un idioma para comenzar a traducir sus productos.",
       "selectChannel": "Seleccionar Canal",
       "selectLocale": "Seleccionar Idioma",
-      "checking": "Verificando la funcionalidad multi-idioma...",
-      "active": "¡La funcionalidad multi-idioma está activa!",
-      "inactive": "La funcionalidad multi-idioma no está disponible.",
+      "checking": "Verificando la funcionalidad multiidioma...",
+      "active": "¡La funcionalidad multiidioma está activa!",
+      "inactive": "La funcionalidad multiidioma no está disponible.",
       "checkingDescription": "Por favor espere mientras verificamos la configuración de su tienda.",
       "activeDescription": "Su tienda está lista para usar múltiples idiomas.",
       "inactiveDescription": "Su plan actual no admite múltiples idiomas.",
@@ -26,7 +26,7 @@
         "description": "Aprenda las mejores prácticas para traducir el contenido de su catálogo",
         "links": {
           "bestPractices": "Mejores Prácticas de Traducción",
-          "managing": "Gestión de Contenido Multi-idioma"
+          "managing": "Gestión de Contenido Multiidioma"
         }
       },
       "support": {
@@ -144,7 +144,12 @@
       "status_processing": "Procesando",
       "status_completed": "Completado",
       "status_failed": "Fallido",
-      "refresh": "Actualizar"
+      "refresh": "Actualizar",
+      "cancel": "Cancelar",
+      "next": "Siguiente",
+      "uploadFile": "Subir archivo",
+      "dragAndDrop": "Arrastra y suelta tu archivo de traducción aquí, o haz clic para seleccionar un archivo",
+      "fileRequirements": "Solo se admiten archivos .csv"
     }
   }
 } 

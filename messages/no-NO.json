@@ -132,7 +132,6 @@
       "selectLocale": "Velg språk",
       "import": "Importer oversettelser",
       "export": "Eksporter oversettelser",
-      "refresh": "Oppdater",
       "type": "Type",
       "status": "Status",
       "channel": "Kanal",
@@ -144,7 +143,13 @@
       "status_pending": "Venter",
       "status_processing": "Behandler",
       "status_completed": "Fullført",
-      "status_failed": "Mislyktes"
+      "status_failed": "Mislyktes",
+      "refresh": "Oppdater",
+      "cancel": "Avbryt",
+      "next": "Neste",
+      "uploadFile": "Last opp fil",
+      "dragAndDrop": "Dra og slipp oversettelsesfilen din her, eller klikk for å velge en fil",
+      "fileRequirements": "Kun .csv-filer støttes"
     }
   }
 } 

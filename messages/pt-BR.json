@@ -144,7 +144,12 @@
       "status_processing": "Processando",
       "status_completed": "Concluído",
       "status_failed": "Falhou",
-      "refresh": "Atualizar"
+      "refresh": "Atualizar",
+      "cancel": "Cancelar",
+      "next": "Próximo",
+      "uploadFile": "Enviar arquivo",
+      "dragAndDrop": "Arraste e solte seu arquivo de tradução aqui ou clique para selecionar um arquivo",
+      "fileRequirements": "Apenas arquivos .csv são suportados"
     }
   }
 } 

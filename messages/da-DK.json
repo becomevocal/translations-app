@@ -127,12 +127,11 @@
   },
   "translations": {
     "jobs": {
-      "title": "Oversættelsesopgaver",
+      "title": "Oversættelsesjobs",
       "selectChannel": "Vælg kanal",
       "selectLocale": "Vælg sprog",
       "import": "Importér oversættelser",
       "export": "Eksportér oversættelser",
-      "refresh": "Opdater",
       "type": "Type",
       "status": "Status",
       "channel": "Kanal",
@@ -144,7 +143,13 @@
       "status_pending": "Afventer",
       "status_processing": "Behandler",
       "status_completed": "Fuldført",
-      "status_failed": "Mislykket"
+      "status_failed": "Mislykket",
+      "refresh": "Opdater",
+      "cancel": "Annuller",
+      "next": "Næste",
+      "uploadFile": "Upload fil",
+      "dragAndDrop": "Træk og slip din oversættelsesfil her, eller klik for at vælge en fil",
+      "fileRequirements": "Kun .csv-filer understøttes"
     }
   }
 } 

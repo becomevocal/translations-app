@@ -132,19 +132,24 @@
       "selectLocale": "언어 선택",
       "import": "번역 가져오기",
       "export": "번역 내보내기",
-      "refresh": "새로고침",
       "type": "유형",
       "status": "상태",
       "channel": "채널",
       "locale": "언어",
-      "created": "생성일",
+      "created": "생성됨",
       "actions": "작업",
       "download": "다운로드",
       "view": "파일 보기",
       "status_pending": "대기 중",
       "status_processing": "처리 중",
       "status_completed": "완료됨",
-      "status_failed": "실패"
+      "status_failed": "실패",
+      "refresh": "새로고침",
+      "cancel": "취소",
+      "next": "다음",
+      "uploadFile": "파일 업로드",
+      "dragAndDrop": "번역 파일을 여기에 끌어다 놓거나 클릭하여 파일을 선택하세요",
+      "fileRequirements": ".csv 파일만 지원됩니다"
     }
   }
 } 

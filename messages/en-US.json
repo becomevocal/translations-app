@@ -144,7 +144,12 @@
       "status_processing": "Processing",
       "status_completed": "Completed",
       "status_failed": "Failed",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "cancel": "Cancel",
+      "next": "Next",
+      "uploadFile": "Upload File",
+      "dragAndDrop": "Drag and drop your translation file here, or click to select a file",
+      "fileRequirements": "Only .csv files are supported"
     }
   }
 } 

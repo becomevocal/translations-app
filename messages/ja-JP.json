@@ -128,15 +128,15 @@
   "translations": {
     "jobs": {
       "title": "翻訳ジョブ",
-      "selectChannel": "チャンネルを選択",
+      "selectChannel": "チャネルを選択",
       "selectLocale": "言語を選択",
       "import": "翻訳をインポート",
       "export": "翻訳をエクスポート",
       "type": "タイプ",
       "status": "ステータス",
-      "channel": "チャンネル",
+      "channel": "チャネル",
       "locale": "言語",
-      "created": "作成日時",
+      "created": "作成日",
       "actions": "アクション",
       "download": "ダウンロード",
       "view": "ファイルを表示",
@@ -144,7 +144,12 @@
       "status_processing": "処理中",
       "status_completed": "完了",
       "status_failed": "失敗",
-      "refresh": "更新"
+      "refresh": "更新",
+      "cancel": "キャンセル",
+      "next": "次へ",
+      "uploadFile": "ファイルをアップロード",
+      "dragAndDrop": "翻訳ファイルをここにドラッグ＆ドロップするか、クリックしてファイルを選択してください",
+      "fileRequirements": ".csvファイルのみサポートされています"
     }
   }
 } 

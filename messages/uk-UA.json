@@ -144,7 +144,12 @@
       "status_processing": "Обробляється",
       "status_completed": "Завершено",
       "status_failed": "Помилка",
-      "refresh": "Оновити"
+      "refresh": "Оновити",
+      "cancel": "Скасувати",
+      "next": "Далі",
+      "uploadFile": "Завантажити файл",
+      "dragAndDrop": "Перетягніть файл перекладу сюди або клацніть, щоб вибрати файл",
+      "fileRequirements": "Підтримуються лише файли .csv"
     }
   }
 } 
