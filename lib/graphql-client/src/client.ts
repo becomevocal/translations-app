@@ -280,7 +280,7 @@ export class GraphQLClient {
   async getAppExtensions(): Promise<AppExtension[]> {
     type Response = ResultOf<typeof GetAppExtensionsDocument>;
     const response = await this.request<Response>({
-      query: GetAppExtensionsDocument.toString(),
+      query: print(GetAppExtensionsDocument),
     });
     const data = response.data;
     const edges = data.store.appExtensions?.edges;
@@ -304,7 +304,7 @@ export class GraphQLClient {
     const variables = createAppExtensionInput(params);
     type Response = ResultOf<typeof CreateAppExtensionDocument>;
     const response = await this.request<Response>(
-      { query: CreateAppExtensionDocument.toString() },
+      { query: print(CreateAppExtensionDocument) },
       variables
     );
     const data = response.data;
@@ -325,7 +325,7 @@ export class GraphQLClient {
     });
     type Response = ResultOf<typeof UpdateAppExtensionDocument>;
     const response = await this.request<Response>(
-      { query: UpdateAppExtensionDocument.toString() },
+      { query: print(UpdateAppExtensionDocument) },
       variables
     );
     const data = response.data;
@@ -343,7 +343,7 @@ export class GraphQLClient {
   async deleteAppExtension(id: string): Promise<string> {
     type Response = ResultOf<typeof DeleteAppExtensionDocument>;
     const response = await this.request<Response>(
-      { query: DeleteAppExtensionDocument.toString() },
+      { query: print(DeleteAppExtensionDocument) },
       { id }
     );
     const data = response.data;
@@ -926,7 +926,7 @@ export class GraphQLClient {
 
     const variables = createGetAllProductsVariables({ limit, cursor });
     const response = await this.request(
-      { query: GetAllProductsDocument.toString() },
+      { query: print(GetAllProductsDocument) },
       variables
     );
     const typedResponse = response as unknown as {
