@@ -13,6 +13,50 @@ interface TranslationRecord {
   [key: string]: string | number; // Allow dynamic locale-based column names
 }
 
+// Helper function to safely parse JSON
+function safeParseJSON(str: string | number, defaultValue: any = null) {
+  if (typeof str !== 'string') return defaultValue;
+  try {
+    return str ? JSON.parse(str) : defaultValue;
+  } catch (error) {
+    console.error('Error parsing JSON:', error);
+    return defaultValue;
+  }
+}
+
+// Helper function to get locale-specific field
+function getLocaleField(record: TranslationRecord, fieldPrefix: string, locale: string): string {
+  const key = `${fieldPrefix}_${locale}`;
+  const value = record[key];
+  return typeof value === 'string' ? value : '';
+}
+
+// Helper function to prepare product data for update
+function prepareProductData(record: TranslationRecord, locale: string) {
+  return {
+    // Basic Information
+    name: getLocaleField(record, 'name', locale),
+    description: getLocaleField(record, 'description', locale),
+    
+    // SEO Information
+    pageTitle: getLocaleField(record, 'pageTitle', locale),
+    metaDescription: getLocaleField(record, 'metaDescription', locale),
+    
+    // Storefront Details
+    warranty: getLocaleField(record, 'warranty', locale),
+    availabilityDescription: getLocaleField(record, 'availabilityDescription', locale),
+    searchKeywords: getLocaleField(record, 'searchKeywords', locale),
+    
+    // Pre-order Settings
+    preOrderMessage: getLocaleField(record, 'preOrderMessage', locale),
+    
+    // Complex Data
+    options: safeParseJSON(getLocaleField(record, 'options', locale), []),
+    modifiers: safeParseJSON(getLocaleField(record, 'modifiers', locale), []),
+    customFields: safeParseJSON(getLocaleField(record, 'customFields', locale), [])
+  };
+}
+
 // Helper function to parse CSV using Web APIs
 async function parseCSV(text: string): Promise<TranslationRecord[]> {
   const rows = text.split('\n');
@@ -178,6 +222,112 @@ async function verifyAuthorization(request: NextRequest) {
   throw new Error('Unauthorized: Valid authorization header or context required');
 }
 
+// Interface for the mutation variables
+interface ProductLocaleUpdateVariables {
+  channelId: number;
+  locale: string;
+  input: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    data: {
+      name: string;
+      description: string;
+    };
+  };
+  seoInput: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    data: {
+      pageTitle: string;
+      metaDescription: string;
+    };
+  };
+  preOrderInput: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    data: {
+      message: string;
+    };
+  };
+  storefrontInput: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    data: {
+      warranty: string;
+      availabilityDescription: string;
+      searchKeywords: string;
+    };
+  };
+  optionsInput?: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    data: {
+      options: any[];
+    };
+  };
+  modifiersInput?: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    data: {
+      modifiers: any[];
+    };
+  };
+  customFieldsInput?: {
+    productId: number;
+    data: any[];
+  };
+  removedBasicInfoInput?: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    overridesToRemove: string[];
+  };
+  removedSeoInput?: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    overridesToRemove: string[];
+  };
+  removedStorefrontDetailsInput?: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    overridesToRemove: string[];
+  };
+  removedPreOrderInput?: {
+    productId: number;
+    localeContext: {
+      channelId: number;
+      locale: string;
+    };
+    overridesToRemove: string[];
+  };
+}
+
 // Process an import job
 async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClient) {
   console.log(`[Import] Starting import job ${job.id} for channel ${job.channelId} and locale ${job.locale}`);
@@ -204,17 +354,173 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
     await processBatch(records, async (record: TranslationRecord) => {
       try {
         console.log(`[Import] Updating product ${record.productId}`);
+        
+        const productData = prepareProductData(record, job.locale);
+        const defaultLocale = 'en'; // TODO: Get from channel
+        const defaultData = prepareProductData(record, defaultLocale);
 
-        await graphqlClient.updateProductLocaleData({
-          locale: job.locale,
+        // Prepare input variables for the mutation
+        const variables: ProductLocaleUpdateVariables = {
           channelId: job.channelId,
-          productId: record.productId,
-          productData: {
-            name: record[`name_${job.locale}`] as string,
-            description: record[`description_${job.locale}`] as string
+          locale: job.locale,
+          
+          // Basic Information
+          input: {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            data: {
+              name: productData.name,
+              description: productData.description
+            }
+          },
+          
+          // SEO Information
+          seoInput: {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            data: {
+              pageTitle: productData.pageTitle,
+              metaDescription: productData.metaDescription
+            }
+          },
+          
+          // Pre-order Settings
+          preOrderInput: {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            data: {
+              message: productData.preOrderMessage
+            }
+          },
+          
+          // Storefront Details
+          storefrontInput: {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            data: {
+              warranty: productData.warranty,
+              availabilityDescription: productData.availabilityDescription,
+              searchKeywords: productData.searchKeywords
+            }
           }
-        });
+        };
 
+        // Add options if present
+        if (productData.options?.length > 0) {
+          variables.optionsInput = {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            data: { options: productData.options }
+          };
+        }
+
+        // Add modifiers if present
+        if (productData.modifiers?.length > 0) {
+          variables.modifiersInput = {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            data: { modifiers: productData.modifiers }
+          };
+        }
+
+        // Add custom fields if present
+        if (productData.customFields?.length > 0) {
+          variables.customFieldsInput = {
+            productId: record.productId,
+            data: productData.customFields
+          };
+        }
+
+        // Add removal inputs for empty fields that exist in default locale
+        if (defaultData.name && !productData.name) {
+          variables.removedBasicInfoInput = {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            overridesToRemove: ['name']
+          };
+        }
+
+        if (defaultData.description && !productData.description) {
+          if (!variables.removedBasicInfoInput) {
+            variables.removedBasicInfoInput = {
+              productId: record.productId,
+              localeContext: {
+                channelId: job.channelId,
+                locale: job.locale
+              },
+              overridesToRemove: []
+            };
+          }
+          variables.removedBasicInfoInput.overridesToRemove.push('description');
+        }
+
+        // Similar removal logic for other fields...
+        // SEO
+        const seoRemovals: string[] = [];
+        if (defaultData.pageTitle && !productData.pageTitle) seoRemovals.push('pageTitle');
+        if (defaultData.metaDescription && !productData.metaDescription) seoRemovals.push('metaDescription');
+        if (seoRemovals.length > 0) {
+          variables.removedSeoInput = {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            overridesToRemove: seoRemovals
+          };
+        }
+
+        // Storefront
+        const storefrontRemovals: string[] = [];
+        if (defaultData.warranty && !productData.warranty) storefrontRemovals.push('warranty');
+        if (defaultData.availabilityDescription && !productData.availabilityDescription) storefrontRemovals.push('availabilityDescription');
+        if (defaultData.searchKeywords && !productData.searchKeywords) storefrontRemovals.push('searchKeywords');
+        if (storefrontRemovals.length > 0) {
+          variables.removedStorefrontDetailsInput = {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            overridesToRemove: storefrontRemovals
+          };
+        }
+
+        // Pre-order
+        if (defaultData.preOrderMessage && !productData.preOrderMessage) {
+          variables.removedPreOrderInput = {
+            productId: record.productId,
+            localeContext: {
+              channelId: job.channelId,
+              locale: job.locale
+            },
+            overridesToRemove: ['message']
+          };
+        }
+
+        // Call the mutation
+        await graphqlClient.NOTADA_updateProductLocaleData(variables);
         console.log(`[Import] Successfully updated product ${record.productId}`);
       } catch (error) {
         console.error(`[Import] Error updating product ${record.productId}:`, error);

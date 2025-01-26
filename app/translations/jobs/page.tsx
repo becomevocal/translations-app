@@ -290,14 +290,14 @@ export default function TranslationsJobs() {
                   onItemClick: () => setShowExportModal(true),
                   icon: <FileDownloadIcon />,
                 },
-                // For debugging cron
-                // {
-                //   content: t("refresh"),
-                //   icon: <RedoIcon />,
-                //   onItemClick: () => {
-                //     handleRunCron();
-                //   },
-                // },
+                // Refresh button for debugging cron locally
+                ...(process.env.NODE_ENV === 'development' ? [{
+                  content: t("refresh"),
+                  icon: <RedoIcon />,
+                  onItemClick: () => {
+                    handleRunCron();
+                  },
+                }] : []),
               ],
               toggle: {
                 text: "Action",
@@ -470,7 +470,7 @@ export default function TranslationsJobs() {
         header="Upload Translation File"
         actions={[
           {
-            text: "Cancel",
+            text: t("export"),
             variant: "subtle",
             onClick: () => {
               setShowUploadModal(false);
