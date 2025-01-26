@@ -181,6 +181,10 @@ export class BigCommerceRestClient {
     return this.request<{data: any[]}>(`/v3/channels?available=true`, { method: "GET" });
   }
 
+  async getChannel(channelId: number) {
+    return this.request<{data: any}>(`/v3/channels/${channelId}`, { method: "GET" });
+  }
+
   async getChannelProductAssignments(channelId: number) {
     return this.request<{data: any[]}>(`/v3/catalog/products/channel-assignments?channel_id:in=${channelId}`, {
       method: "GET",

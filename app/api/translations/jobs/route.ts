@@ -2,6 +2,16 @@ import { NextRequest } from 'next/server';
 import { getSessionFromContext } from '@/lib/auth';
 import { dbClient as db } from '@/lib/db';
 import { put } from '@vercel/blob';
+import crypto from 'crypto';
+
+// Helper to generate a unique filename
+function generateUniqueFilename(originalName: string, storeHash: string): string {
+  const timestamp = Date.now();
+  const randomBytes = crypto.randomBytes(8).toString('hex');
+  // Sanitize the original filename to remove any potentially unsafe characters
+  const sanitizedOriginalName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
+  return `imports/${storeHash}/${timestamp}-${randomBytes}-${sanitizedOriginalName}`;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,10 +56,14 @@ export async function POST(request: NextRequest) {
         return new Response('Missing required fields', { status: 400 });
       }
 
-      // Upload file to blob storage
-      const blob = await put(file.name, file, { 
+      // Generate unique filename
+      const uniqueFilename = generateUniqueFilename(file.name, storeHash);
+
+      // Upload file to blob storage with unique name
+      const blob = await put(uniqueFilename, file, { 
         access: 'public',
-        contentType: 'text/csv'
+        contentType: 'text/csv',
+        addRandomSuffix: false // We handle uniqueness ourselves
       });
 
       // Create job with file URL

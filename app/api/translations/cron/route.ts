@@ -6,6 +6,7 @@ import type { GraphQLClient } from '@bigcommerce/translations-graphql-client';
 import type { TranslationJob } from '@/lib/db/clients/types';
 import { createRestClient, BigCommerceRestClient } from '@bigcommerce/translations-rest-client';
 import { getSessionFromContext } from '@/lib/auth';
+import crypto from 'crypto';
 
 // CSV record type
 interface TranslationRecord {
@@ -614,11 +615,27 @@ function formatCustomFieldsData(customFields: any) {
   });
 }
 
+// Helper to generate a unique filename for exports
+function generateUniqueExportFilename(jobId: number, storeHash: string, locale: string, channelName: string): string {
+  const timestamp = Date.now();
+  const randomBytes = crypto.randomBytes(8).toString('hex');
+  // Sanitize the channel name to remove any potentially unsafe characters
+  const sanitizedChannelName = channelName.replace(/[^a-zA-Z0-9.-]/g, '_');
+  // Create a descriptive filename that includes job ID, channel, and locale
+  const descriptiveFilename = `${jobId}-${sanitizedChannelName}-${locale}.csv`;
+  return `exports/${storeHash}/${timestamp}-${randomBytes}-${descriptiveFilename}`;
+}
+
 // Process an export job
 async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClient, restClient: BigCommerceRestClient) {
   console.log(`[Export] Starting export job ${job.id} for channel ${job.channelId} and locale ${job.locale}`);
   
   try {
+    // Get channel details first
+    console.log(`[Export] Fetching channel details for channel ${job.channelId}`);
+    const channelResponse = await restClient.getChannel(job.channelId);
+    const channelName = channelResponse.data?.name || `channel-${job.channelId}`;
+
     // Get products from channel
     console.log(`[Export] Fetching products for channel ${job.channelId}`);
 
@@ -736,11 +753,13 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
     // Create CSV content
     const csvContent = stringifyCSV(translatedProducts, defaultLocale, job.locale);
 
-    // Upload to blob storage
+    // Upload to blob storage with unique filename including channel name
     console.log('[Export] Uploading CSV to blob storage');
-    const { url } = await put(`exports/${job.id}.csv`, csvContent, {
+    const uniqueFilename = generateUniqueExportFilename(job.id, job.storeHash, job.locale, channelName);
+    const { url } = await put(uniqueFilename, csvContent, {
       access: 'public',
-      addRandomSuffix: false,
+      contentType: 'text/csv',
+      addRandomSuffix: false // We handle uniqueness ourselves
     });
 
     console.log(`[Export] Upload complete. File URL: ${url}`);
