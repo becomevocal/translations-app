@@ -316,6 +316,16 @@ export default function TranslationsJobs() {
         />
       }
     >
+      <Box paddingBottom="medium">
+        <Message
+          type="warning"
+          messages={[
+            {
+              text: "The import/export feature is currently in active development. Not all fields import successfully. Please only use this functionality with sandbox stores.",
+            },
+          ]}
+        />
+      </Box>
       <Flex flexDirection="column" flexGap={theme.spacing.xLarge}>
         <FlexItem>
           <Panel>
@@ -470,7 +480,7 @@ export default function TranslationsJobs() {
         header="Upload Translation File"
         actions={[
           {
-            text: t("export"),
+            text: t("cancel"),
             variant: "subtle",
             onClick: () => {
               setShowUploadModal(false);

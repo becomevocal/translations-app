@@ -3,10 +3,12 @@ import { dbClient as db } from '@/lib/db';
 import { put, list, del } from '@vercel/blob';
 import { createGraphQLClient } from '@bigcommerce/translations-graphql-client';
 import type { GraphQLClient } from '@bigcommerce/translations-graphql-client';
+import { formatChannelId, formatProductId } from '@bigcommerce/translations-graphql-client/src/utils';
 import type { TranslationJob } from '@/lib/db/clients/types';
 import { createRestClient, BigCommerceRestClient } from '@bigcommerce/translations-rest-client';
 import { getSessionFromContext } from '@/lib/auth';
 import crypto from 'crypto';
+import Papa, { ParseResult, ParseError, UnparseConfig } from 'papaparse';
 
 // CSV record type
 interface TranslationRecord {
@@ -33,53 +35,71 @@ function getLocaleField(record: TranslationRecord, fieldPrefix: string, locale: 
 }
 
 // Helper function to prepare product data for update
-function prepareProductData(record: TranslationRecord, locale: string) {
+function prepareProductData(record: TranslationRecord, locale: string, channelId: number) {
+  const getValue = (value: string, shouldParseJson: boolean = false) => {
+    if (!shouldParseJson) return value;
+    // Only try to parse JSON for fields that should be JSON
+    try {
+      return JSON.parse(value);
+    } catch {
+      return [];
+    }
+  };
+
   return {
-    // Basic Information
-    name: getLocaleField(record, 'name', locale),
-    description: getLocaleField(record, 'description', locale),
+    // Basic Information - Don't parse as JSON
+    name: getValue(getLocaleField(record, 'name', locale)),
+    description: getValue(getLocaleField(record, 'description', locale)),
     
-    // SEO Information
-    pageTitle: getLocaleField(record, 'pageTitle', locale),
-    metaDescription: getLocaleField(record, 'metaDescription', locale),
+    // SEO Information - Don't parse as JSON
+    pageTitle: getValue(getLocaleField(record, 'pageTitle', locale)),
+    metaDescription: getValue(getLocaleField(record, 'metaDescription', locale)),
     
-    // Storefront Details
-    warranty: getLocaleField(record, 'warranty', locale),
-    availabilityDescription: getLocaleField(record, 'availabilityDescription', locale),
-    searchKeywords: getLocaleField(record, 'searchKeywords', locale),
+    // Storefront Details - Don't parse as JSON
+    warranty: getValue(getLocaleField(record, 'warranty', locale)),
+    availabilityDescription: getValue(getLocaleField(record, 'availabilityDescription', locale)),
+    searchKeywords: getValue(getLocaleField(record, 'searchKeywords', locale)),
     
-    // Pre-order Settings
-    preOrderMessage: getLocaleField(record, 'preOrderMessage', locale),
+    // Pre-order Settings - Don't parse as JSON
+    preOrderMessage: getValue(getLocaleField(record, 'preOrderMessage', locale)),
     
-    // Complex Data
-    options: safeParseJSON(getLocaleField(record, 'options', locale), []),
-    modifiers: safeParseJSON(getLocaleField(record, 'modifiers', locale), []),
-    customFields: safeParseJSON(getLocaleField(record, 'customFields', locale), [])
+    // Complex Data - Parse as JSON
+    options: getValue(getLocaleField(record, 'options', locale), true) || [],
+    modifiers: getValue(getLocaleField(record, 'modifiers', locale), true) || [],
+    customFields: getValue(getLocaleField(record, 'customFields', locale), true) || []
   };
 }
 
-// Helper function to parse CSV using Web APIs
+// Helper function to parse CSV using PapaParse
 async function parseCSV(text: string): Promise<TranslationRecord[]> {
-  const rows = text.split('\n');
-  const headers = rows[0].split(',').map(h => h.trim());
-  
-  return rows.slice(1)
-    .filter(row => row.trim())
-    .map(row => {
-      const values = row.split(',').map(v => v.trim());
-      const record: any = {};
-      headers.forEach((header, i) => {
-        if (header === 'productId') {
-          record[header] = parseInt(values[i], 10);
-        } else {
-          record[header] = values[i];
+  return new Promise((resolve, reject) => {
+    Papa.parse<TranslationRecord>(text, {
+      header: true,
+      skipEmptyLines: true,
+      transform: (value: string, field: string) => {
+        // Transform productId to number
+        if (field === 'productId') {
+          const parsed = parseInt(value, 10);
+          if (isNaN(parsed)) {
+            throw new Error(`Invalid product ID in CSV: ${value}`);
+          }
+          return parsed;
         }
-      });
-      return record as TranslationRecord;
+        return value;
+      },
+      complete: (results: ParseResult<TranslationRecord>) => {
+        if (results.errors.length > 0) {
+          console.error('CSV parsing errors:', results.errors);
+          reject(new Error('Failed to parse CSV: ' + results.errors[0].message));
+          return;
+        }
+        resolve(results.data);
+      }
     });
+  });
 }
 
-// Helper function to stringify CSV using Web APIs
+// Helper function to stringify CSV using PapaParse
 function stringifyCSV(records: TranslationRecord[], defaultLocale: string, targetLocale: string): string {
   const headers = [
     'productId',
@@ -113,21 +133,27 @@ function stringifyCSV(records: TranslationRecord[], defaultLocale: string, targe
     `customFields_${defaultLocale}`,
     `customFields_${targetLocale}`
   ];
-  
-  // Helper to escape and quote CSV cell content
-  const escapeCsvCell = (str: string | number): string => {
-    if (typeof str === 'number') return String(str);
-    if (!str) return '""';
-    // Escape quotes by doubling them and wrap the entire cell in quotes
-    return `"${str.replace(/"/g, '""')}"`;
+
+  const config: UnparseConfig = {
+    quotes: true, // Always quote strings to handle special characters
+    quoteChar: '"',
+    escapeChar: '"',
+    delimiter: ',',
+    header: true,
+    newline: '\n'
   };
 
-  const headerRow = headers.join(',');
-  const rows = records.map(record => 
-    headers.map(header => escapeCsvCell(record[header as keyof TranslationRecord])).join(',')
-  );
-  
-  return [headerRow, ...rows].join('\n');
+  // Use PapaParse to stringify the CSV
+  return Papa.unparse({
+    fields: headers,
+    data: records.map(record => {
+      const row: Record<string, any> = {};
+      headers.forEach(header => {
+        row[header] = record[header];
+      });
+      return row;
+    })
+  }, config);
 }
 
 // Configuration from environment variables with defaults
@@ -198,7 +224,6 @@ async function processBatch<T, R>(
   return results;
 }
 
-// Updated verification function to check either secret or context
 async function verifyAuthorization(request: NextRequest) {
   // Check for Authorization header (secret)
   const authHeader = request.headers.get('authorization');
@@ -225,12 +250,12 @@ async function verifyAuthorization(request: NextRequest) {
 
 // Interface for the mutation variables
 interface ProductLocaleUpdateVariables {
-  channelId: number;
+  channelId: string;
   locale: string;
   input: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     data: {
@@ -239,9 +264,9 @@ interface ProductLocaleUpdateVariables {
     };
   };
   seoInput: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     data: {
@@ -250,9 +275,9 @@ interface ProductLocaleUpdateVariables {
     };
   };
   preOrderInput: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     data: {
@@ -260,9 +285,9 @@ interface ProductLocaleUpdateVariables {
     };
   };
   storefrontInput: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     data: {
@@ -272,9 +297,9 @@ interface ProductLocaleUpdateVariables {
     };
   };
   optionsInput?: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     data: {
@@ -282,9 +307,9 @@ interface ProductLocaleUpdateVariables {
     };
   };
   modifiersInput?: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     data: {
@@ -292,37 +317,37 @@ interface ProductLocaleUpdateVariables {
     };
   };
   customFieldsInput?: {
-    productId: number;
+    productId: string;
     data: any[];
   };
   removedBasicInfoInput?: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     overridesToRemove: string[];
   };
   removedSeoInput?: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     overridesToRemove: string[];
   };
   removedStorefrontDetailsInput?: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     overridesToRemove: string[];
   };
   removedPreOrderInput?: {
-    productId: number;
+    productId: string;
     localeContext: {
-      channelId: number;
+      channelId: string;
       locale: string;
     };
     overridesToRemove: string[];
@@ -356,20 +381,24 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
       try {
         console.log(`[Import] Updating product ${record.productId}`);
         
-        const productData = prepareProductData(record, job.locale);
+        const productData = prepareProductData(record, job.locale, job.channelId);
         const defaultLocale = 'en'; // TODO: Get from channel
-        const defaultData = prepareProductData(record, defaultLocale);
+        const defaultData = prepareProductData(record, defaultLocale, job.channelId);
+
+        // Format IDs for GraphQL
+        const formattedChannelId = formatChannelId(job.channelId);
+        const formattedProductId = formatProductId(record.productId);
 
         // Prepare input variables for the mutation
         const variables: ProductLocaleUpdateVariables = {
-          channelId: job.channelId,
+          channelId: formattedChannelId,
           locale: job.locale,
           
           // Basic Information
           input: {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             data: {
@@ -380,9 +409,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
           
           // SEO Information
           seoInput: {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             data: {
@@ -393,9 +422,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
           
           // Pre-order Settings
           preOrderInput: {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             data: {
@@ -405,9 +434,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
           
           // Storefront Details
           storefrontInput: {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             data: {
@@ -421,9 +450,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         // Add options if present
         if (productData.options?.length > 0) {
           variables.optionsInput = {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             data: { options: productData.options }
@@ -433,9 +462,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         // Add modifiers if present
         if (productData.modifiers?.length > 0) {
           variables.modifiersInput = {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             data: { modifiers: productData.modifiers }
@@ -445,7 +474,7 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         // Add custom fields if present
         if (productData.customFields?.length > 0) {
           variables.customFieldsInput = {
-            productId: record.productId,
+            productId: formattedProductId,
             data: productData.customFields
           };
         }
@@ -453,9 +482,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         // Add removal inputs for empty fields that exist in default locale
         if (defaultData.name && !productData.name) {
           variables.removedBasicInfoInput = {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             overridesToRemove: ['name']
@@ -465,9 +494,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         if (defaultData.description && !productData.description) {
           if (!variables.removedBasicInfoInput) {
             variables.removedBasicInfoInput = {
-              productId: record.productId,
+              productId: formattedProductId,
               localeContext: {
-                channelId: job.channelId,
+                channelId: formattedChannelId,
                 locale: job.locale
               },
               overridesToRemove: []
@@ -483,9 +512,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         if (defaultData.metaDescription && !productData.metaDescription) seoRemovals.push('metaDescription');
         if (seoRemovals.length > 0) {
           variables.removedSeoInput = {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             overridesToRemove: seoRemovals
@@ -499,9 +528,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         if (defaultData.searchKeywords && !productData.searchKeywords) storefrontRemovals.push('searchKeywords');
         if (storefrontRemovals.length > 0) {
           variables.removedStorefrontDetailsInput = {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             overridesToRemove: storefrontRemovals
@@ -511,9 +540,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         // Pre-order
         if (defaultData.preOrderMessage && !productData.preOrderMessage) {
           variables.removedPreOrderInput = {
-            productId: record.productId,
+            productId: formattedProductId,
             localeContext: {
-              channelId: job.channelId,
+              channelId: formattedChannelId,
               locale: job.locale
             },
             overridesToRemove: ['message']
