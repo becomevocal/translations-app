@@ -6,8 +6,9 @@ import ProductForm from "@/components/product-form";
 import { LoadingScreen } from "@/components/loading-indicator";
 import { useHasMounted } from "@/hooks/useMounted";
 import { useChannels } from "@/hooks/useChannels";
+import { Suspense } from "react";
 
-export default function ProductInfo() {
+function ProductInfoContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const hasMounted = useHasMounted();
@@ -30,5 +31,13 @@ export default function ProductInfo() {
       productId={Number(params?.pid || 0)}
       context={context || ""}
     />
+  );
+}
+
+export default function ProductInfo() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <ProductInfoContent />
+    </Suspense>
   );
 }
