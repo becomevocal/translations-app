@@ -394,7 +394,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: false });
       }
     },
-    [productData, productId, currentChannel, context, t]
+    [productData, productId, currentChannel, context, t, defaultLocale]
   );
 
   const handleChannelChange = useCallback(
