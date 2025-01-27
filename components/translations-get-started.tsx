@@ -4,16 +4,17 @@ import { useTranslations } from "next-intl";
 import ActiveStateIcon from "@/icons/multi-lang-active-icon.svg";
 import InactiveStateIcon from "@/icons/multi-lang-inactive-icon.svg";
 import LoadingStateIcon from "@/icons/multi-lang-loading-icon.svg";
-
+import { Suspense } from "react";
 import { Button, Flex, FlexItem, Text } from "@bigcommerce/big-design";
+import { LoadingScreen } from "@/components/loading-indicator";
 
-export const TranslationsGetStarted = ({
+function TranslationsGetStartedContent({
   isActive = false,
   isLoading = true,
 }: {
   isActive?: boolean;
   isLoading?: boolean;
-}) => {
+}) {
   const t = useTranslations("app.getStarted");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,5 +80,16 @@ export const TranslationsGetStarted = ({
         </Button>
       </FlexItem>
     </Flex>
+  );
+}
+
+export const TranslationsGetStarted = (props: {
+  isActive?: boolean;
+  isLoading?: boolean;
+}) => {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <TranslationsGetStartedContent {...props} />
+    </Suspense>
   );
 };

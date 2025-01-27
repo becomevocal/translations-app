@@ -30,6 +30,7 @@ import { theme } from "@bigcommerce/big-design-theme";
 import { useChannels } from "@/hooks/useChannels";
 import ErrorMessage from "@/components/error-message";
 import { LoadingScreen } from "@/components/loading-indicator";
+import { Suspense } from "react";
 
 type TranslationJob = {
   id: number;
@@ -43,7 +44,7 @@ type TranslationJob = {
   updatedAt: string;
 };
 
-export default function TranslationsJobs() {
+function TranslationsJobsContent() {
   const t = useTranslations("translations.jobs");
   const searchParams = useSearchParams();
   const context = searchParams?.get("context");
@@ -518,5 +519,13 @@ export default function TranslationsJobs() {
         </FormGroup>
       </Modal>
     </Page>
+  );
+}
+
+export default function TranslationsJobs() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <TranslationsJobsContent />
+    </Suspense>
   );
 }
