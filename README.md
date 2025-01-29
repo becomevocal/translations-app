@@ -40,6 +40,8 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Improve global "failed to load" design
 - [x] Split up graphql queries to reduce complexity limits
 - [ ] Initial import / export functionality (include ensuring uploads are securely named)
+- [ ] Remove ability to export default locale for translation
+- [ ] Fix issue with null product description causing save to fail
 - [ ] Ability to view import errors (beyond high level # of errors)
 - [ ] Add BC CP SDK to preview session timeouts
 - [ ] Update resource links on home screen

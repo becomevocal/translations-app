@@ -114,6 +114,7 @@ function TranslationsJobsContent() {
       if (jobType === "export") {
         setShowExportModal(false);
       }
+      handleRunCron();
     } catch (error) {
       console.error("Error creating job:", error);
     } finally {
@@ -155,6 +156,7 @@ function TranslationsJobsContent() {
       setShowUploadModal(false);
       setSelectedFile(null);
       fetchJobs();
+      handleRunCron();
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
@@ -171,7 +173,7 @@ function TranslationsJobsContent() {
       const response = await fetch(
         `/api/translations/cron?context=${context}`,
         {
-          method: "POST",
+          method: "GET",
         }
       );
       if (!response.ok) throw new Error("Failed to run cron job");
