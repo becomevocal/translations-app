@@ -46,6 +46,102 @@ function prepareProductData(record: TranslationRecord, locale: string, channelId
     }
   };
 
+  // Helper to transform options data structure
+  const transformOptionsData = (options: any[]) => {
+    if (!Array.isArray(options)) return [];
+    
+    return options.map(option => ({
+      optionId: option.id, // Transform id to optionId
+      data: {
+        dropdown: {
+          displayName: option.displayName,
+          values: option.values?.map((value: any) => ({
+            valueId: value.id, // Transform id to valueId
+            label: value.label
+          })) || []
+        }
+      }
+    }));
+  };
+
+  // Helper to transform modifiers data structure
+  const transformModifiersData = (modifiers: any[]) => {
+    if (!Array.isArray(modifiers)) return [];
+    
+    return modifiers.map(modifier => {
+      const baseData = {
+        modifierId: modifier.id, // Transform id to modifierId
+        data: {
+          displayName: modifier.displayName
+        }
+      };
+
+      // Handle different modifier types based on the type field
+      const type = modifier.type as 'CheckboxProductModifier' | 'TextFieldProductModifier' | 'MultilineTextFieldProductModifier' | 'NumbersOnlyTextFieldProductModifier' | 'DropdownProductModifier' | 'RadioButtonsProductModifier' | 'RectangleListProductModifier' | 'SwatchProductModifier' | 'PickListProductModifier';
+
+      switch (type) {
+        case 'CheckboxProductModifier':
+          return {
+            ...baseData,
+            data: {
+              ...baseData.data,
+              checkbox: {
+                fieldValue: modifier.fieldValue
+              }
+            }
+          };
+        case 'TextFieldProductModifier':
+        case 'MultilineTextFieldProductModifier':
+          return {
+            ...baseData,
+            data: {
+              ...baseData.data,
+              [type === 'TextFieldProductModifier' ? 'textField' : 'multiLineTextField']: {
+                defaultValue: modifier.defaultValue
+              }
+            }
+          };
+        case 'NumbersOnlyTextFieldProductModifier':
+          return {
+            ...baseData,
+            data: {
+              ...baseData.data,
+              numberField: {
+                defaultValue: modifier.defaultValue
+              }
+            }
+          };
+        case 'DropdownProductModifier':
+        case 'RadioButtonsProductModifier':
+        case 'RectangleListProductModifier':
+        case 'SwatchProductModifier':
+        case 'PickListProductModifier':
+          const typeKey = {
+            'DropdownProductModifier': 'dropdown',
+            'RadioButtonsProductModifier': 'radioButtons',
+            'RectangleListProductModifier': 'rectangleList',
+            'SwatchProductModifier': 'swatch',
+            'PickListProductModifier': 'pickList'
+          }[type] as 'dropdown' | 'radioButtons' | 'rectangleList' | 'swatch' | 'pickList';
+          
+          return {
+            ...baseData,
+            data: {
+              ...baseData.data,
+              [typeKey]: {
+                values: modifier.values?.map((value: any) => ({
+                  valueId: value.id, // Transform id to valueId
+                  label: value.label
+                })) || []
+              }
+            }
+          };
+        default:
+          return baseData;
+      }
+    });
+  };
+
   return {
     // Basic Information - Don't parse as JSON
     name: getValue(getLocaleField(record, 'name', locale)),
@@ -63,9 +159,9 @@ function prepareProductData(record: TranslationRecord, locale: string, channelId
     // Pre-order Settings - Don't parse as JSON
     preOrderMessage: getValue(getLocaleField(record, 'preOrderMessage', locale)),
     
-    // Complex Data - Parse as JSON
-    options: getValue(getLocaleField(record, 'options', locale), true) || [],
-    modifiers: getValue(getLocaleField(record, 'modifiers', locale), true) || [],
+    // Complex Data - Parse as JSON and transform
+    options: transformOptionsData(getValue(getLocaleField(record, 'options', locale), true)),
+    modifiers: transformModifiersData(getValue(getLocaleField(record, 'modifiers', locale), true)),
     customFields: getValue(getLocaleField(record, 'customFields', locale), true) || []
   };
 }
@@ -455,7 +551,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
               channelId: formattedChannelId,
               locale: job.locale
             },
-            data: { options: productData.options }
+            data: {
+              options: productData.options
+            }
           };
         }
 
@@ -565,9 +663,9 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
   }
 }
 
-// Helper function to format options data
+// Helper function to format options data for export
 function formatOptionsData(options: any) {
-  if (!options?.edges) return '';
+  if (!options?.edges) return [];
   
   return options.edges.map((edge: any) => {
     const node = edge.node;
@@ -700,7 +798,7 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
           const productNode = translation;
           const localeNode = productNode.overridesForLocale;
 
-          // TODO: make a shared function for this that proudcts GET route also can use
+          // TODO: make a shared function for this that products GET route also can use
         const options =
           productNode?.options?.edges;
         const modifiers =
@@ -749,7 +847,6 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
         } catch (error) {
           console.error(`[Export] Error fetching translation for product ${productId}:`, error);
           return {
-            // TODO: fetch default product info from rest client
             productId: productId,
             [`name_${defaultLocale}`]: "",
             [`name_${job.locale}`]: "",
