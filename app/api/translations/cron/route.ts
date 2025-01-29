@@ -16,16 +16,6 @@ interface TranslationRecord {
   [key: string]: string | number; // Allow dynamic locale-based column names
 }
 
-// Helper function to safely parse JSON
-function safeParseJSON(str: string | number, defaultValue: any = null) {
-  if (typeof str !== 'string') return defaultValue;
-  try {
-    return str ? JSON.parse(str) : defaultValue;
-  } catch (error) {
-    console.error('Error parsing JSON:', error);
-    return defaultValue;
-  }
-}
 
 // Helper function to get locale-specific field
 function getLocaleField(record: TranslationRecord, fieldPrefix: string, locale: string): string {
@@ -326,7 +316,7 @@ async function verifyAuthorization(request: NextRequest) {
   if (authHeader) {
     const [type, token] = authHeader.split(' ');
     if (type === 'Bearer' && token === process.env.CRON_SECRET) {
-      return;
+      return { type: 'cron' as const };
     }
   }
 
@@ -334,8 +324,8 @@ async function verifyAuthorization(request: NextRequest) {
   const context = request.nextUrl.searchParams.get('context');
   if (context) {
     try {
-      await getSessionFromContext(context);
-      return;
+      const session = await getSessionFromContext(context);
+      return { type: 'user' as const, storeHash: session.storeHash };
     } catch (error) {
       console.error('Invalid context:', error);
     }
@@ -896,17 +886,15 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
   }
 }
 
-export async function POST(request: NextRequest) {
+// Remove POST handler and keep only GET handler
+export async function GET(request: NextRequest) {
   try {
     // Updated verification
-    await verifyAuthorization(request);
+    const auth = await verifyAuthorization(request);
 
-    // Get context if available (for filtering jobs)
-    const context = request.nextUrl.searchParams.get('context');
-    
-    // Get pending jobs (filtered by store if context provided)
-    const pendingJobs = context 
-      ? await db.getPendingTranslationJobsByStore((await getSessionFromContext(context)).storeHash)
+    // Get pending jobs (filtered by store if user auth)
+    const pendingJobs = auth.type === 'user'
+      ? await db.getPendingTranslationJobsByStore(auth.storeHash)
       : await db.getPendingTranslationJobs();
 
     // Process each job
