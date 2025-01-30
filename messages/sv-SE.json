@@ -16,8 +16,8 @@
       "contactSupport": "Kontakta support"
     },
     "home": {
-      "welcome": "Välkommen till Översättningscentret!",
-      "description": "Här kan du lära dig om hantering av flera språk i din Catalyst-butik."
+      "welcome": "Välkommen till Översättningscentret",
+      "description": "Här kan du hantera översättningar av din katalog till flera språk för din Catalyst-butik."
     },
     "resources": {
       "title": "Resurser",

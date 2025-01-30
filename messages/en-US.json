@@ -16,8 +16,8 @@
       "contactSupport": "Contact support"
     },
     "home": {
-      "welcome": "Welcome to the Translation Center!",
-      "description": "This is where you can learn about the management of multiple languages on your Catalyst storefront."
+      "welcome": "Welcome to the Translation Center",
+      "description": "Where you can manage translations of your catalog into multiple languages for your Catalyst storefront."
     },
     "resources": {
       "title": "Resources",

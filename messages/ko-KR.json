@@ -16,8 +16,8 @@
       "contactSupport": "고객 지원 문의"
     },
     "home": {
-      "welcome": "번역 센터에 오신 것을 환영합니다!",
-      "description": "Catalyst 스토어에서 다국어 관리하는 방법을 배워보세요."
+      "welcome": "번역 센터에 오신 것을 환영합니다",
+      "description": "여기에서 Catalyst 스토어프론트를 위한 카탈로그의 다국어 번역을 관리할 수 있습니다."
     },
     "resources": {
       "title": "리소스",
