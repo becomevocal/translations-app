@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { dbClient as db } from '@/lib/db';
-import { put, list, del } from '@vercel/blob';
+import { put } from '@vercel/blob';
 import { createGraphQLClient } from '@bigcommerce/translations-graphql-client';
 import type { GraphQLClient } from '@bigcommerce/translations-graphql-client';
 import { formatChannelId, formatProductId } from '@bigcommerce/translations-graphql-client/src/utils';
@@ -9,6 +9,7 @@ import { createRestClient, BigCommerceRestClient } from '@bigcommerce/translatio
 import { getSessionFromContext } from '@/lib/auth';
 import crypto from 'crypto';
 import Papa, { ParseResult, ParseError, UnparseConfig } from 'papaparse';
+import { fallbackLocale } from '@/lib/constants';
 
 // CSV record type
 interface TranslationRecord {
@@ -478,6 +479,19 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
       throw new Error('No file URL provided for import job');
     }
 
+    // Get store token and create REST client
+    const accessToken = await db.getStoreToken(job.storeHash);
+    if (!accessToken) {
+      throw new Error('Store token not found');
+    }
+    const restClient = createRestClient({accessToken, storeHash: job.storeHash});
+
+    // Fetch channel locales to get default locale
+    console.log(`[Import] Fetching channel locales for channel ${job.channelId}`);
+    const { data: localesData } = await restClient.getChannelLocales(job.channelId);
+    const defaultLocale = localesData.find(locale => locale.is_default)?.code || fallbackLocale.code;
+    console.log(`[Import] Using default locale: ${defaultLocale}`);
+
     // Fetch CSV file
     console.log(`[Import] Fetching CSV from ${job.fileUrl}`);
     const response = await fetch(job.fileUrl);
@@ -497,7 +511,6 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         console.log(`[Import] Updating product ${record.productId}`);
         
         const productData = prepareProductData(record, job.locale, job.channelId);
-        const defaultLocale = 'en'; // TODO: Get from channel
         const defaultData = prepareProductData(record, defaultLocale, job.channelId);
 
         // Format IDs for GraphQL
@@ -782,6 +795,12 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
     const channelResponse = await restClient.getChannel(job.channelId);
     const channelName = channelResponse.data?.name || `channel-${job.channelId}`;
 
+    // Get channel locales to determine default locale
+    console.log(`[Export] Fetching channel locales for channel ${job.channelId}`);
+    const { data: localesData } = await restClient.getChannelLocales(job.channelId);
+    const defaultLocale = localesData.find(locale => locale.is_default)?.code || fallbackLocale.code;
+    console.log(`[Export] Using default locale: ${defaultLocale}`);
+
     // Get products from channel
     console.log(`[Export] Fetching products for channel ${job.channelId}`);
 
@@ -795,9 +814,6 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
 
     // Get translations for each product
     console.log(`[Export] Fetching translations for ${productAssignments.data?.length} products in locale ${job.locale}`);
-
-    // TODO: Get default locale from channel
-    const defaultLocale = 'en'
 
     const translatedProducts = await Promise.all(
       productAssignments.data.map(async (assignment: { channel_id: number, product_id: number }) => {
