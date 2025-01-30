@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "翻訳ジョブ",
+      "pageDescription": "カタログの翻訳を一括でエクスポート・インポートして、特定のチャネルの言語データを管理します。CSVファイルに対応しています。",
+      "tableTitle": "ジョブ結果",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "タイプ",
+        "status": "ステータス",
+        "channel": "チャネル",
+        "locale": "言語",
+        "created": "作成日時",
+        "actions": "アクション",
+        "import": "インポート",
+        "export": "エクスポート"
+      },
       "title": "翻訳ジョブ",
       "selectChannel": "チャネルを選択",
       "selectLocale": "言語を選択",
@@ -136,8 +150,7 @@
       "status": "ステータス",
       "channel": "チャネル",
       "locale": "言語",
-      "created": "作成日",
-      "actions": "アクション",
+      "created": "作成日時",
       "download": "ダウンロード",
       "view": "ファイルを表示",
       "status_pending": "保留中",
@@ -145,11 +158,43 @@
       "status_completed": "完了",
       "status_failed": "失敗",
       "refresh": "更新",
-      "cancel": "キャンセル",
-      "next": "次へ",
-      "uploadFile": "ファイルをアップロード",
-      "dragAndDrop": "翻訳ファイルをここにドラッグ＆ドロップするか、クリックしてファイルを選択してください",
-      "fileRequirements": ".csvファイルのみサポートされています"
+      "emptyState": {
+        "title": "翻訳ジョブが見つかりません",
+        "description": "上部のインポートまたはエクスポートボタンをクリックして、新しい翻訳ジョブを作成してください"
+      },
+      "navigation": {
+        "back": "戻る"
+      },
+      "actions": {
+        "button": "アクション"
+      },
+      "importModal": {
+        "title": "翻訳のインポート",
+        "selectChannel": "チャネルを選択",
+        "selectLocale": "言語を選択",
+        "cancel": "キャンセル",
+        "next": "次へ",
+        "upload": {
+          "title": "翻訳ファイルのアップロード",
+          "selectFile": "ファイルを選択",
+          "uploadButton": "アップロード",
+          "dragAndDrop": "翻訳を含むCSVファイルを選択してください。",
+          "selectedFile": "選択されたファイル: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "翻訳のエクスポート",
+        "selectChannel": "チャネルを選択",
+        "selectLocale": "言語を選択",
+        "cancel": "キャンセル",
+        "export": "エクスポート"
+      },
+      "errors": {
+        "fetchJobs": "ジョブの取得に失敗しました",
+        "runCron": "定期実行ジョブの実行に失敗しました",
+        "createJob": "ジョブの作成に失敗しました",
+        "uploadFile": "ファイルのアップロードに失敗しました"
+      }
     }
   }
 } 

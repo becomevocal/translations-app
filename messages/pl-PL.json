@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "Zadania tłumaczeniowe",
+      "pageDescription": "Zarządzaj danymi językowymi dla określonych kanałów, eksportując i importując tłumaczenia katalogów masowo. Obsługuje pliki CSV.",
+      "tableTitle": "Wyniki zadań",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Typ",
+        "status": "Status",
+        "channel": "Kanał",
+        "locale": "Język",
+        "created": "Utworzono",
+        "actions": "Akcje",
+        "import": "Importuj",
+        "export": "Eksportuj"
+      },
       "title": "Zadania tłumaczeniowe",
       "selectChannel": "Wybierz kanał",
       "selectLocale": "Wybierz język",
@@ -137,7 +151,6 @@
       "channel": "Kanał",
       "locale": "Język",
       "created": "Utworzono",
-      "actions": "Akcje",
       "download": "Pobierz",
       "view": "Zobacz plik",
       "status_pending": "Oczekujące",
@@ -145,11 +158,43 @@
       "status_completed": "Zakończone",
       "status_failed": "Niepowodzenie",
       "refresh": "Odśwież",
-      "cancel": "Anuluj",
-      "next": "Dalej",
-      "uploadFile": "Prześlij plik",
-      "dragAndDrop": "Przeciągnij i upuść plik tłumaczenia tutaj lub kliknij, aby wybrać plik",
-      "fileRequirements": "Obsługiwane są tylko pliki .csv"
+      "emptyState": {
+        "title": "Nie znaleziono zadań tłumaczeniowych",
+        "description": "Utwórz nowe zadanie tłumaczeniowe, klikając przycisk Importuj lub Eksportuj powyżej"
+      },
+      "navigation": {
+        "back": "Wstecz"
+      },
+      "actions": {
+        "button": "Akcja"
+      },
+      "importModal": {
+        "title": "Importuj tłumaczenia",
+        "selectChannel": "Wybierz kanał",
+        "selectLocale": "Wybierz język",
+        "cancel": "Anuluj",
+        "next": "Dalej",
+        "upload": {
+          "title": "Prześlij plik tłumaczenia",
+          "selectFile": "Wybierz plik",
+          "uploadButton": "Prześlij",
+          "dragAndDrop": "Wybierz plik CSV zawierający twoje tłumaczenia.",
+          "selectedFile": "Wybrany plik: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Eksportuj tłumaczenia",
+        "selectChannel": "Wybierz kanał",
+        "selectLocale": "Wybierz język",
+        "cancel": "Anuluj",
+        "export": "Eksportuj"
+      },
+      "errors": {
+        "fetchJobs": "Nie udało się pobrać zadań",
+        "runCron": "Nie udało się uruchomić zaplanowanego zadania",
+        "createJob": "Nie udało się utworzyć zadania",
+        "uploadFile": "Nie udało się przesłać pliku"
+      }
     }
   }
 } 

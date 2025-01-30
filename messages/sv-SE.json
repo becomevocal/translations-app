@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "Översättningsjobb",
+      "pageDescription": "Hantera språkdata för specifika kanaler genom att exportera och importera katalogöversättningar i bulk. Stöder CSV-filer.",
+      "tableTitle": "Jobbresultat",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Typ",
+        "status": "Status",
+        "channel": "Kanal",
+        "locale": "Språk",
+        "created": "Skapad",
+        "actions": "Åtgärder",
+        "import": "Importera",
+        "export": "Exportera"
+      },
       "title": "Översättningsjobb",
       "selectChannel": "Välj kanal",
       "selectLocale": "Välj språk",
@@ -137,7 +151,6 @@
       "channel": "Kanal",
       "locale": "Språk",
       "created": "Skapad",
-      "actions": "Åtgärder",
       "download": "Ladda ner",
       "view": "Visa fil",
       "status_pending": "Väntar",
@@ -145,11 +158,43 @@
       "status_completed": "Slutförd",
       "status_failed": "Misslyckades",
       "refresh": "Uppdatera",
-      "cancel": "Avbryt",
-      "next": "Nästa",
-      "uploadFile": "Ladda upp fil",
-      "dragAndDrop": "Dra och släpp din översättningsfil här eller klicka för att välja en fil",
-      "fileRequirements": "Endast .csv-filer stöds"
+      "emptyState": {
+        "title": "Inga översättningsjobb hittades",
+        "description": "Skapa ett nytt översättningsjobb genom att klicka på knappen Importera eller Exportera ovan"
+      },
+      "navigation": {
+        "back": "Tillbaka"
+      },
+      "actions": {
+        "button": "Åtgärd"
+      },
+      "importModal": {
+        "title": "Importera översättningar",
+        "selectChannel": "Välj kanal",
+        "selectLocale": "Välj språk",
+        "cancel": "Avbryt",
+        "next": "Nästa",
+        "upload": {
+          "title": "Ladda upp översättningsfil",
+          "selectFile": "Välj fil",
+          "uploadButton": "Ladda upp",
+          "dragAndDrop": "Välj en CSV-fil som innehåller dina översättningar.",
+          "selectedFile": "Vald fil: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Exportera översättningar",
+        "selectChannel": "Välj kanal",
+        "selectLocale": "Välj språk",
+        "cancel": "Avbryt",
+        "export": "Exportera"
+      },
+      "errors": {
+        "fetchJobs": "Det gick inte att hämta jobb",
+        "runCron": "Det gick inte att köra schemalagt jobb",
+        "createJob": "Det gick inte att skapa jobb",
+        "uploadFile": "Det gick inte att ladda upp filen"
+      }
     }
   }
 } 

@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "Tâches de Traduction",
+      "pageDescription": "Gérez les données de langue pour des canaux spécifiques en exportant et important des traductions de catalogue en masse. Prend en charge les fichiers CSV.",
+      "tableTitle": "Résultats des Tâches",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Type",
+        "status": "Statut",
+        "channel": "Canal",
+        "locale": "Langue",
+        "created": "Créé",
+        "actions": "Actions",
+        "import": "Importer",
+        "export": "Exporter"
+      },
       "title": "Tâches de traduction",
       "selectChannel": "Sélectionner le canal",
       "selectLocale": "Sélectionner la langue",
@@ -137,7 +151,6 @@
       "channel": "Canal",
       "locale": "Langue",
       "created": "Créé",
-      "actions": "Actions",
       "download": "Télécharger",
       "view": "Voir le fichier",
       "status_pending": "En attente",
@@ -145,11 +158,43 @@
       "status_completed": "Terminé",
       "status_failed": "Échoué",
       "refresh": "Actualiser",
-      "cancel": "Annuler",
-      "next": "Suivant",
-      "uploadFile": "Téléverser un fichier",
-      "dragAndDrop": "Glissez-déposez votre fichier de traduction ici, ou cliquez pour sélectionner un fichier",
-      "fileRequirements": "Seuls les fichiers .csv sont pris en charge"
+      "emptyState": {
+        "title": "Aucune tâche de traduction trouvée",
+        "description": "Créez une nouvelle tâche de traduction en cliquant sur le bouton Importer ou Exporter ci-dessus"
+      },
+      "navigation": {
+        "back": "Retour"
+      },
+      "actions": {
+        "button": "Action"
+      },
+      "importModal": {
+        "title": "Importer des Traductions",
+        "selectChannel": "Sélectionner le Canal",
+        "selectLocale": "Sélectionner la Langue",
+        "cancel": "Annuler",
+        "next": "Suivant",
+        "upload": {
+          "title": "Téléverser un Fichier de Traduction",
+          "selectFile": "Sélectionner un Fichier",
+          "uploadButton": "Téléverser",
+          "dragAndDrop": "Sélectionnez un fichier CSV contenant vos traductions.",
+          "selectedFile": "Fichier sélectionné : {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Exporter des Traductions",
+        "selectChannel": "Sélectionner le Canal",
+        "selectLocale": "Sélectionner la Langue",
+        "cancel": "Annuler",
+        "export": "Exporter"
+      },
+      "errors": {
+        "fetchJobs": "Échec de la récupération des tâches",
+        "runCron": "Échec de l'exécution de la tâche planifiée",
+        "createJob": "Échec de la création de la tâche",
+        "uploadFile": "Échec du téléversement du fichier"
+      }
     }
   }
 } 

@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "번역 작업",
+      "pageDescription": "카탈로그 번역을 일괄적으로 내보내기 및 가져오기하여 특정 채널의 언어 데이터를 관리합니다. CSV 파일을 지원합니다.",
+      "tableTitle": "작업 결과",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "유형",
+        "status": "상태",
+        "channel": "채널",
+        "locale": "언어",
+        "created": "생성일",
+        "actions": "작업",
+        "import": "가져오기",
+        "export": "내보내기"
+      },
       "title": "번역 작업",
       "selectChannel": "채널 선택",
       "selectLocale": "언어 선택",
@@ -136,8 +150,7 @@
       "status": "상태",
       "channel": "채널",
       "locale": "언어",
-      "created": "생성됨",
-      "actions": "작업",
+      "created": "생성일",
       "download": "다운로드",
       "view": "파일 보기",
       "status_pending": "대기 중",
@@ -145,11 +158,43 @@
       "status_completed": "완료됨",
       "status_failed": "실패",
       "refresh": "새로고침",
-      "cancel": "취소",
-      "next": "다음",
-      "uploadFile": "파일 업로드",
-      "dragAndDrop": "번역 파일을 여기에 끌어다 놓거나 클릭하여 파일을 선택하세요",
-      "fileRequirements": ".csv 파일만 지원됩니다"
+      "emptyState": {
+        "title": "번역 작업을 찾을 수 없습니다",
+        "description": "위의 가져오기 또는 내보내기 버튼을 클릭하여 새 번역 작업을 만드세요"
+      },
+      "navigation": {
+        "back": "뒤로"
+      },
+      "actions": {
+        "button": "작업"
+      },
+      "importModal": {
+        "title": "번역 가져오기",
+        "selectChannel": "채널 선택",
+        "selectLocale": "언어 선택",
+        "cancel": "취소",
+        "next": "다음",
+        "upload": {
+          "title": "번역 파일 업로드",
+          "selectFile": "파일 선택",
+          "uploadButton": "업로드",
+          "dragAndDrop": "번역이 포함된 CSV 파일을 선택하세요.",
+          "selectedFile": "선택된 파일: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "번역 내보내기",
+        "selectChannel": "채널 선택",
+        "selectLocale": "언어 선택",
+        "cancel": "취소",
+        "export": "내보내기"
+      },
+      "errors": {
+        "fetchJobs": "작업을 가져오는데 실패했습니다",
+        "runCron": "예약된 작업 실행에 실패했습니다",
+        "createJob": "작업 생성에 실패했습니다",
+        "uploadFile": "파일 업로드에 실패했습니다"
+      }
     }
   }
 } 

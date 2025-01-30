@@ -127,17 +127,30 @@
   },
   "translations": {
     "jobs": {
-      "title": "Oversættelsesjobs",
+      "pageTitle": "Oversættelsesopgaver",
+      "pageDescription": "Administrer sprogdata for specifikke kanaler ved at eksportere og importere katalogoversættelser i bulk. Understøtter CSV-filer.",
+      "tableTitle": "Opgaveresultater",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Type",
+        "status": "Status",
+        "channel": "Kanal",
+        "locale": "Sprog",
+        "created": "Oprettet",
+        "actions": "Handlinger",
+        "import": "Importer",
+        "export": "Eksporter"
+      },
+      "title": "Oversættelsesopgaver",
       "selectChannel": "Vælg kanal",
       "selectLocale": "Vælg sprog",
-      "import": "Importér oversættelser",
-      "export": "Eksportér oversættelser",
+      "import": "Importer oversættelser",
+      "export": "Eksporter oversættelser",
       "type": "Type",
       "status": "Status",
       "channel": "Kanal",
       "locale": "Sprog",
       "created": "Oprettet",
-      "actions": "Handlinger",
       "download": "Download",
       "view": "Vis fil",
       "status_pending": "Afventer",
@@ -145,11 +158,43 @@
       "status_completed": "Fuldført",
       "status_failed": "Mislykket",
       "refresh": "Opdater",
-      "cancel": "Annuller",
-      "next": "Næste",
-      "uploadFile": "Upload fil",
-      "dragAndDrop": "Træk og slip din oversættelsesfil her, eller klik for at vælge en fil",
-      "fileRequirements": "Kun .csv-filer understøttes"
+      "emptyState": {
+        "title": "Ingen oversættelsesopgaver fundet",
+        "description": "Opret en ny oversættelsesopgave ved at klikke på knappen Importer eller Eksporter ovenfor"
+      },
+      "navigation": {
+        "back": "Tilbage"
+      },
+      "actions": {
+        "button": "Handling"
+      },
+      "importModal": {
+        "title": "Importer oversættelser",
+        "selectChannel": "Vælg kanal",
+        "selectLocale": "Vælg sprog",
+        "cancel": "Annuller",
+        "next": "Næste",
+        "upload": {
+          "title": "Upload oversættelsesfil",
+          "selectFile": "Vælg fil",
+          "uploadButton": "Upload",
+          "dragAndDrop": "Vælg en CSV-fil der indeholder dine oversættelser.",
+          "selectedFile": "Valgt fil: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Eksporter oversættelser",
+        "selectChannel": "Vælg kanal",
+        "selectLocale": "Vælg sprog",
+        "cancel": "Annuller",
+        "export": "Eksporter"
+      },
+      "errors": {
+        "fetchJobs": "Kunne ikke hente opgaver",
+        "runCron": "Kunne ikke køre planlagt opgave",
+        "createJob": "Kunne ikke oprette opgave",
+        "uploadFile": "Kunne ikke uploade fil"
+      }
     }
   }
 } 

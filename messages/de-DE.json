@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "Übersetzungsaufträge",
+      "pageDescription": "Verwalten Sie Sprachdaten für bestimmte Kanäle durch Export und Import von Katalogübersetzungen in Massen. Unterstützt CSV-Dateien.",
+      "tableTitle": "Auftragsergebnisse",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Typ",
+        "status": "Status",
+        "channel": "Kanal",
+        "locale": "Sprache",
+        "created": "Erstellt",
+        "actions": "Aktionen",
+        "import": "Importieren",
+        "export": "Exportieren"
+      },
       "title": "Übersetzungsaufträge",
       "selectChannel": "Kanal auswählen",
       "selectLocale": "Sprache auswählen",
@@ -137,7 +151,6 @@
       "channel": "Kanal",
       "locale": "Sprache",
       "created": "Erstellt",
-      "actions": "Aktionen",
       "download": "Herunterladen",
       "view": "Datei anzeigen",
       "status_pending": "Ausstehend",
@@ -145,11 +158,43 @@
       "status_completed": "Abgeschlossen",
       "status_failed": "Fehlgeschlagen",
       "refresh": "Aktualisieren",
-      "cancel": "Abbrechen",
-      "next": "Weiter",
-      "uploadFile": "Datei hochladen",
-      "dragAndDrop": "Ziehen Sie Ihre Übersetzungsdatei hierher oder klicken Sie, um eine Datei auszuwählen",
-      "fileRequirements": "Nur .csv-Dateien werden unterstützt"
+      "emptyState": {
+        "title": "Keine Übersetzungsaufträge gefunden",
+        "description": "Erstellen Sie einen neuen Übersetzungsauftrag, indem Sie oben auf die Schaltfläche Importieren oder Exportieren klicken"
+      },
+      "navigation": {
+        "back": "Zurück"
+      },
+      "actions": {
+        "button": "Aktion"
+      },
+      "importModal": {
+        "title": "Übersetzungen importieren",
+        "selectChannel": "Kanal auswählen",
+        "selectLocale": "Sprache auswählen",
+        "cancel": "Abbrechen",
+        "next": "Weiter",
+        "upload": {
+          "title": "Übersetzungsdatei hochladen",
+          "selectFile": "Datei auswählen",
+          "uploadButton": "Hochladen",
+          "dragAndDrop": "Wählen Sie eine CSV-Datei mit Ihren Übersetzungen aus.",
+          "selectedFile": "Ausgewählte Datei: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Übersetzungen exportieren",
+        "selectChannel": "Kanal auswählen",
+        "selectLocale": "Sprache auswählen",
+        "cancel": "Abbrechen",
+        "export": "Exportieren"
+      },
+      "errors": {
+        "fetchJobs": "Fehler beim Abrufen der Aufträge",
+        "runCron": "Fehler beim Ausführen des geplanten Auftrags",
+        "createJob": "Fehler beim Erstellen des Auftrags",
+        "uploadFile": "Fehler beim Hochladen der Datei"
+      }
     }
   }
 } 

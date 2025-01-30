@@ -127,7 +127,21 @@
   },
   "translations": {
     "jobs": {
-      "title": "Vertaalopdrachten",
+      "pageTitle": "Vertaaltaken",
+      "pageDescription": "Beheer taalgegevens voor specifieke kanalen door catalogusvertalingen in bulk te exporteren en importeren. Ondersteunt CSV-bestanden.",
+      "tableTitle": "Taakresultaten",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Type",
+        "status": "Status",
+        "channel": "Kanaal",
+        "locale": "Taal",
+        "created": "Aangemaakt",
+        "actions": "Acties",
+        "import": "Importeren",
+        "export": "Exporteren"
+      },
+      "title": "Vertaaltaken",
       "selectChannel": "Selecteer kanaal",
       "selectLocale": "Selecteer taal",
       "import": "Vertalingen importeren",
@@ -137,7 +151,6 @@
       "channel": "Kanaal",
       "locale": "Taal",
       "created": "Aangemaakt",
-      "actions": "Acties",
       "download": "Downloaden",
       "view": "Bestand bekijken",
       "status_pending": "In afwachting",
@@ -145,11 +158,43 @@
       "status_completed": "Voltooid",
       "status_failed": "Mislukt",
       "refresh": "Vernieuwen",
-      "cancel": "Annuleren",
-      "next": "Volgende",
-      "uploadFile": "Bestand uploaden",
-      "dragAndDrop": "Sleep je vertaalbestand hierheen of klik om een bestand te selecteren",
-      "fileRequirements": "Alleen .csv-bestanden worden ondersteund"
+      "emptyState": {
+        "title": "Geen vertaaltaken gevonden",
+        "description": "Maak een nieuwe vertaaltaak aan door op de knop Importeren of Exporteren hierboven te klikken"
+      },
+      "navigation": {
+        "back": "Terug"
+      },
+      "actions": {
+        "button": "Actie"
+      },
+      "importModal": {
+        "title": "Vertalingen importeren",
+        "selectChannel": "Selecteer kanaal",
+        "selectLocale": "Selecteer taal",
+        "cancel": "Annuleren",
+        "next": "Volgende",
+        "upload": {
+          "title": "Vertaalbestand uploaden",
+          "selectFile": "Selecteer bestand",
+          "uploadButton": "Uploaden",
+          "dragAndDrop": "Selecteer een CSV-bestand met uw vertalingen.",
+          "selectedFile": "Geselecteerd bestand: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Vertalingen exporteren",
+        "selectChannel": "Selecteer kanaal",
+        "selectLocale": "Selecteer taal",
+        "cancel": "Annuleren",
+        "export": "Exporteren"
+      },
+      "errors": {
+        "fetchJobs": "Kon taken niet ophalen",
+        "runCron": "Kon geplande taak niet uitvoeren",
+        "createJob": "Kon taak niet aanmaken",
+        "uploadFile": "Kon bestand niet uploaden"
+      }
     }
   }
 } 

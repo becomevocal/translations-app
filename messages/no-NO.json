@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "Oversettelsesoppgaver",
+      "pageDescription": "Administrer språkdata for spesifikke kanaler ved å eksportere og importere katalogoversettelser i bulk. Støtter CSV-filer.",
+      "tableTitle": "Oppgaveresultater",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Type",
+        "status": "Status",
+        "channel": "Kanal",
+        "locale": "Språk",
+        "created": "Opprettet",
+        "actions": "Handlinger",
+        "import": "Importer",
+        "export": "Eksporter"
+      },
       "title": "Oversettelsesoppgaver",
       "selectChannel": "Velg kanal",
       "selectLocale": "Velg språk",
@@ -137,7 +151,6 @@
       "channel": "Kanal",
       "locale": "Språk",
       "created": "Opprettet",
-      "actions": "Handlinger",
       "download": "Last ned",
       "view": "Vis fil",
       "status_pending": "Venter",
@@ -145,11 +158,43 @@
       "status_completed": "Fullført",
       "status_failed": "Mislyktes",
       "refresh": "Oppdater",
-      "cancel": "Avbryt",
-      "next": "Neste",
-      "uploadFile": "Last opp fil",
-      "dragAndDrop": "Dra og slipp oversettelsesfilen din her, eller klikk for å velge en fil",
-      "fileRequirements": "Kun .csv-filer støttes"
+      "emptyState": {
+        "title": "Ingen oversettelsesoppgaver funnet",
+        "description": "Opprett en ny oversettelsesoppgave ved å klikke på Importer- eller Eksporter-knappen ovenfor"
+      },
+      "navigation": {
+        "back": "Tilbake"
+      },
+      "actions": {
+        "button": "Handling"
+      },
+      "importModal": {
+        "title": "Importer oversettelser",
+        "selectChannel": "Velg kanal",
+        "selectLocale": "Velg språk",
+        "cancel": "Avbryt",
+        "next": "Neste",
+        "upload": {
+          "title": "Last opp oversettelsesfil",
+          "selectFile": "Velg fil",
+          "uploadButton": "Last opp",
+          "dragAndDrop": "Velg en CSV-fil som inneholder oversettelsene dine.",
+          "selectedFile": "Valgt fil: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Eksporter oversettelser",
+        "selectChannel": "Velg kanal",
+        "selectLocale": "Velg språk",
+        "cancel": "Avbryt",
+        "export": "Eksporter"
+      },
+      "errors": {
+        "fetchJobs": "Kunne ikke hente oppgaver",
+        "runCron": "Kunne ikke kjøre planlagt oppgave",
+        "createJob": "Kunne ikke opprette oppgave",
+        "uploadFile": "Kunne ikke laste opp fil"
+      }
     }
   }
 } 

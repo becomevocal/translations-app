@@ -127,6 +127,20 @@
   },
   "translations": {
     "jobs": {
+      "pageTitle": "Trabalhos de Tradução",
+      "pageDescription": "Gerencie dados de idioma para canais específicos exportando e importando traduções do catálogo em massa. Suporta arquivos CSV.",
+      "tableTitle": "Resultados dos Trabalhos",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Tipo",
+        "status": "Status",
+        "channel": "Canal",
+        "locale": "Idioma",
+        "created": "Criado",
+        "actions": "Ações",
+        "import": "Importar",
+        "export": "Exportar"
+      },
       "title": "Trabalhos de tradução",
       "selectChannel": "Selecionar canal",
       "selectLocale": "Selecionar idioma",
@@ -137,7 +151,6 @@
       "channel": "Canal",
       "locale": "Idioma",
       "created": "Criado",
-      "actions": "Ações",
       "download": "Baixar",
       "view": "Ver arquivo",
       "status_pending": "Pendente",
@@ -145,11 +158,43 @@
       "status_completed": "Concluído",
       "status_failed": "Falhou",
       "refresh": "Atualizar",
-      "cancel": "Cancelar",
-      "next": "Próximo",
-      "uploadFile": "Enviar arquivo",
-      "dragAndDrop": "Arraste e solte seu arquivo de tradução aqui ou clique para selecionar um arquivo",
-      "fileRequirements": "Apenas arquivos .csv são suportados"
+      "emptyState": {
+        "title": "Nenhum trabalho de tradução encontrado",
+        "description": "Crie um novo trabalho de tradução clicando no botão Importar ou Exportar acima"
+      },
+      "navigation": {
+        "back": "Voltar"
+      },
+      "actions": {
+        "button": "Ação"
+      },
+      "importModal": {
+        "title": "Importar Traduções",
+        "selectChannel": "Selecionar Canal",
+        "selectLocale": "Selecionar Idioma",
+        "cancel": "Cancelar",
+        "next": "Próximo",
+        "upload": {
+          "title": "Enviar Arquivo de Tradução",
+          "selectFile": "Selecionar Arquivo",
+          "uploadButton": "Enviar",
+          "dragAndDrop": "Selecione um arquivo CSV contendo suas traduções.",
+          "selectedFile": "Arquivo selecionado: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Exportar Traduções",
+        "selectChannel": "Selecionar Canal",
+        "selectLocale": "Selecionar Idioma",
+        "cancel": "Cancelar",
+        "export": "Exportar"
+      },
+      "errors": {
+        "fetchJobs": "Falha ao buscar trabalhos",
+        "runCron": "Falha ao executar trabalho agendado",
+        "createJob": "Falha ao criar trabalho",
+        "uploadFile": "Falha ao enviar arquivo"
+      }
     }
   }
 } 
