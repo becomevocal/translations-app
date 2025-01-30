@@ -132,6 +132,31 @@ function prepareProductData(record: TranslationRecord, locale: string, channelId
     });
   };
 
+  // Helper to transform custom fields data structure
+  const transformCustomFieldsData = (customFields: any[], channelId: string, locale: string) => {
+    if (!Array.isArray(customFields)) return [];
+    
+    const formattedChannelId = formatChannelId(parseInt(channelId, 10));
+    
+    return customFields.map(field => ({
+      customFieldId: field.id,
+      overrides: [
+        {
+          channelLocaleOverrides: {
+            context: {
+              channelId: formattedChannelId,
+              locale: locale,
+            },
+            data: {
+              name: field.name || null,
+              value: field.value || null,
+            },
+          },
+        },
+      ],
+    }));
+  };
+
   return {
     // Basic Information - Don't parse as JSON
     name: getValue(getLocaleField(record, 'name', locale)),
@@ -152,7 +177,11 @@ function prepareProductData(record: TranslationRecord, locale: string, channelId
     // Complex Data - Parse as JSON and transform
     options: transformOptionsData(getValue(getLocaleField(record, 'options', locale), true)),
     modifiers: transformModifiersData(getValue(getLocaleField(record, 'modifiers', locale), true)),
-    customFields: getValue(getLocaleField(record, 'customFields', locale), true) || []
+    customFields: transformCustomFieldsData(
+      getValue(getLocaleField(record, 'customFields', locale), true),
+      channelId.toString(),
+      locale
+    )
   };
 }
 
