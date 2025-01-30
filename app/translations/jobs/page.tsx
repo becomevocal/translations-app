@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import styled from "styled-components";
+import Papa from "papaparse";
 import {
   Box,
   Button,
@@ -19,12 +20,12 @@ import {
   FormGroup,
   OffsetPaginationProps,
   Dropdown,
+  TableFigure,
 } from "@bigcommerce/big-design";
 import {
   ArrowDropDownIcon,
   ArrowUpwardIcon,
   FileDownloadIcon,
-  RedoIcon,
   MoreHorizIcon,
 } from "@bigcommerce/big-design-icons";
 import { Header, Page } from "@bigcommerce/big-design-patterns";
@@ -46,20 +47,27 @@ type TranslationJob = {
   updatedAt: string;
 };
 
+type CSVPreview = {
+  headers: string[];
+  firstRow: string[];
+};
+
+type CSVPreviewRow = {
+  [key: string]: string;
+};
+
 const StyledPanelContents = styled.div`
   display: block;
   box-sizing: border-box;
   margin-inline: -${defaultTheme.spacing.medium};
   max-width: calc(
-    100% + ${defaultTheme.spacing.medium}px +
-      ${defaultTheme.spacing.medium}px
+    100% + ${defaultTheme.spacing.medium}px + ${defaultTheme.spacing.medium}px
   );
   overflow-x: auto;
   @media (min-width: ${defaultTheme.breakpointValues.tablet}) {
     margin-inline: -${defaultTheme.spacing.xLarge};
     max-width: calc(
-      100% + ${defaultTheme.spacing.xLarge}px +
-        ${defaultTheme.spacing.xLarge}px
+      100% + ${defaultTheme.spacing.xLarge}px + ${defaultTheme.spacing.xLarge}px
     );
   }
 `;
@@ -77,9 +85,11 @@ function TranslationsJobsContent() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [csvPreview, setCsvPreview] = useState<CSVPreview | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
 
@@ -144,11 +154,36 @@ function TranslationsJobsContent() {
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
+    if (!file) {
+      setSelectedFile(null);
+      setCsvPreview(null);
+      return;
     }
+
+    setSelectedFile(file);
+
+    Papa.parse(file, {
+      header: false,
+      preview: 2, // Only parse first two rows
+      complete: (results) => {
+        if (results.data.length >= 2) {
+          const [headers, firstRow] = results.data as string[][];
+          setCsvPreview({
+            headers: headers.map((header) => header.trim()),
+            firstRow: firstRow.map((cell) => cell.trim()),
+          });
+          setShowPreviewModal(true);
+        } else {
+          setCsvPreview(null);
+        }
+      },
+      error: (error) => {
+        console.error("Error parsing CSV:", error);
+        setCsvPreview(null);
+      },
+    });
   };
 
   const handleUpload = async () => {
@@ -176,7 +211,9 @@ function TranslationsJobsContent() {
       }
 
       setShowUploadModal(false);
+      setShowPreviewModal(false);
       setSelectedFile(null);
+      setCsvPreview(null);
       fetchJobs();
       handleRunCron();
     } catch (error) {
@@ -241,18 +278,28 @@ function TranslationsJobsContent() {
       header: t("columnHeaders.type"),
       hash: "type",
       render: (item: TranslationJob) =>
-        item.jobType === "import" ? t("columnHeaders.import") : t("columnHeaders.export"),
+        item.jobType === "import"
+          ? t("columnHeaders.import")
+          : t("columnHeaders.export"),
     },
     {
       header: t("columnHeaders.status"),
       hash: "status",
       render: (item: TranslationJob) => (
         <Flex alignItems="center" marginBottom="none">
-          {item.status === "processing" && <ProgressCircle size="small" />}
+          {item.status === "processing" && (
+            <Box marginRight="xSmall">
+              <ProgressCircle size="xSmall" />
+            </Box>
+          )}
           <Text>{t(`status_${item.status}`)}</Text>
           {item.error && (
             <Tooltip
-              trigger={<Box display="inline-block"><Text color="danger">(!)</Text></Box>}
+              trigger={
+                <Box display="inline-block">
+                  <Text color="danger">(!)</Text>
+                </Box>
+              }
               placement="right-end"
             >
               {item.error}
@@ -295,9 +342,7 @@ function TranslationsJobsContent() {
           ]}
           maxHeight={250}
           placement="bottom-end"
-          toggle={
-            <Button variant="utility" iconOnly={<MoreHorizIcon />} />
-          }
+          toggle={<Button variant="utility" iconOnly={<MoreHorizIcon />} />}
         />
       ),
     },
@@ -337,20 +382,11 @@ function TranslationsJobsContent() {
                   onItemClick: () => setShowExportModal(true),
                   icon: <FileDownloadIcon />,
                 },
-                // Refresh button for debugging cron locally
-                ...(process.env.NODE_ENV === 'development' ? [{
-                  content: t("refresh"),
-                  icon: <RedoIcon />,
-                  onItemClick: () => {
-                    handleRunCron();
-                  },
-                }] : []),
               ],
               toggle: {
                 text: t("actions.button"),
                 variant: "primary",
                 iconRight: <ArrowDropDownIcon />,
-                isLoading: isRunningCron,
               },
             },
           ]}
@@ -366,9 +402,7 @@ function TranslationsJobsContent() {
     >
       <Flex flexDirection="column" flexGap={defaultTheme.spacing.xLarge}>
         <FlexItem>
-          <Panel
-            header={t("tableTitle")}
-          >
+          <Panel header={t("tableTitle")}>
             <StyledPanelContents>
               <Table
                 columns={columns}
@@ -378,7 +412,12 @@ function TranslationsJobsContent() {
                 pagination={paginationProps}
                 emptyComponent={
                   isLoading ? (
-                    <Flex alignItems="center" justifyContent="center" paddingVertical="xxLarge" paddingHorizontal="medium">
+                    <Flex
+                      alignItems="center"
+                      justifyContent="center"
+                      paddingVertical="xxLarge"
+                      paddingHorizontal="medium"
+                    >
                       <ProgressCircle size="medium" />
                     </Flex>
                   ) : (
@@ -419,7 +458,7 @@ function TranslationsJobsContent() {
               setShowImportModal(false);
               setSelectedChannel(null);
               setSelectedLocale("");
-            }
+            },
           },
           {
             text: t("importModal.next"),
@@ -430,8 +469,8 @@ function TranslationsJobsContent() {
                 setShowUploadModal(true);
               }
             },
-            disabled: !selectedChannel || !selectedLocale
-          }
+            disabled: !selectedChannel || !selectedLocale,
+          },
         ]}
       >
         <Box padding="medium">
@@ -484,15 +523,15 @@ function TranslationsJobsContent() {
               setShowExportModal(false);
               setSelectedChannel(null);
               setSelectedLocale("");
-            }
+            },
           },
           {
             text: t("exportModal.export"),
             variant: "primary",
             onClick: () => handleCreateJob("export"),
             disabled: !selectedChannel || !selectedLocale || isCreatingJob,
-            isLoading: isCreatingJob
-          }
+            isLoading: isCreatingJob,
+          },
         ]}
       >
         <Box padding="medium">
@@ -528,10 +567,12 @@ function TranslationsJobsContent() {
 
       {/* Upload Modal */}
       <Modal
-        isOpen={showUploadModal}
+        isOpen={showUploadModal && !showPreviewModal}
         onClose={() => {
           setShowUploadModal(false);
+          setShowImportModal(true);
           setSelectedFile(null);
+          setCsvPreview(null);
           if (fileInputRef.current) {
             fileInputRef.current.value = "";
           }
@@ -541,11 +582,13 @@ function TranslationsJobsContent() {
         header={t("importModal.upload.title")}
         actions={[
           {
-            text: t("importModal.cancel"),
+            text: t("navigation.back"),
             variant: "subtle",
             onClick: () => {
               setShowUploadModal(false);
+              setShowImportModal(true);
               setSelectedFile(null);
+              setCsvPreview(null);
               if (fileInputRef.current) {
                 fileInputRef.current.value = "";
               }
@@ -553,12 +596,9 @@ function TranslationsJobsContent() {
             disabled: isCreatingJob,
           },
           {
-            text: selectedFile ? t("importModal.upload.uploadButton") : t("importModal.upload.selectFile"),
+            text: t("importModal.upload.selectFile"),
             variant: "primary",
-            onClick: selectedFile
-              ? handleUpload
-              : () => fileInputRef.current?.click(),
-            isLoading: isCreatingJob,
+            onClick: () => fileInputRef.current?.click(),
           },
         ]}
       >
@@ -573,12 +613,67 @@ function TranslationsJobsContent() {
             onChange={handleFileSelect}
             style={{ marginTop: defaultTheme.spacing.small }}
           />
-          {selectedFile && (
-            <Text marginTop="small">
-              {t("importModal.upload.selectedFile", { filename: selectedFile.name })}
-            </Text>
-          )}
         </FormGroup>
+      </Modal>
+
+      {/* Preview Modal */}
+      <Modal
+        isOpen={showPreviewModal}
+        onClose={() => {
+          setShowPreviewModal(false);
+          setShowUploadModal(true);
+          setCsvPreview(null);
+        }}
+        closeOnClickOutside={false}
+        closeOnEscKey={false}
+        header="Preview CSV Contents"
+        actions={[
+          {
+            text: t("navigation.back"),
+            variant: "subtle",
+            onClick: () => {
+              setShowPreviewModal(false);
+              setShowUploadModal(true);
+              setCsvPreview(null);
+            },
+            disabled: isCreatingJob,
+          },
+          {
+            text: t("importModal.upload.uploadButton"),
+            variant: "primary",
+            onClick: handleUpload,
+            isLoading: isCreatingJob,
+          },
+        ]}
+      >
+        {csvPreview && (
+          <Box padding="medium">
+            <Box border="box" borderRadius="normal">
+              <TableFigure>
+                <Table<CSVPreviewRow>
+                  columns={csvPreview.headers.map((header) => ({
+                    header: header,
+                    hash: header,
+                    render: (item: CSVPreviewRow) => (
+                      <Text>{item[header]}</Text>
+                    ),
+                    verticalAlign: "top",
+                  }))}
+                  items={[
+                    csvPreview.firstRow.reduce(
+                      (obj, value, index) => ({
+                        ...obj,
+                        [csvPreview.headers[index]]: value,
+                      }),
+                      {} as CSVPreviewRow
+                    ),
+                  ]}
+                  stickyHeader
+                />
+              </TableFigure>
+            </Box>
+          </Box>
+        )}
       </Modal>
     </Page>
   );
