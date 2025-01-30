@@ -91,4 +91,159 @@ export interface ProductLocaleUpdateOptions {
       customFields?: string[];
     };
   }
+}
+
+export interface ProductBasicInformationInput {
+  data: {
+    name?: string;
+    description?: string;
+  };
+}
+
+export interface ProductSeoInformationInput {
+  data: {
+    pageTitle?: string;
+    metaDescription?: string;
+  };
+}
+
+export interface ProductStorefrontDetailsInput {
+  data: {
+    warranty?: string;
+    availabilityDescription?: string;
+    searchKeywords?: string;
+  };
+}
+
+export interface ProductPreOrderSettingsInput {
+  data: {
+    message?: string;
+  };
+}
+
+export interface ProductCustomFieldOverride {
+  customFieldId: string;
+  overrides: {
+    channelLocaleOverrides: {
+      context: {
+        channelId: string;
+        locale: string;
+      };
+      data: {
+        name: any;
+        value: any;
+        isVisible: boolean;
+      };
+    };
+  }[];
+}
+
+export interface ProductCustomFieldsInput {
+  productId: string;
+  data: ProductCustomFieldOverride[];
+}
+
+export interface ProductOptionValueOverride {
+  id: string;
+  label: string;
+}
+
+export interface ProductOptionOverride {
+  optionId: string;
+  data: {
+    dropdown?: any;
+    displayName?: string;
+    values?: ProductOptionValueOverride[];
+  };
+}
+
+export interface ProductOptionsInput {
+  productId: string;
+  localeContext: {
+    channelId: string;
+    locale: string;
+  };
+  data: {
+    options: (ProductOptionOverride | null)[];
+  };
+}
+
+export interface ProductModifierValueOverride {
+  id: string;
+  label: string;
+}
+
+export interface ProductModifierOverride {
+  modifierId: string;
+  data: any;
+}
+
+export interface ProductModifiersInput {
+  productId: string;
+  localeContext: {
+    channelId: string;
+    locale: string;
+  };
+  data: {
+    modifiers: (ProductModifierOverride | null)[];
+  };
+}
+
+export interface RemoveBasicInfoInput {
+  overridesToRemove: string[];
+}
+
+export interface RemoveOptionsInput {
+  productId: string;
+  localeContext: {
+    channelId: string;
+    locale: string;
+  };
+  data: {
+    options: any[];
+  };
+}
+
+export interface RemoveModifiersInput {
+  productId: string;
+  localeContext: {
+    channelId: string;
+    locale: string;
+  };
+  data: {
+    modifiers: any[];
+  };
+}
+
+export interface RemoveCustomFieldsOverridesInput {
+  productId: string;
+  data: {
+    customFieldId: string;
+    channelLocaleContextData: {
+      context: {
+        channelId: string;
+        locale: string;
+      };
+      attributes: string[];
+    };
+  }[];
+}
+
+export interface UpdateProductLocaleDataVariables {
+  channelId: string;
+  locale: string;
+  input?: ProductBasicInformationInput;
+  seoInput?: ProductSeoInformationInput;
+  storefrontInput?: ProductStorefrontDetailsInput;
+  preOrderInput?: ProductPreOrderSettingsInput;
+  customFieldsInput?: ProductCustomFieldsInput;
+  optionsInput?: ProductOptionsInput;
+  modifiersInput?: ProductModifiersInput;
+  removedBasicInfoInput?: RemoveBasicInfoInput;
+  removedSeoInput?: RemoveBasicInfoInput;
+  removedStorefrontDetailsInput?: RemoveBasicInfoInput;
+  removedPreOrderInput?: RemoveBasicInfoInput;
+  removedCustomFieldsInput?: RemoveCustomFieldsOverridesInput;
+  removedOptionsInput?: RemoveOptionsInput;
+  removedModifiersInput?: RemoveModifiersInput;
 } 

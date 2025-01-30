@@ -23,6 +23,7 @@ import {
   ProductLocaleQueryOptions,
   ProductLocaleUpdateOptions,
 } from "./types";
+import { UpdateProductLocaleDataVariables } from "./types/product";
 import {
   GetAppExtensionsDocument,
   CreateAppExtensionDocument,
@@ -109,7 +110,7 @@ export class GraphQLClient {
     if (!this.complexityConfig) return;
 
     const complexity = parseInt(
-      response.headers.get('x-bc-graphql-complexity') || "0",
+      response.headers.get("x-bc-graphql-complexity") || "0",
       10
     );
 
@@ -147,10 +148,15 @@ export class GraphQLClient {
 
     if (this.failOnLimitReached) {
       const error = new Error(
-        `Rate limit reached. Retry after ${Math.ceil(retryAfterMs / 1000)} seconds`
+        `Rate limit reached. Retry after ${Math.ceil(
+          retryAfterMs / 1000
+        )} seconds`
       ) as RateLimitError;
       error.retryAfter = Math.ceil(retryAfterMs / 1000);
-      this.logger("[%s] Failing request without retrying since failOnLimitReached is true.", requestId);
+      this.logger(
+        "[%s] Failing request without retrying since failOnLimitReached is true.",
+        requestId
+      );
       throw error;
     }
 
@@ -159,7 +165,10 @@ export class GraphQLClient {
         `Rate limit reached. Max retries (${this.maxRetries}) exceeded.`
       ) as RateLimitError;
       error.retryAfter = Math.ceil(retryAfterMs / 1000);
-      this.logger(`[%s] Failing request without retrying since max retries (${this.maxRetries}) exceeded.`, requestId);
+      this.logger(
+        `[%s] Failing request without retrying since max retries (${this.maxRetries}) exceeded.`,
+        requestId
+      );
       throw error;
     }
 
@@ -407,103 +416,209 @@ export class GraphQLClient {
     return typedResponse.data.store.product;
   }
 
-  async NOTADA_updateProductLocaleData(variables: any) {
-    const hasRemovedBasicInfo = variables.removedBasicInfoInput &&
+  async NOTADA_updateProductLocaleData(
+    variables: UpdateProductLocaleDataVariables
+  ) {
+    // Check for inputs: Basic Info
+    const hasBasicInfo =
+      variables.input?.data &&
+      (variables.input.data.name || variables.input.data.description);
+
+    const hasRemovedBasicInfo =
+      variables.removedBasicInfoInput &&
       variables.removedBasicInfoInput.overridesToRemove &&
       variables.removedBasicInfoInput.overridesToRemove.length > 0;
 
-    const hasRemovedSeo = variables.removedSeoInput &&
+    // Check for inputs: SEO
+    const hasSeo =
+      variables.seoInput?.data &&
+      (variables.seoInput.data.pageTitle ||
+        variables.seoInput.data.metaDescription);
+
+    const hasRemovedSeo =
+      variables.removedSeoInput &&
       variables.removedSeoInput.overridesToRemove &&
       variables.removedSeoInput.overridesToRemove.length > 0;
 
-    const hasRemovedStorefrontDetails = variables.removedStorefrontDetailsInput &&
+    // Check for inputs: Storefront Details
+    const hasStorefrontDetails =
+      variables.storefrontInput?.data &&
+      (variables.storefrontInput.data.warranty ||
+        variables.storefrontInput.data.availabilityDescription ||
+        variables.storefrontInput.data.searchKeywords);
+
+    const hasRemovedStorefrontDetails =
+      variables.removedStorefrontDetailsInput &&
       variables.removedStorefrontDetailsInput.overridesToRemove &&
       variables.removedStorefrontDetailsInput.overridesToRemove.length > 0;
 
-    const hasRemovedPreOrder = variables.removedPreOrderInput &&
+    // Check for inputs: Pre Order
+    const hasPreOrder =
+      variables.preOrderInput?.data && variables.preOrderInput.data.message;
+
+    const hasRemovedPreOrder =
+      variables.removedPreOrderInput &&
       variables.removedPreOrderInput.overridesToRemove &&
       variables.removedPreOrderInput.overridesToRemove.length > 0;
-    
-    const hasCustomFields = variables.customFieldsInput && 
-      variables.customFieldsInput.data && 
+
+    // Check for inputs: Custom Fields
+    const hasRemovedCustomFields =
+      variables.removedCustomFieldsInput &&
+      variables.removedCustomFieldsInput.data &&
+      variables.removedCustomFieldsInput.data.length > 0;
+
+    const hasCustomFields =
+      variables.customFieldsInput &&
+      variables.customFieldsInput.data &&
       variables.customFieldsInput.data.length > 0;
 
-    const hasOptions = variables.optionsInput && 
-      variables.optionsInput.data && 
-      variables.optionsInput.data.options && 
+    // Check for inputs: Options
+    const hasOptions =
+      variables.optionsInput &&
+      variables.optionsInput.data &&
+      variables.optionsInput.data.options &&
       variables.optionsInput.data.options.length > 0;
 
-    const hasRemovedOptions = variables.removedOptionsInput &&
+    const hasRemovedOptions =
+      variables.removedOptionsInput &&
       variables.removedOptionsInput.data &&
       variables.removedOptionsInput.data.options &&
       variables.removedOptionsInput.data.options.length > 0;
 
-    const hasModifiers = variables.modifiersInput && 
-      variables.modifiersInput.data && 
-      variables.modifiersInput.data.modifiers && 
+    // Check for inputs: Modifiers
+    const hasModifiers =
+      variables.modifiersInput &&
+      variables.modifiersInput.data &&
+      variables.modifiersInput.data.modifiers &&
       variables.modifiersInput.data.modifiers.length > 0;
 
-    const hasRemovedModifiers = variables.removedModifiersInput &&
+    const hasRemovedModifiers =
+      variables.removedModifiersInput &&
       variables.removedModifiersInput.data &&
       variables.removedModifiersInput.data.modifiers &&
       variables.removedModifiersInput.data.modifiers.length > 0;
 
-    const hasRemovedCustomFields = variables.removedCustomFieldsInput &&
-      variables.removedCustomFieldsInput.data &&
-      variables.removedCustomFieldsInput.data.length > 0;
-
     const removalMutations = {
       query: `
         mutation (
-          ${hasRemovedBasicInfo ? '$removedBasicInfoInput: RemoveProductBasicInformationOverridesInput!,' : ''}
-          ${hasRemovedSeo ? '$removedSeoInput: RemoveProductSeoInformationOverridesInput!,' : ''}
-          ${hasRemovedStorefrontDetails ? '$removedStorefrontDetailsInput: RemoveProductStorefrontDetailsOverridesInput!,' : ''}
-          ${hasRemovedPreOrder ? '$removedPreOrderInput: RemoveProductPreOrderSettingsOverridesInput!,' : ''}
-          ${hasRemovedOptions ? '$removedOptionsInput: RemoveProductOptionsOverridesInput!,' : ''}
-          ${hasRemovedModifiers ? '$removedModifiersInput: RemoveProductModifiersOverridesInput!,' : ''}
-          ${hasRemovedCustomFields ? '$removedCustomFieldsInput: RemoveProductCustomFieldsOverridesInput!' : ''}
+          ${
+            hasRemovedBasicInfo
+              ? "$removedBasicInfoInput: RemoveProductBasicInformationOverridesInput!,"
+              : ""
+          }
+          ${
+            hasRemovedSeo
+              ? "$removedSeoInput: RemoveProductSeoInformationOverridesInput!,"
+              : ""
+          }
+          ${
+            hasRemovedStorefrontDetails
+              ? "$removedStorefrontDetailsInput: RemoveProductStorefrontDetailsOverridesInput!,"
+              : ""
+          }
+          ${
+            hasRemovedPreOrder
+              ? "$removedPreOrderInput: RemoveProductPreOrderSettingsOverridesInput!,"
+              : ""
+          }
+          ${
+            hasRemovedOptions
+              ? "$removedOptionsInput: RemoveProductOptionsOverridesInput!,"
+              : ""
+          }
+          ${
+            hasRemovedModifiers
+              ? "$removedModifiersInput: RemoveProductModifiersOverridesInput!,"
+              : ""
+          }
+          ${
+            hasRemovedCustomFields
+              ? "$removedCustomFieldsInput: RemoveProductCustomFieldsOverridesInput!"
+              : ""
+          }
         ) {
           product {
-            ${hasRemovedBasicInfo ? `
+            ${
+              hasRemovedBasicInfo
+                ? `
             removeProductBasicInformationOverrides(input: $removedBasicInfoInput) {
               product { id }
-            }` : ''}
-            ${hasRemovedSeo ? `
+            }`
+                : ""
+            }
+            ${
+              hasRemovedSeo
+                ? `
             removeProductSeoInformationOverrides(input: $removedSeoInput) {
               product { id }
-            }` : ''}
-            ${hasRemovedStorefrontDetails ? `
+            }`
+                : ""
+            }
+            ${
+              hasRemovedStorefrontDetails
+                ? `
             removeProductStorefrontDetailsOverrides(input: $removedStorefrontDetailsInput) {
               product { id }
-            }` : ''}
-            ${hasRemovedPreOrder ? `
+            }`
+                : ""
+            }
+            ${
+              hasRemovedPreOrder
+                ? `
             removeProductPreOrderSettingsOverrides(input: $removedPreOrderInput) {
               product { id }
-            }` : ''}
-            ${hasRemovedOptions ? `
+            }`
+                : ""
+            }
+            ${
+              hasRemovedOptions
+                ? `
             removeProductOptionsOverrides(input: $removedOptionsInput) {
               product { id }
-            }` : ''}
-            ${hasRemovedModifiers ? `
+            }`
+                : ""
+            }
+            ${
+              hasRemovedModifiers
+                ? `
             removeProductModifiersOverrides(input: $removedModifiersInput) {
               product { id }
-            }` : ''}
-            ${hasRemovedCustomFields ? `
+            }`
+                : ""
+            }
+            ${
+              hasRemovedCustomFields
+                ? `
             removeProductCustomFieldsOverrides(input: $removedCustomFieldsInput) {
               product { id }
-            }` : ''}
+            }`
+                : ""
+            }
           }
         }
       `,
       variables: {
-        ...(hasRemovedBasicInfo && { removedBasicInfoInput: variables.removedBasicInfoInput }),
+        ...(hasRemovedBasicInfo && {
+          removedBasicInfoInput: variables.removedBasicInfoInput,
+        }),
         ...(hasRemovedSeo && { removedSeoInput: variables.removedSeoInput }),
-        ...(hasRemovedStorefrontDetails && { removedStorefrontDetailsInput: variables.removedStorefrontDetailsInput }),
-        ...(hasRemovedPreOrder && { removedPreOrderInput: variables.removedPreOrderInput }),
-        ...(hasRemovedOptions && { removedOptionsInput: variables.removedOptionsInput }),
-        ...(hasRemovedModifiers && { removedModifiersInput: variables.removedModifiersInput }),
-        ...(hasRemovedCustomFields && { removedCustomFieldsInput: variables.removedCustomFieldsInput })
-      }
+        ...(hasRemovedStorefrontDetails && {
+          removedStorefrontDetailsInput:
+            variables.removedStorefrontDetailsInput,
+        }),
+        ...(hasRemovedPreOrder && {
+          removedPreOrderInput: variables.removedPreOrderInput,
+        }),
+        ...(hasRemovedOptions && {
+          removedOptionsInput: variables.removedOptionsInput,
+        }),
+        ...(hasRemovedModifiers && {
+          removedModifiersInput: variables.removedModifiersInput,
+        }),
+        ...(hasRemovedCustomFields && {
+          removedCustomFieldsInput: variables.removedCustomFieldsInput,
+        }),
+      },
     };
 
     const updateMutations = {
@@ -511,15 +626,38 @@ export class GraphQLClient {
         mutation (
           $channelId: ID!,
           $locale: String!,
-          $input: SetProductBasicInformationInput!,
-          $seoInput: SetProductSeoInformationInput!,
-          $preOrderInput: SetProductPreOrderSettingsInput!,
-          $storefrontInput: SetProductStorefrontDetailsInput!
-          ${hasOptions ? '$optionsInput: SetProductOptionsInformationInput!,' : ''}
-          ${hasModifiers ? '$modifiersInput: SetProductModifiersInformationInput!,' : ''}
-          ${hasCustomFields ? '$customFieldsInput: UpdateProductCustomFieldsInput!' : ''}
+          ${hasBasicInfo ? "$input: SetProductBasicInformationInput!," : ""}
+          ${hasSeo ? "$seoInput: SetProductSeoInformationInput!," : ""}
+          ${
+            hasPreOrder
+              ? "$preOrderInput: SetProductPreOrderSettingsInput!,"
+              : ""
+          }
+          ${
+            hasStorefrontDetails
+              ? "$storefrontInput: SetProductStorefrontDetailsInput!,"
+              : ""
+          }
+          ${
+            hasOptions
+              ? "$optionsInput: SetProductOptionsInformationInput!,"
+              : ""
+          }
+          ${
+            hasModifiers
+              ? "$modifiersInput: SetProductModifiersInformationInput!,"
+              : ""
+          }
+          ${
+            hasCustomFields
+              ? "$customFieldsInput: UpdateProductCustomFieldsInput!"
+              : ""
+          }
         ) {
           product {
+            ${
+              hasBasicInfo
+                ? `
             setProductBasicInformation(input: $input) {
               product {
                 id
@@ -530,7 +668,12 @@ export class GraphQLClient {
                   }
                 }
               }
+            }`
+                : ""
             }
+            ${
+              hasSeo
+                ? `
             setProductSeoInformation(input: $seoInput) {
               product {
                 id
@@ -541,7 +684,12 @@ export class GraphQLClient {
                   }
                 }
               }
+            }`
+                : ""
             }
+            ${
+              hasPreOrder
+                ? `
             setProductPreOrderSettings(input: $preOrderInput) {
               product {
                 overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
@@ -550,7 +698,12 @@ export class GraphQLClient {
                   }
                 }
               }
+            }`
+                : ""
             }
+            ${
+              hasStorefrontDetails
+                ? `
             setProductStorefrontDetails(input: $storefrontInput) {
               product {
                 overridesForLocale (localeContext: { channelId: $channelId, locale: $locale }) {
@@ -561,8 +714,12 @@ export class GraphQLClient {
                   }
                 }
               }
+            }`
+                : ""
             }
-            ${hasOptions ? `
+            ${
+              hasOptions
+                ? `
             setProductOptionsInformation (input: $optionsInput) {
               product {
                 id
@@ -587,8 +744,12 @@ export class GraphQLClient {
                 }
               }
             }
-            ` : ''}
-            ${hasModifiers ? `
+            `
+                : ""
+            }
+            ${
+              hasModifiers
+                ? `
             setProductModifiersInformation (input: $modifiersInput) {
               product {
                 id
@@ -736,8 +897,12 @@ export class GraphQLClient {
                 }
               }
             }
-            ` : ''}
-            ${hasCustomFields ? `
+            `
+                : ""
+            }
+            ${
+              hasCustomFields
+                ? `
             updateProductCustomFields(input: $customFieldsInput) {
               product {
                 customFields {
@@ -761,38 +926,44 @@ export class GraphQLClient {
                 }
               }
             }
-            ` : ''}
+            `
+                : ""
+            }
           }
         }
       `,
       variables: {
         channelId: variables.channelId,
         locale: variables.locale,
-        input: variables.input,
-        seoInput: variables.seoInput,
-        preOrderInput: variables.preOrderInput,
-        storefrontInput: variables.storefrontInput,
+        ...(hasBasicInfo && { input: variables.input }),
+        ...(hasSeo && { seoInput: variables.seoInput }),
+        ...(hasPreOrder && { preOrderInput: variables.preOrderInput }),
+        ...(hasStorefrontDetails && {
+          storefrontInput: variables.storefrontInput,
+        }),
         ...(hasOptions && { optionsInput: variables.optionsInput }),
         ...(hasModifiers && { modifiersInput: variables.modifiersInput }),
-        ...(hasCustomFields && { customFieldsInput: variables.customFieldsInput })
-      }
+        ...(hasCustomFields && {
+          customFieldsInput: variables.customFieldsInput,
+        }),
+      },
     };
 
     // Run mutations in parallel if there are removal operations
-    const hasRemovals = Object.keys(removalMutations.variables).length > 0; 
+    const hasRemovals = Object.keys(removalMutations.variables).length > 0;
     const promises = [];
-    
+
     if (hasRemovals) {
       promises.push(this.request(removalMutations));
     }
     promises.push(this.request(updateMutations));
 
     const results = await Promise.all(promises);
-    
+
     // Combine the responses
     return {
       ...results[0],
-      ...results[results.length - 1]
+      ...results[results.length - 1],
     };
   }
 
@@ -808,83 +979,89 @@ export class GraphQLClient {
       productId,
       localeContext: {
         channelId,
-        locale
+        locale,
       },
       data: {
         name: options.productData?.name,
         description: options.productData?.description,
-      }
-    }
-    const hasBasicInput = Boolean(options.productData?.name || options.productData?.description);
+      },
+    };
+    const hasBasicInput = Boolean(
+      options.productData?.name || options.productData?.description
+    );
 
     const seoInput = {
       productId,
       localeContext: {
         channelId,
-        locale
+        locale,
       },
       data: {
         pageTitle: options.productData?.pageTitle,
         metaDescription: options.productData?.metaDescription,
-      }
-    }
-    const hasSeoInput = Boolean(options.productData?.pageTitle || options.productData?.metaDescription);
+      },
+    };
+    const hasSeoInput = Boolean(
+      options.productData?.pageTitle || options.productData?.metaDescription
+    );
 
     const preOrderInput = {
       productId,
       localeContext: {
         channelId,
-        locale
+        locale,
       },
       data: {
         message: options.productData?.preOrderMessage,
-      }
-    }
+      },
+    };
     const hasPreOrderInput = Boolean(options.productData?.preOrderMessage);
 
     const storefrontInput = {
       productId,
       localeContext: {
         channelId,
-        locale
+        locale,
       },
       data: {
         warranty: options.productData?.warranty,
         availabilityDescription: options.productData?.availabilityDescription,
         searchKeywords: options.productData?.searchKeywords,
-      }
-    }
+      },
+    };
     const hasStorefrontInput = Boolean(
-      options.productData?.warranty || 
-      options.productData?.availabilityDescription || 
-      options.productData?.searchKeywords
+      options.productData?.warranty ||
+        options.productData?.availabilityDescription ||
+        options.productData?.searchKeywords
     );
 
     const optionsInput = {
       productId,
       localeContext: {
         channelId,
-        locale
+        locale,
       },
-      data: { options: options.productData?.options || [] }
-    }
+      data: { options: options.productData?.options || [] },
+    };
     const hasOptionsInput = Boolean(options.productData?.options?.length);
 
     const modifiersInput = {
       productId,
       localeContext: {
         channelId,
-        locale
+        locale,
       },
-      data: { modifiers: options.productData?.modifiers || [] }
-    }
+      data: { modifiers: options.productData?.modifiers || [] },
+    };
     const hasModifiersInput = Boolean(options.productData?.modifiers?.length);
 
     const customFieldsInput = {
       productId,
-      data: options.productData?.customFields || []
-    }
-    const hasCustomFieldsInput = Boolean(options.productData?.customFields?.length);
+      data: options.productData?.customFields || [],
+    };
+    const hasCustomFieldsInput = Boolean(
+      options.productData?.customFields?.length
+    );
 
     const variables = {
       productId: formatProductId(options.productId),
