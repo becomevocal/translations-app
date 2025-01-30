@@ -3,12 +3,12 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import styled from "styled-components";
 import {
   Box,
   Button,
   Flex,
   FlexItem,
-  Message,
   Modal,
   Panel,
   Select,
@@ -17,16 +17,18 @@ import {
   Tooltip,
   ProgressCircle,
   FormGroup,
+  OffsetPaginationProps,
+  Dropdown,
 } from "@bigcommerce/big-design";
 import {
   ArrowDropDownIcon,
   ArrowUpwardIcon,
-  CloudUploadIcon,
   FileDownloadIcon,
   RedoIcon,
+  MoreHorizIcon,
 } from "@bigcommerce/big-design-icons";
 import { Header, Page } from "@bigcommerce/big-design-patterns";
-import { theme } from "@bigcommerce/big-design-theme";
+import { theme as defaultTheme } from "@bigcommerce/big-design-theme";
 import { useChannels } from "@/hooks/useChannels";
 import ErrorMessage from "@/components/error-message";
 import { LoadingScreen } from "@/components/loading-indicator";
@@ -44,6 +46,24 @@ type TranslationJob = {
   updatedAt: string;
 };
 
+const StyledPanelContents = styled.div`
+  display: block;
+  box-sizing: border-box;
+  margin-inline: -${defaultTheme.spacing.medium};
+  max-width: calc(
+    100% + ${defaultTheme.spacing.medium}px +
+      ${defaultTheme.spacing.medium}px
+  );
+  overflow-x: auto;
+  @media (min-width: ${defaultTheme.breakpointValues.tablet}) {
+    margin-inline: -${defaultTheme.spacing.xLarge};
+    max-width: calc(
+      100% + ${defaultTheme.spacing.xLarge}px +
+        ${defaultTheme.spacing.xLarge}px
+    );
+  }
+`;
+
 function TranslationsJobsContent() {
   const t = useTranslations("translations.jobs");
   const searchParams = useSearchParams();
@@ -57,10 +77,11 @@ function TranslationsJobsContent() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploadUrl, setUploadUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const {
     channels,
@@ -74,17 +95,18 @@ function TranslationsJobsContent() {
     : [];
 
   const fetchJobs = useCallback(async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`/api/translations/jobs?context=${context}`);
-      if (!response.ok) throw new Error("Failed to fetch jobs");
+      if (!response.ok) throw new Error(t("errors.fetchJobs"));
       const data = await response.json();
       setJobs(data);
     } catch (error) {
-      console.error("Error fetching jobs:", error);
+      console.error(t("errors.fetchJobs"), error);
     } finally {
       setIsLoading(false);
     }
-  }, [context]);
+  }, [context, t]);
 
   const handleCreateJob = async (jobType: "import" | "export") => {
     if (!selectedChannel || !selectedLocale) return;
@@ -109,14 +131,14 @@ function TranslationsJobsContent() {
         }
       );
 
-      if (!response.ok) throw new Error("Failed to create job");
+      if (!response.ok) throw new Error(t("errors.createJob"));
       fetchJobs();
       if (jobType === "export") {
         setShowExportModal(false);
       }
       handleRunCron();
     } catch (error) {
-      console.error("Error creating job:", error);
+      console.error(t("errors.createJob"), error);
     } finally {
       setIsCreatingJob(false);
     }
@@ -150,7 +172,7 @@ function TranslationsJobsContent() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to upload file");
+        throw new Error(t("errors.uploadFile"));
       }
 
       setShowUploadModal(false);
@@ -158,7 +180,7 @@ function TranslationsJobsContent() {
       fetchJobs();
       handleRunCron();
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error(t("errors.uploadFile"), error);
     } finally {
       setIsCreatingJob(false);
       if (fileInputRef.current) {
@@ -176,10 +198,10 @@ function TranslationsJobsContent() {
           method: "GET",
         }
       );
-      if (!response.ok) throw new Error("Failed to run cron job");
+      if (!response.ok) throw new Error(t("errors.runCron"));
       await fetchJobs();
     } catch (error) {
-      console.error("Error running cron:", error);
+      console.error(t("errors.runCron"), error);
     } finally {
       setIsRunningCron(false);
     }
@@ -211,18 +233,18 @@ function TranslationsJobsContent() {
 
   const columns = [
     {
-      header: "ID",
+      header: t("columnHeaders.id"),
       hash: "id",
       render: (item: TranslationJob) => item.id,
     },
     {
-      header: t("type"),
+      header: t("columnHeaders.type"),
       hash: "type",
       render: (item: TranslationJob) =>
-        item.jobType === "import" ? t("import") : t("export"),
+        item.jobType === "import" ? t("columnHeaders.import") : t("columnHeaders.export"),
     },
     {
-      header: t("status"),
+      header: t("columnHeaders.status"),
       hash: "status",
       render: (item: TranslationJob) => (
         <Flex alignItems="center" marginBottom="none">
@@ -230,8 +252,8 @@ function TranslationsJobsContent() {
           <Text>{t(`status_${item.status}`)}</Text>
           {item.error && (
             <Tooltip
-              trigger={<Text color="danger">(!)</Text>}
-              placement="right"
+              trigger={<Box display="inline-block"><Text color="danger">(!)</Text></Box>}
+              placement="right-end"
             >
               {item.error}
             </Tooltip>
@@ -240,41 +262,63 @@ function TranslationsJobsContent() {
       ),
     },
     {
-      header: t("channel"),
+      header: t("columnHeaders.channel"),
       hash: "channel",
       render: (item: TranslationJob) =>
         channels?.find((c) => c.channel_id === item.channelId)?.channel_name ||
         item.channelId,
     },
     {
-      header: t("locale"),
+      header: t("columnHeaders.locale"),
       hash: "locale",
       render: (item: TranslationJob) => {
-        const channel = channels?.find((c) => c.channel_id === item.channelId);
-        const localeInfo = channel?.locales.find((l) => l.code === item.locale);
-        return localeInfo?.title || item.locale;
+        return item.locale;
       },
     },
     {
-      header: t("created"),
+      header: t("columnHeaders.created"),
       hash: "created",
       render: (item: TranslationJob) =>
         new Date(item.createdAt).toLocaleString(),
     },
     {
-      header: t("actions"),
+      header: t("columnHeaders.actions"),
       hash: "actions",
       render: (item: TranslationJob) => (
-        <Button
-          variant="secondary"
-          disabled={item.status !== "completed" || !item.fileUrl}
-          onClick={() => window.open(item.fileUrl, "_blank")}
-        >
-          {item.jobType === "export" ? t("download") : t("view")}
-        </Button>
+        <Dropdown
+          items={[
+            {
+              content: item.jobType === "export" ? t("download") : t("view"),
+              onItemClick: () => window.open(item.fileUrl, "_blank"),
+              disabled: item.status !== "completed" || !item.fileUrl,
+            },
+          ]}
+          maxHeight={250}
+          placement="bottom-end"
+          toggle={
+            <Button variant="utility" iconOnly={<MoreHorizIcon />} />
+          }
+        />
       ),
     },
   ];
+
+  const paginationProps: OffsetPaginationProps = {
+    currentPage,
+    totalItems: jobs.length,
+    itemsPerPage,
+    onPageChange: setCurrentPage,
+    itemsPerPageOptions: [10, 20, 50, 100],
+    onItemsPerPageChange: (newItemsPerPage) => {
+      setCurrentPage(1);
+      setItemsPerPage(newItemsPerPage);
+    },
+  };
+
+  const paginatedJobs = jobs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <Page
@@ -284,12 +328,12 @@ function TranslationsJobsContent() {
             {
               items: [
                 {
-                  content: t("import"),
+                  content: t("importModal.title"),
                   onItemClick: () => setShowImportModal(true),
                   icon: <ArrowUpwardIcon />,
                 },
                 {
-                  content: t("export"),
+                  content: t("exportModal.title"),
                   onItemClick: () => setShowExportModal(true),
                   icon: <FileDownloadIcon />,
                 },
@@ -303,41 +347,55 @@ function TranslationsJobsContent() {
                 }] : []),
               ],
               toggle: {
-                text: "Action",
+                text: t("actions.button"),
                 variant: "primary",
                 iconRight: <ArrowDropDownIcon />,
                 isLoading: isRunningCron,
               },
             },
           ]}
-          title={t("title")}
+          title={t("pageTitle")}
+          description={t("pageDescription")}
           backLink={{
-            text: "Back",
+            text: t("navigation.back"),
             onClick: handleBackClick,
             href: "#",
           }}
         />
       }
     >
-      <Box paddingBottom="medium">
-        <Message
-          type="warning"
-          messages={[
-            {
-              text: "The import/export feature is currently in active development. Not all fields import successfully. Please only use this functionality with sandbox stores.",
-            },
-          ]}
-        />
-      </Box>
-      <Flex flexDirection="column" flexGap={theme.spacing.xLarge}>
+      <Flex flexDirection="column" flexGap={defaultTheme.spacing.xLarge}>
         <FlexItem>
-          <Panel>
-            <Table
-              columns={columns}
-              items={jobs}
-              stickyHeader
-              itemName={t("title")}
-            />
+          <Panel
+            header={t("tableTitle")}
+          >
+            <StyledPanelContents>
+              <Table
+                columns={columns}
+                items={paginatedJobs}
+                stickyHeader
+                itemName={t("pageTitle")}
+                pagination={paginationProps}
+                emptyComponent={
+                  isLoading ? (
+                    <Flex alignItems="center" justifyContent="center" paddingVertical="xxLarge" paddingHorizontal="medium">
+                      <ProgressCircle size="medium" />
+                    </Flex>
+                  ) : (
+                    <Flex
+                      alignItems="center"
+                      justifyContent="center"
+                      flexDirection="column"
+                      paddingVertical="xxLarge"
+                      paddingHorizontal="medium"
+                    >
+                      <Text marginBottom="small">{t("emptyState.title")}</Text>
+                      <Text>{t("emptyState.description")}</Text>
+                    </Flex>
+                  )
+                }
+              />
+            </StyledPanelContents>
           </Panel>
         </FlexItem>
       </Flex>
@@ -352,10 +410,10 @@ function TranslationsJobsContent() {
         }}
         closeOnClickOutside={false}
         closeOnEscKey={false}
-        header={t("import")}
+        header={t("importModal.title")}
         actions={[
           {
-            text: t("cancel"),
+            text: t("importModal.cancel"),
             variant: "subtle",
             onClick: () => {
               setShowImportModal(false);
@@ -364,7 +422,7 @@ function TranslationsJobsContent() {
             }
           },
           {
-            text: t("next"),
+            text: t("importModal.next"),
             variant: "primary",
             onClick: () => {
               if (selectedChannel && selectedLocale) {
@@ -381,7 +439,7 @@ function TranslationsJobsContent() {
             <Flex>
               <FlexItem flexGrow={1} marginRight="medium">
                 <Select
-                  label={t("selectChannel")}
+                  label={t("importModal.selectChannel")}
                   options={channelOptions}
                   onOptionChange={(value) => {
                     setSelectedChannel(value ? Number(value) : null);
@@ -394,7 +452,7 @@ function TranslationsJobsContent() {
 
               <FlexItem flexGrow={1}>
                 <Select
-                  label={t("selectLocale")}
+                  label={t("importModal.selectLocale")}
                   options={localeOptions}
                   onOptionChange={(value) => setSelectedLocale(value || "")}
                   value={selectedLocale}
@@ -417,10 +475,10 @@ function TranslationsJobsContent() {
         }}
         closeOnClickOutside={false}
         closeOnEscKey={false}
-        header={t("export")}
+        header={t("exportModal.title")}
         actions={[
           {
-            text: t("cancel"),
+            text: t("exportModal.cancel"),
             variant: "subtle",
             onClick: () => {
               setShowExportModal(false);
@@ -429,7 +487,7 @@ function TranslationsJobsContent() {
             }
           },
           {
-            text: t("export"),
+            text: t("exportModal.export"),
             variant: "primary",
             onClick: () => handleCreateJob("export"),
             disabled: !selectedChannel || !selectedLocale || isCreatingJob,
@@ -442,7 +500,7 @@ function TranslationsJobsContent() {
             <Flex>
               <FlexItem flexGrow={1} marginRight="medium">
                 <Select
-                  label={t("selectChannel")}
+                  label={t("exportModal.selectChannel")}
                   options={channelOptions}
                   onOptionChange={(value) => {
                     setSelectedChannel(value ? Number(value) : null);
@@ -455,7 +513,7 @@ function TranslationsJobsContent() {
 
               <FlexItem flexGrow={1}>
                 <Select
-                  label={t("selectLocale")}
+                  label={t("exportModal.selectLocale")}
                   options={localeOptions}
                   onOptionChange={(value) => setSelectedLocale(value || "")}
                   value={selectedLocale}
@@ -480,10 +538,10 @@ function TranslationsJobsContent() {
         }}
         closeOnClickOutside={false}
         closeOnEscKey={false}
-        header="Upload Translation File"
+        header={t("importModal.upload.title")}
         actions={[
           {
-            text: t("cancel"),
+            text: t("importModal.cancel"),
             variant: "subtle",
             onClick: () => {
               setShowUploadModal(false);
@@ -495,7 +553,7 @@ function TranslationsJobsContent() {
             disabled: isCreatingJob,
           },
           {
-            text: selectedFile ? "Upload" : "Select File",
+            text: selectedFile ? t("importModal.upload.uploadButton") : t("importModal.upload.selectFile"),
             variant: "primary",
             onClick: selectedFile
               ? handleUpload
@@ -505,7 +563,7 @@ function TranslationsJobsContent() {
         ]}
       >
         <FormGroup>
-          <Text>Select a CSV file containing your translations.</Text>
+          <Text>{t("importModal.upload.dragAndDrop")}</Text>
         </FormGroup>
         <FormGroup>
           <input
@@ -513,10 +571,12 @@ function TranslationsJobsContent() {
             type="file"
             accept=".csv"
             onChange={handleFileSelect}
-            style={{ marginTop: theme.spacing.small }}
+            style={{ marginTop: defaultTheme.spacing.small }}
           />
           {selectedFile && (
-            <Text marginTop="small">Selected file: {selectedFile.name}</Text>
+            <Text marginTop="small">
+              {t("importModal.upload.selectedFile", { filename: selectedFile.name })}
+            </Text>
           )}
         </FormGroup>
       </Modal>

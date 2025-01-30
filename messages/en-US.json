@@ -127,29 +127,64 @@
   },
   "translations": {
     "jobs": {
-      "title": "Translation Jobs",
-      "selectChannel": "Select Channel",
-      "selectLocale": "Select Locale",
-      "import": "Import Translations",
-      "export": "Export Translations",
-      "type": "Type",
-      "status": "Status",
-      "channel": "Channel",
-      "locale": "Locale",
-      "created": "Created",
-      "actions": "Actions",
-      "download": "Download",
-      "view": "View File",
+      "pageTitle": "Translation Jobs",
+      "pageDescription": "Manage locale data for specific channels by exporting and importing catalog translations in bulk. Supports CSV files.",
+      "tableTitle": "Job Results",
+      "columnHeaders": {
+        "id": "ID",
+        "type": "Type",
+        "status": "Status",
+        "channel": "Channel",
+        "locale": "Locale",
+        "created": "Created",
+        "actions": "Actions",
+        "import": "Import",
+        "export": "Export"
+      },
       "status_pending": "Pending",
       "status_processing": "Processing",
       "status_completed": "Completed",
       "status_failed": "Failed",
-      "refresh": "Refresh",
-      "cancel": "Cancel",
-      "next": "Next",
-      "uploadFile": "Upload File",
-      "dragAndDrop": "Drag and drop your translation file here, or click to select a file",
-      "fileRequirements": "Only .csv files are supported"
+      "refresh": "Refresh Job",
+      "download": "Download",
+      "view": "View File",
+      "emptyState": {
+        "title": "No translation jobs found",
+        "description": "Create a new translation job by clicking the Import or Export button above"
+      },
+      "navigation": {
+        "back": "Back"
+      },
+      "actions": {
+        "button": "Action"
+      },
+      "importModal": {
+        "title": "Import Translations",
+        "selectChannel": "Select Channel",
+        "selectLocale": "Select Locale",
+        "cancel": "Cancel",
+        "next": "Next",
+        "upload": {
+          "title": "Upload Translation File",
+          "selectFile": "Select File",
+          "uploadButton": "Upload",
+          "dragAndDrop": "Select a CSV file containing your translations.",
+          "selectedFile": "Selected file: {filename}"
+        }
+      },
+      "exportModal": {
+        "title": "Export Translations",
+        "selectChannel": "Select Channel",
+        "selectLocale": "Select Locale",
+        "cancel": "Cancel",
+        "export": "Export"
+      },
+      "errors": {
+        "fetchJobs": "Failed to fetch jobs",
+        "runCron": "Failed to run cron job",
+        "createJob": "Failed to create job",
+        "uploadFile": "Failed to upload file"
+      }
     }
   }
 } 
