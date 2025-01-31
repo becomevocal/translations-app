@@ -46,8 +46,8 @@ For merchant documentation on how to use this app, please see the [User Guide](h
 - [x] Create help docs
 - [x] Remove ability to export default locale for translation
 - [ ] Update resource links on home screen
-- [ ] Add BC CP SDK to preview session timeouts
-- [ ] Ability to view import errors (beyond high level # of errors)
+- [ ] Add BC CP SDK to preview session timeout
+- [ ] Ability to view import errors and get help parsing CSV (beyond high level # of errors)
 - [ ] Move server side locale transforms in api route into graphql client
 
 ## Getting Started
