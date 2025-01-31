@@ -117,7 +117,7 @@
       "required": "Required",
       "optional": "Optional",
       "actions": {
-        "save": "Save Changes",
+        "save": "Save",
         "saving": "Saving...",
         "cancel": "Cancel",
         "edit": "Edit",
