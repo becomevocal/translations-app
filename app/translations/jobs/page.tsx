@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import styled from "styled-components";
-import Papa from "papaparse";
+import Papa, { ParseError } from "papaparse";
 import {
   Box,
   Button,
@@ -166,25 +166,37 @@ function TranslationsJobsContent() {
 
     setSelectedFile(file);
 
-    Papa.parse(file, {
+    Papa.parse<string[]>(file, {
       header: false,
-      preview: 2, // Only parse first two rows
+      preview: 2,
+      skipEmptyLines: 'greedy',
+      delimiter: ',',
+      quoteChar: '"',
+      escapeChar: '"',
+      transformHeader: (header) => header.trim(),
+      transform: (value) => value.trim(),
       complete: (results) => {
-        if (results.data.length >= 2) {
-          const [headers, firstRow] = results.data as string[][];
-          setCsvPreview({
-            headers: headers.map((header) => header.trim()),
-            firstRow: firstRow.map((cell) => cell.trim()),
-          });
-          setShowPreviewModal(true);
+        if (results.data.length >= 2 && !results.errors.length) {
+          const [headers, firstRow] = results.data;
+          if (headers && firstRow) {
+            setCsvPreview({
+              headers: headers.map((header) => header.trim()),
+              firstRow: firstRow.map((cell) => cell.trim()),
+            });
+            setShowPreviewModal(true);
+          } else {
+            console.error('Invalid CSV structure: Missing headers or first row');
+            setCsvPreview(null);
+          }
         } else {
+          console.error('CSV parsing failed or insufficient data');
           setCsvPreview(null);
         }
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error("Error parsing CSV:", error);
         setCsvPreview(null);
-      },
+      }
     });
   };
 

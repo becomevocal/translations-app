@@ -191,25 +191,37 @@ async function parseCSV(text: string): Promise<TranslationRecord[]> {
   return new Promise((resolve, reject) => {
     Papa.parse<TranslationRecord>(text, {
       header: true,
-      skipEmptyLines: true,
+      skipEmptyLines: 'greedy',
+      delimiter: ',',
+      quoteChar: '"',
+      escapeChar: '"',
+      transformHeader: (header) => header.trim(),
       transform: (value: string, field: string) => {
         // Transform productId to number
         if (field === 'productId') {
-          const parsed = parseInt(value, 10);
+          const parsed = parseInt(value.trim(), 10);
           if (isNaN(parsed)) {
             throw new Error(`Invalid product ID in CSV: ${value}`);
           }
           return parsed;
         }
-        return value;
+        return value.trim();
       },
       complete: (results: ParseResult<TranslationRecord>) => {
         if (results.errors.length > 0) {
           console.error('CSV parsing errors:', results.errors);
-          reject(new Error('Failed to parse CSV: ' + results.errors[0].message));
+          reject(new Error('Failed to parse CSV: ' + results.errors.map(e => e.message).join(', ')));
+          return;
+        }
+        if (!results.data.length) {
+          reject(new Error('CSV file is empty'));
           return;
         }
         resolve(results.data);
+      },
+      error: (error: Error) => {
+        console.error('CSV parsing error:', error);
+        reject(new Error(`Failed to parse CSV: ${error.message}`));
       }
     });
   });
@@ -239,37 +251,46 @@ function stringifyCSV(records: TranslationRecord[], defaultLocale: string, targe
     // Pre-order Settings
     `preOrderMessage_${defaultLocale}`,
     `preOrderMessage_${targetLocale}`,
-    // Options - Dynamic headers will be added for each option
+    // Options
     `options_${defaultLocale}`,
     `options_${targetLocale}`,
-    // Modifiers - Dynamic headers will be added for each modifier
+    // Modifiers
     `modifiers_${defaultLocale}`,
     `modifiers_${targetLocale}`,
-    // Custom Fields - Dynamic headers will be added for each custom field
+    // Custom Fields
     `customFields_${defaultLocale}`,
     `customFields_${targetLocale}`
   ];
 
   const config: UnparseConfig = {
-    quotes: true, // Always quote strings to handle special characters
+    quotes: true,
     quoteChar: '"',
     escapeChar: '"',
     delimiter: ',',
     header: true,
-    newline: '\n'
+    newline: '\n',
+    skipEmptyLines: true
   };
 
-  // Use PapaParse to stringify the CSV
-  return Papa.unparse({
-    fields: headers,
-    data: records.map(record => {
+  try {
+    const csvData = records.map(record => {
       const row: Record<string, any> = {};
       headers.forEach(header => {
-        row[header] = record[header];
+        // Handle null/undefined values
+        const value = record[header];
+        row[header] = value === null || value === undefined ? '' : value;
       });
       return row;
-    })
-  }, config);
+    });
+
+    return Papa.unparse({
+      fields: headers,
+      data: csvData
+    }, config);
+  } catch (error) {
+    console.error('Error generating CSV:', error);
+    throw new Error('Failed to generate CSV file');
+  }
 }
 
 // Configuration from environment variables with defaults
