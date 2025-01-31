@@ -13,6 +13,8 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
   <td><img width="1624" alt="Screenshot 2024-07-31 at 2 18 38 AM" src="https://github.com/user-attachments/assets/42575204-23d1-4d05-a2ca-6401a5313b61"></td>
 </table>
 
+For merchant documentation on how to use this app, please see the [User Guide](https://start.bigcommerce.com/multi-lang-translations/).
+
 # Todo
 
 - [x] Ability to translate product name and description
@@ -41,10 +43,10 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 - [x] Split up graphql queries to reduce complexity limits
 - [x] Initial import / export functionality (include ensuring uploads are securely named)
 - [x] Fix issue with null product description causing save to fail
-- [ ] Create help docs
+- [x] Create help docs
+- [x] Remove ability to export default locale for translation
 - [ ] Update resource links on home screen
 - [ ] Add BC CP SDK to preview session timeouts
-- [ ] Remove ability to export default locale for translation
 - [ ] Ability to view import errors (beyond high level # of errors)
 - [ ] Move server side locale transforms in api route into graphql client
 
