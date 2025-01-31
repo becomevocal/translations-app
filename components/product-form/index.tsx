@@ -7,6 +7,7 @@ import React, {
   FormEvent,
   MouseEvent,
   useMemo,
+  useRef,
 } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -162,6 +163,11 @@ interface State {
 type Action =
   | { type: "SET_CHANNEL"; payload: number }
   | { type: "SET_LOCALE"; payload: string }
+  | { type: "SET_INITIAL_STATE"; payload: { 
+      channel: number; 
+      locale: string; 
+      isInitialLoad: boolean;
+    } }
   | { type: "SET_PRODUCT_DATA"; payload: ProductData }
   | { type: "SET_FORM"; payload: FormFields }
   | { type: "SET_PRODUCT_INFO_LOADING"; payload: boolean }
@@ -188,6 +194,13 @@ const initialState: State = {
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case "SET_INITIAL_STATE":
+      return {
+        ...state,
+        currentChannel: action.payload.channel,
+        currentLocale: action.payload.locale,
+        isProductInfoLoading: !action.payload.isInitialLoad,
+      };
     case "SET_CHANNEL":
       return { ...state, currentChannel: action.payload };
     case "SET_LOCALE":
@@ -267,11 +280,13 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
     );
   }, [channels, currentChannel, storeInformation.language]);
 
-  const fetchProductData = useCallback(async () => {
+  const hasInitialized = useRef(false);
+
+  const fetchProductData = useCallback(async (channelId: number) => {
     dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: true });
     try {
       const res = await fetch(
-        `/api/product/${productId}?context=${context}&channel_id=${currentChannel}`
+        `/api/product/${productId}?context=${context}&channel_id=${channelId}`
       );
       if (!res.ok) throw new Error(t("products.form.loadingError"));
       const data = await res.json();
@@ -285,13 +300,50 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         messages: [{ text: t("products.form.loadingError") }],
       });
     }
-  }, [productId, context, currentChannel, t]);
+  }, [productId, context, t]);
 
   useEffect(() => {
-    if (productId && currentChannel) {
-      fetchProductData();
+    if (hasInitialized.current || !channels?.length || !productId) {
+      return;
     }
-  }, [fetchProductData, productId, currentChannel]);
+
+    hasInitialized.current = true;
+    
+    const savedChannelId = localStorage.getItem('translations_selected_channel');
+    const savedLocale = localStorage.getItem('translations_selected_locale');
+    
+    const savedChannel = savedChannelId ? 
+      channels.find(c => c.channel_id === Number(savedChannelId)) : 
+      null;
+    
+    let channelToUse: number;
+    let localeToUse: string;
+    
+    if (savedChannel && savedLocale && 
+        savedChannel.locales.some(l => l.code === savedLocale)) {
+      channelToUse = savedChannel.channel_id;
+      localeToUse = savedLocale;
+    } else {
+      const firstChannel = channels[0];
+      channelToUse = firstChannel.channel_id;
+      localeToUse = firstChannel.locales?.[1]?.code || 
+        firstChannel.locales[0].code;
+      
+      localStorage.setItem('translations_selected_channel', channelToUse.toString());
+      localStorage.setItem('translations_selected_locale', localeToUse);
+    }
+
+    dispatch({ 
+      type: "SET_INITIAL_STATE", 
+      payload: { 
+        channel: channelToUse, 
+        locale: localeToUse,
+        isInitialLoad: true
+      } 
+    });
+    
+    fetchProductData(channelToUse);
+  }, [channels, productId, fetchProductData]);
 
   const handleSubmit = useCallback(
     async (
@@ -354,6 +406,8 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
 
   const handleLocaleChange = useCallback(
     async (selectedLocale: string) => {
+      localStorage.setItem('translations_selected_locale', selectedLocale);
+
       if (productData.localeData[selectedLocale] || selectedLocale === defaultLocale) {
         let newFormObject = getFormObjectForLocale(productData, selectedLocale);
         dispatch({ type: "SET_FORM", payload: newFormObject });
@@ -403,16 +457,19 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         (channel) => channel.channel_id === selectedChannelId
       );
       if (selectedChannel) {
+        const newLocale = selectedChannel.locales?.[1]?.code || 
+          selectedChannel.locales[0].code;
+
+        localStorage.setItem('translations_selected_channel', selectedChannelId.toString());
+        localStorage.setItem('translations_selected_locale', newLocale);
+
         dispatch({ type: "SET_CHANNEL", payload: selectedChannelId });
-        dispatch({
-          type: "SET_LOCALE",
-          payload:
-            selectedChannel.locales?.[1]?.code ||
-            selectedChannel.locales[0].code,
-        });
+        dispatch({ type: "SET_LOCALE", payload: newLocale });
+        
+        fetchProductData(selectedChannelId);
       }
     },
-    [channels]
+    [channels, fetchProductData]
   );
 
   const handleChange = useCallback(

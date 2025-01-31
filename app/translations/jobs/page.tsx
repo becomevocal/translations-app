@@ -248,6 +248,62 @@ function TranslationsJobsContent() {
     router.push(context ? `/?context=${context}` : "/");
   };
 
+  const handleChannelChange = (selectedChannelId: string) => {
+    const channelId = Number(selectedChannelId);
+    const selectedChannel = channels?.find(
+      (channel) => channel.channel_id === channelId
+    );
+    
+    if (selectedChannel) {
+      setSelectedChannel(channelId);
+      // Match product form logic: use first non-default locale or fall back to first locale
+      const newLocale = selectedChannel.locales?.[1]?.code || 
+        selectedChannel.locales[0].code;
+      setSelectedLocale(newLocale);
+
+      // Save selections to localStorage
+      localStorage.setItem('translations_selected_channel', channelId.toString());
+      localStorage.setItem('translations_selected_locale', newLocale);
+    }
+  };
+
+  // Update locale selection and save to localStorage
+  const handleLocaleChange = (value: string) => {
+    setSelectedLocale(value || "");
+    localStorage.setItem('translations_selected_locale', value);
+  };
+
+  // Load saved preferences or set defaults when channels load
+  useEffect(() => {
+    if (channels?.length && !selectedChannel) {
+      const savedChannelId = localStorage.getItem('translations_selected_channel');
+      const savedLocale = localStorage.getItem('translations_selected_locale');
+      
+      // Find the saved channel if it exists in current channels
+      const savedChannel = savedChannelId ? 
+        channels.find(c => c.channel_id === Number(savedChannelId)) : 
+        null;
+      
+      if (savedChannel && savedLocale && 
+          savedChannel.locales.some(l => l.code === savedLocale)) {
+        // Use saved preferences if valid
+        setSelectedChannel(savedChannel.channel_id);
+        setSelectedLocale(savedLocale);
+      } else {
+        // Fall back to defaults
+        const firstChannel = channels[0];
+        setSelectedChannel(firstChannel.channel_id);
+        const newLocale = firstChannel.locales?.[1]?.code || 
+          firstChannel.locales[0].code;
+        setSelectedLocale(newLocale);
+        
+        // Save defaults
+        localStorage.setItem('translations_selected_channel', firstChannel.channel_id.toString());
+        localStorage.setItem('translations_selected_locale', newLocale);
+      }
+    }
+  }, [channels, selectedChannel]);
+
   useEffect(() => {
     if (context) {
       fetchJobs();
@@ -480,10 +536,7 @@ function TranslationsJobsContent() {
                 <Select
                   label={t("importModal.selectChannel")}
                   options={channelOptions}
-                  onOptionChange={(value) => {
-                    setSelectedChannel(value ? Number(value) : null);
-                    setSelectedLocale("");
-                  }}
+                  onOptionChange={handleChannelChange}
                   value={selectedChannel?.toString() || ""}
                   required
                 />
@@ -493,7 +546,7 @@ function TranslationsJobsContent() {
                 <Select
                   label={t("importModal.selectLocale")}
                   options={localeOptions}
-                  onOptionChange={(value) => setSelectedLocale(value || "")}
+                  onOptionChange={handleLocaleChange}
                   value={selectedLocale}
                   disabled={!selectedChannel}
                   required
@@ -541,10 +594,7 @@ function TranslationsJobsContent() {
                 <Select
                   label={t("exportModal.selectChannel")}
                   options={channelOptions}
-                  onOptionChange={(value) => {
-                    setSelectedChannel(value ? Number(value) : null);
-                    setSelectedLocale("");
-                  }}
+                  onOptionChange={handleChannelChange}
                   value={selectedChannel?.toString() || ""}
                   required
                 />
@@ -554,7 +604,7 @@ function TranslationsJobsContent() {
                 <Select
                   label={t("exportModal.selectLocale")}
                   options={localeOptions}
-                  onOptionChange={(value) => setSelectedLocale(value || "")}
+                  onOptionChange={handleLocaleChange}
                   value={selectedLocale}
                   disabled={!selectedChannel}
                   required
