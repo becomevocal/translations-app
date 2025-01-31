@@ -99,9 +99,11 @@ function TranslationsJobsContent() {
     error: channelsError,
   } = useChannels(context ?? null);
 
-  // Get available locales for selected channel
+  // Get available locales for selected channel, excluding the default locale
   const availableLocales = selectedChannel
-    ? channels?.find((c) => c.channel_id === selectedChannel)?.locales || []
+    ? channels?.find((c) => c.channel_id === selectedChannel)?.locales.filter(
+        (locale) => !locale.is_default
+      ) || []
     : [];
 
   const fetchJobs = useCallback(async () => {
@@ -256,9 +258,9 @@ function TranslationsJobsContent() {
     
     if (selectedChannel) {
       setSelectedChannel(channelId);
-      // Match product form logic: use first non-default locale or fall back to first locale
-      const newLocale = selectedChannel.locales?.[1]?.code || 
-        selectedChannel.locales[0].code;
+      // Get first non-default locale
+      const nonDefaultLocales = selectedChannel.locales.filter(locale => !locale.is_default);
+      const newLocale = nonDefaultLocales[0]?.code || '';
       setSelectedLocale(newLocale);
 
       // Save selections to localStorage
@@ -285,16 +287,17 @@ function TranslationsJobsContent() {
         null;
       
       if (savedChannel && savedLocale && 
-          savedChannel.locales.some(l => l.code === savedLocale)) {
-        // Use saved preferences if valid
+          savedChannel.locales.some(l => l.code === savedLocale && !l.is_default)) {
+        // Use saved preferences if valid and not default locale
         setSelectedChannel(savedChannel.channel_id);
         setSelectedLocale(savedLocale);
       } else {
         // Fall back to defaults
         const firstChannel = channels[0];
+        const nonDefaultLocales = firstChannel.locales.filter(locale => !locale.is_default);
+        const newLocale = nonDefaultLocales[0]?.code || '';
+        
         setSelectedChannel(firstChannel.channel_id);
-        const newLocale = firstChannel.locales?.[1]?.code || 
-          firstChannel.locales[0].code;
         setSelectedLocale(newLocale);
         
         // Save defaults
