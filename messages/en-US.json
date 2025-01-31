@@ -147,7 +147,7 @@
       "status_failed": "Failed",
       "refresh": "Refresh Job",
       "download": "Download",
-      "view": "View File",
+      "view": "View file",
       "emptyState": {
         "title": "No translation jobs found",
         "description": "Create a new translation job by clicking the Import or Export button above"
@@ -166,7 +166,7 @@
         "next": "Next",
         "upload": {
           "title": "Upload Translation File",
-          "selectFile": "Select File",
+          "selectFile": "Select file",
           "uploadButton": "Upload",
           "dragAndDrop": "Select a CSV file containing your translations.",
           "selectedFile": "Selected file: {filename}"

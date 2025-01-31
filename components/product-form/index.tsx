@@ -282,12 +282,17 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
 
   const hasInitialized = useRef(false);
 
-  const fetchProductData = useCallback(async (channelId: number) => {
+  const fetchProductData = useCallback(async (channelId: number, locale?: string) => {
     dispatch({ type: "SET_PRODUCT_INFO_LOADING", payload: true });
     try {
-      const res = await fetch(
-        `/api/product/${productId}?context=${context}&channel_id=${channelId}`
-      );
+      const url = new URL(`/api/product/${productId}`, window.location.origin);
+      url.searchParams.append('context', context);
+      url.searchParams.append('channel_id', channelId.toString());
+      if (locale) {
+        url.searchParams.append('locale', locale);
+      }
+      
+      const res = await fetch(url.toString());
       if (!res.ok) throw new Error(t("products.form.loadingError"));
       const data = await res.json();
       dispatch({ type: "SET_PRODUCT_DATA", payload: data });
@@ -342,7 +347,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
       } 
     });
     
-    fetchProductData(channelToUse);
+    fetchProductData(channelToUse, localeToUse);
   }, [channels, productId, fetchProductData]);
 
   const handleSubmit = useCallback(
@@ -466,7 +471,7 @@ function ProductForm({ channels, productId, context }: ProductFormProps) {
         dispatch({ type: "SET_CHANNEL", payload: selectedChannelId });
         dispatch({ type: "SET_LOCALE", payload: newLocale });
         
-        fetchProductData(selectedChannelId);
+        fetchProductData(selectedChannelId, newLocale);
       }
     },
     [channels, fetchProductData]
