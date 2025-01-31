@@ -82,7 +82,8 @@ export async function GET(request: NextRequest) {
         })
       );
 
-      return result;
+      // Filter channels to only include those with more than one locale
+      return result.filter((channel) => channel.locales.length > 1);
     };
 
     // Cache per storeHash
