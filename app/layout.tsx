@@ -3,6 +3,7 @@
 import { Analytics } from '@vercel/analytics/next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import Script from 'next/script';
 
 import Alerts from "@/components/alerts-manager";
 import {
@@ -28,6 +29,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        <Script src="https://cdn.bigcommerce.com/jssdk/bc-sdk.js" strategy="afterInteractive" />
+      </head>
       <BigDesignTheme>
         <GlobalStyles />
         <body>

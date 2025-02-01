@@ -47,7 +47,7 @@ For merchant documentation on how to use this app, please see the [User Guide](h
 - [x] Remove ability to export default locale for translation
 - [x] Update import steps to use FileUploader and InlineMessage components
 - [x] Link out to supported import columns and best practices for importing CSV files
-- [ ] Add BC CP SDK to prevent session timeout
+- [x] Add BC CP SDK to prevent session timeout
 - [ ] Update resource links on home screen
 - [ ] Skip mutations if they are all empty fields (e.g. re-import blank _fr export)
 - [ ] Ability to view import errors (beyond high level # of errors)

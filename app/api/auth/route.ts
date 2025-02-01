@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
     channelId: null,
     storeHash,
     userLocale: userBrowserLocale,
-  });
+  }, "6h");
 
   await setSession(clientToken);
 

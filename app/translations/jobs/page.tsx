@@ -35,7 +35,6 @@ import { useChannels } from "@/hooks/useChannels";
 import ErrorMessage from "@/components/error-message";
 import { LoadingScreen } from "@/components/loading-indicator";
 import { Suspense } from "react";
-import { addAlert } from "@/components/alerts-manager";
 
 type TranslationJob = {
   id: number;

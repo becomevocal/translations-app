@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     channelId: Number(payload?.channel_id) || null,
     storeHash,
     userLocale: user.locale,
-  });
+  }, "6h");
 
   // create new searchParams preserving the existing ones but removing the signed_payload_jwt
   const newSearchParams = new URLSearchParams(rUrl.searchParams.toString());
