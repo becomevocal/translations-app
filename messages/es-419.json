@@ -21,20 +21,18 @@
     },
     "resources": {
       "title": "Recursos",
-      "translationGuide": {
-        "title": "Guía de Traducción",
-        "description": "Aprenda las mejores prácticas para traducir el contenido de su catálogo",
+      "userGuide": {
+        "title": "Guía de usuario",
+        "description": "Aprende cómo usar esta aplicación para traducir tu catálogo a múltiples idiomas",
         "links": {
-          "bestPractices": "Mejores Prácticas de Traducción",
-          "managing": "Gestión de Contenido Multilingüe"
+          "view": "Ver guía de usuario"
         }
       },
-      "support": {
-        "title": "Soporte de Traducción",
-        "description": "Obtenga ayuda con la gestión de traducciones y configuración de localización",
+      "catalystDocs": {
+        "title": "Documentación de i18n de Catalyst",
+        "description": "Aprende cómo internacionalizar tu tienda para adaptarla a tu experiencia multilingüe deseada",
         "links": {
-          "faq": "Preguntas Frecuentes de Traducción",
-          "settings": "Configuración de Localización"
+          "view": "Ver documentación"
         }
       }
     },

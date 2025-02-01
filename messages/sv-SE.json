@@ -21,6 +21,20 @@
     },
     "resources": {
       "title": "Resurser",
+      "userGuide": {
+        "title": "Användarguide",
+        "description": "Lär dig hur du använder den här appen för att översätta din katalog till flera språk",
+        "links": {
+          "view": "Visa användarguide"
+        }
+      },
+      "catalystDocs": {
+        "title": "Catalyst i18n dokumentation",
+        "description": "Lär dig hur du internationaliserar din butik för att passa din önskade flerspråkiga upplevelse",
+        "links": {
+          "view": "Visa dokumentation"
+        }
+      },
       "translationGuide": {
         "title": "Översättningsguide",
         "description": "Lär dig bästa praxis för att översätta ditt kataloginnehåll",

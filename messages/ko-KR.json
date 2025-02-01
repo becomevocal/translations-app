@@ -21,20 +21,18 @@
     },
     "resources": {
       "title": "리소스",
-      "translationGuide": {
-        "title": "번역 가이드",
-        "description": "카탈로그 콘텐츠 번역을 위한 모범 사례를 알아보세요",
+      "userGuide": {
+        "title": "사용자 가이드",
+        "description": "이 앱을 사용하여 카탈로그를 여러 언어로 번역하는 방법 알아보기",
         "links": {
-          "bestPractices": "번역 모범 사례",
-          "managing": "다국어 콘텐츠 관리"
+          "view": "사용자 가이드 보기"
         }
       },
-      "support": {
-        "title": "번역 지원",
-        "description": "번역 및 현지화 설정 관리에 대한 도움을 받으세요",
+      "catalystDocs": {
+        "title": "Catalyst i18n 문서",
+        "description": "원하는 다국어 경험에 맞게 스토어프론트를 국제화하는 방법 알아보기",
         "links": {
-          "faq": "번역 FAQ",
-          "settings": "현지화 설정"
+          "view": "문서 보기"
         }
       }
     },

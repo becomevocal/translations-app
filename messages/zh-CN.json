@@ -21,6 +21,20 @@
     },
     "resources": {
       "title": "资源",
+      "userGuide": {
+        "title": "用户指南",
+        "description": "了解如何使用此应用将您的目录翻译成多种语言",
+        "links": {
+          "view": "查看用户指南"
+        }
+      },
+      "catalystDocs": {
+        "title": "Catalyst i18n 文档",
+        "description": "了解如何国际化您的店铺以适应您期望的多语言体验",
+        "links": {
+          "view": "查看文档"
+        }
+      },
       "translationGuide": {
         "title": "翻译指南",
         "description": "了解翻译您的商品目录内容的最佳实践",

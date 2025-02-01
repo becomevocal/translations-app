@@ -21,20 +21,18 @@
     },
     "resources": {
       "title": "Bronnen",
-      "translationGuide": {
-        "title": "Vertaalhandleiding",
-        "description": "Leer de beste praktijken voor het vertalen van uw catalogusinhoud",
+      "userGuide": {
+        "title": "Gebruikershandleiding",
+        "description": "Leer hoe u deze app kunt gebruiken om uw catalogus in meerdere talen te vertalen",
         "links": {
-          "bestPractices": "Beste vertaalpraktijken",
-          "managing": "Meertalige inhoud beheren"
+          "view": "Bekijk gebruikershandleiding"
         }
       },
-      "support": {
-        "title": "Vertaalondersteuning",
-        "description": "Krijg hulp bij het beheren van vertalingen en lokalisatie-instellingen",
+      "catalystDocs": {
+        "title": "Catalyst i18n documentatie",
+        "description": "Leer hoe u uw winkel kunt internationaliseren om aan te sluiten bij uw gewenste meertalige ervaring",
         "links": {
-          "faq": "Vertaal FAQ",
-          "settings": "Lokalisatie-instellingen"
+          "view": "Bekijk documentatie"
         }
       }
     },

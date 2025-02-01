@@ -21,20 +21,18 @@
     },
     "resources": {
       "title": "リソース",
-      "translationGuide": {
-        "title": "翻訳ガイド",
-        "description": "カタログコンテンツの翻訳のベストプラクティスを学ぶ",
+      "userGuide": {
+        "title": "ユーザーガイド",
+        "description": "このアプリを使用してカタログを複数の言語に翻訳する方法を学ぶ",
         "links": {
-          "bestPractices": "翻訳のベストプラクティス",
-          "managing": "多言語コンテンツの管理"
+          "view": "ユーザーガイドを表示"
         }
       },
-      "support": {
-        "title": "翻訳サポート",
-        "description": "翻訳とローカライゼーション設定の管理に関するヘルプを取得",
+      "catalystDocs": {
+        "title": "Catalyst i18n ドキュメント",
+        "description": "希望する多言語体験に合わせてストアフロントを国際化する方法を学ぶ",
         "links": {
-          "faq": "翻訳FAQ",
-          "settings": "ローカライゼーション設定"
+          "view": "ドキュメントを表示"
         }
       }
     },

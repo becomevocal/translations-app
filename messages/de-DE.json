@@ -21,20 +21,18 @@
     },
     "resources": {
       "title": "Ressourcen",
-      "translationGuide": {
-        "title": "Übersetzungsleitfaden",
-        "description": "Lernen Sie die besten Praktiken für die Übersetzung Ihres Katalog-Inhalts",
+      "userGuide": {
+        "title": "Benutzerhandbuch",
+        "description": "Lernen Sie, wie Sie diese App verwenden können, um Ihren Katalog in mehrere Sprachen zu übersetzen",
         "links": {
-          "bestPractices": "Beste Übersetzungspraktiken",
-          "managing": "Mehrsprachige Inhalte verwalten"
+          "view": "Benutzerhandbuch anzeigen"
         }
       },
-      "support": {
-        "title": "Übersetzungsunterstützung",
-        "description": "Erhalten Sie Hilfe bei der Verwaltung von Übersetzungen und Lokalisierungseinstellungen",
+      "catalystDocs": {
+        "title": "Catalyst i18n Dokumentation",
+        "description": "Erfahren Sie, wie Sie Ihre Storefront internationalisieren können, um Ihr gewünschtes mehrsprachiges Erlebnis zu erreichen",
         "links": {
-          "faq": "Übersetzungs-FAQ",
-          "settings": "Lokalisierungseinstellungen"
+          "view": "Dokumentation anzeigen"
         }
       }
     },

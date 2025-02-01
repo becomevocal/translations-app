@@ -64,31 +64,23 @@ export const ResourceGroup = ({
   const resources = [
     {
       icon: <Image src={BCDevLogo} alt="BigCommerce" />,
-      title: t('translationGuide.title'),
-      description: t('translationGuide.description'),
+      title: t('userGuide.title'),
+      description: t('userGuide.description'),
       links: [
         {
-          text: t('translationGuide.links.bestPractices'),
-          href: "https://developer.bigcommerce.com/docs/storefront-translation",
-        },
-        {
-          text: t('translationGuide.links.managing'),
-          href: "https://developer.bigcommerce.com/docs/multi-language",
+          text: t('userGuide.links.view'),
+          href: "https://start.bigcommerce.com/multi-lang-translations/",
         },
       ],
     },
     {
       icon: <Image src={BCLogo} alt="BigCommerce" />,
-      title: t('support.title'),
-      description: t('support.description'),
+      title: t('catalystDocs.title'),
+      description: t('catalystDocs.description'),
       links: [
         {
-          text: t('support.links.faq'),
-          href: "https://support.bigcommerce.com/s/article/translation-guide",
-        },
-        {
-          text: t('support.links.settings'),
-          href: "https://support.bigcommerce.com/s/article/localization-settings",
+          text: t('catalystDocs.links.view'),
+          href: "https://www.catalyst.dev/docs/internationalization/overview",
         },
       ],
     },

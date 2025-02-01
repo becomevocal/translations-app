@@ -21,20 +21,18 @@
     },
     "resources": {
       "title": "Resources",
-      "translationGuide": {
-        "title": "Translation Guidelines",
-        "description": "Learn best practices for translating your store's catalog content",
+      "userGuide": {
+        "title": "User guide",
+        "description": "Learn how to use this app to translate your catalog into multiple languages",
         "links": {
-          "bestPractices": "Translation Best Practices",
-          "managing": "Managing Multi-Language Content"
+          "view": "View user guide"
         }
       },
-      "support": {
-        "title": "Translation Support",
-        "description": "Get help with managing translations and localization settings",
+      "catalystDocs": {
+        "title": "Catalyst i18n docs",
+        "description": "Learn how to internationalize your storefront to fit your desired multilingual experience",
         "links": {
-          "faq": "Translation FAQ",
-          "settings": "Localization Settings"
+          "view": "View documentation"
         }
       }
     },

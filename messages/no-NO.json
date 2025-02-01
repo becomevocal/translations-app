@@ -21,20 +21,18 @@
     },
     "resources": {
       "title": "Ressurser",
-      "translationGuide": {
-        "title": "Oversettelsesveiledning",
-        "description": "Lær beste praksis for oversettelse av kataloginnholdet ditt",
+      "userGuide": {
+        "title": "Brukerveiledning",
+        "description": "Lær hvordan du bruker denne appen til å oversette katalogen din til flere språk",
         "links": {
-          "bestPractices": "Beste oversettelsespraksiser",
-          "managing": "Håndtering av flerspråklig innhold"
+          "view": "Se brukerveiledning"
         }
       },
-      "support": {
-        "title": "Oversettelsesstøtte",
-        "description": "Få hjelp med håndtering av oversettelser og lokaliseringsinnstillinger",
+      "catalystDocs": {
+        "title": "Catalyst i18n dokumentasjon",
+        "description": "Lær hvordan du internasjonaliserer nettbutikken din for å passe til din ønskede flerspråklige opplevelse",
         "links": {
-          "faq": "Oversettelses-FAQ",
-          "settings": "Lokaliseringsinnstillinger"
+          "view": "Se dokumentasjon"
         }
       }
     },
