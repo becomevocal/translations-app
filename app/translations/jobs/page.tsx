@@ -20,8 +20,8 @@ import {
   FormGroup,
   OffsetPaginationProps,
   Dropdown,
-  TableFigure,
   FileUploader,
+  InlineMessage,
 } from "@bigcommerce/big-design";
 import {
   ArrowDropDownIcon,
@@ -101,9 +101,9 @@ function TranslationsJobsContent() {
 
   // Get available locales for selected channel, excluding the default locale
   const availableLocales = selectedChannel
-    ? channels?.find((c) => c.channel_id === selectedChannel)?.locales.filter(
-        (locale) => !locale.is_default
-      ) || []
+    ? channels
+        ?.find((c) => c.channel_id === selectedChannel)
+        ?.locales.filter((locale) => !locale.is_default) || []
     : [];
 
   const fetchJobs = useCallback(async () => {
@@ -156,10 +156,14 @@ function TranslationsJobsContent() {
     }
   };
 
-  const handleFileSelect = (filesOrEvent: File[] | React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.isArray(filesOrEvent) ? filesOrEvent : filesOrEvent.target.files;
+  const handleFileSelect = (
+    filesOrEvent: File[] | React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.isArray(filesOrEvent)
+      ? filesOrEvent
+      : filesOrEvent.target.files;
     const file = files?.[0];
-    
+
     if (!file) {
       setSelectedFile(null);
       setCsvPreview(null);
@@ -170,8 +174,8 @@ function TranslationsJobsContent() {
     Papa.parse<string[]>(file, {
       header: false,
       preview: 2,
-      skipEmptyLines: 'greedy',
-      delimiter: ',',
+      skipEmptyLines: "greedy",
+      delimiter: ",",
       quoteChar: '"',
       escapeChar: '"',
       transformHeader: (header) => header.trim(),
@@ -186,18 +190,20 @@ function TranslationsJobsContent() {
             });
             setShowPreviewModal(true);
           } else {
-            console.error('Invalid CSV structure: Missing headers or first row');
+            console.error(
+              "Invalid CSV structure: Missing headers or first row"
+            );
             setCsvPreview(null);
           }
         } else {
-          console.error('CSV parsing failed or insufficient data');
+          console.error("CSV parsing failed or insufficient data");
           setCsvPreview(null);
         }
       },
       error: (error: Error) => {
         console.error("Error parsing CSV:", error);
         setCsvPreview(null);
-      }
+      },
     });
   };
 
@@ -265,54 +271,71 @@ function TranslationsJobsContent() {
     const selectedChannel = channels?.find(
       (channel) => channel.channel_id === channelId
     );
-    
+
     if (selectedChannel) {
       setSelectedChannel(channelId);
       // Get first non-default locale
-      const nonDefaultLocales = selectedChannel.locales.filter(locale => !locale.is_default);
-      const newLocale = nonDefaultLocales[0]?.code || '';
+      const nonDefaultLocales = selectedChannel.locales.filter(
+        (locale) => !locale.is_default
+      );
+      const newLocale = nonDefaultLocales[0]?.code || "";
       setSelectedLocale(newLocale);
 
       // Save selections to localStorage
-      localStorage.setItem('translations_selected_channel', channelId.toString());
-      localStorage.setItem('translations_selected_locale', newLocale);
+      localStorage.setItem(
+        "translations_selected_channel",
+        channelId.toString()
+      );
+      localStorage.setItem("translations_selected_locale", newLocale);
     }
   };
 
   // Update locale selection and save to localStorage
   const handleLocaleChange = (value: string) => {
     setSelectedLocale(value || "");
-    localStorage.setItem('translations_selected_locale', value);
+    localStorage.setItem("translations_selected_locale", value);
   };
 
   // Load saved preferences or set defaults when channels load
   useEffect(() => {
     if (channels?.length && !selectedChannel) {
-      const savedChannelId = localStorage.getItem('translations_selected_channel');
-      const savedLocale = localStorage.getItem('translations_selected_locale');
-      
+      const savedChannelId = localStorage.getItem(
+        "translations_selected_channel"
+      );
+      const savedLocale = localStorage.getItem("translations_selected_locale");
+
       // Find the saved channel if it exists in current channels
-      const savedChannel = savedChannelId ? 
-        channels.find(c => c.channel_id === Number(savedChannelId)) : 
-        null;
-      
-      if (savedChannel && savedLocale && 
-          savedChannel.locales.some(l => l.code === savedLocale && !l.is_default)) {
+      const savedChannel = savedChannelId
+        ? channels.find((c) => c.channel_id === Number(savedChannelId))
+        : null;
+
+      if (
+        savedChannel &&
+        savedLocale &&
+        savedChannel.locales.some(
+          (l) => l.code === savedLocale && !l.is_default
+        )
+      ) {
         // Use saved preferences if valid and not default locale
         setSelectedChannel(savedChannel.channel_id);
         setSelectedLocale(savedLocale);
       } else {
         // Fall back to defaults
         const firstChannel = channels[0];
-        const nonDefaultLocales = firstChannel.locales.filter(locale => !locale.is_default);
-        const newLocale = nonDefaultLocales[0]?.code || '';
-        
+        const nonDefaultLocales = firstChannel.locales.filter(
+          (locale) => !locale.is_default
+        );
+        const newLocale = nonDefaultLocales[0]?.code || "";
+
         setSelectedChannel(firstChannel.channel_id);
         setSelectedLocale(newLocale);
-        
+
         // Save defaults
-        localStorage.setItem('translations_selected_channel', firstChannel.channel_id.toString());
-        localStorage.setItem('translations_selected_locale', newLocale);
+        localStorage.setItem(
+          "translations_selected_channel",
+          firstChannel.channel_id.toString()
+        );
+        localStorage.setItem("translations_selected_locale", newLocale);
       }
     }
   }, [channels, selectedChannel]);
@@ -678,7 +701,7 @@ function TranslationsJobsContent() {
         }}
         closeOnClickOutside={false}
         closeOnEscKey={false}
-        header="Preview CSV Contents"
+        header={t("importModal.preview.title")}
         actions={[
           {
             text: t("navigation.back"),
@@ -701,29 +724,50 @@ function TranslationsJobsContent() {
       >
         {csvPreview && (
           <Box padding="medium">
-            <Box border="box" borderRadius="normal">
-              <TableFigure>
-                <Table<CSVPreviewRow>
-                  columns={csvPreview.headers.map((header) => ({
-                    header: header,
-                    hash: header,
-                    render: (item: CSVPreviewRow) => (
-                      <Text>{item[header]}</Text>
-                    ),
-                    verticalAlign: "top",
-                  }))}
-                  items={[
-                    csvPreview.firstRow.reduce(
-                      (obj, value, index) => ({
-                        ...obj,
-                        [csvPreview.headers[index]]: value,
-                      }),
-                      {} as CSVPreviewRow
-                    ),
-                  ]}
-                  stickyHeader
-                />
-              </TableFigure>
+            <InlineMessage
+              type="info"
+              marginBottom="medium"
+              messages={[
+                {
+                  text: t("importModal.preview.description", { locale: selectedLocale }),
+                  link: {
+                    text: t("importModal.preview.learnMore"),
+                    href: t("importModal.preview.learnMoreUrl"),
+                    target: "_blank",
+                  }
+                },
+              ]}
+            />
+
+            <Box
+              backgroundColor="secondary10"
+              borderRadius="normal"
+              padding="medium"
+              marginBottom="medium"
+            >
+              <Text color="secondary70" marginBottom="small">
+                {t("importModal.preview.fileInfo", {
+                  filename: selectedFile?.name,
+                })}
+              </Text>
+              <Flex flexDirection="column">
+                {csvPreview.headers.map((header, index) => (
+                  <Flex
+                    key={index}
+                    marginBottom={
+                      index < csvPreview.headers.length - 1 ? "small" : "none"
+                    }
+                    alignItems="flex-start"
+                  >
+                    <FlexItem flexBasis="50%">
+                      <Text bold>{header}</Text>
+                    </FlexItem>
+                    <FlexItem flexBasis="50%">
+                      <Text>{csvPreview.firstRow[index]}</Text>
+                    </FlexItem>
+                  </Flex>
+                ))}
+              </Flex>
             </Box>
           </Box>
         )}

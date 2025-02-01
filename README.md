@@ -45,6 +45,7 @@ For merchant documentation on how to use this app, please see the [User Guide](h
 - [x] Fix issue with null product description causing save to fail
 - [x] Create help docs
 - [x] Remove ability to export default locale for translation
+- [] Fix mutations if they are all empty fields (re-import blank _fr export)
 - [ ] Update resource links on home screen
 - [ ] Add BC CP SDK to preview session timeout
 - [ ] Ability to view import errors and get help parsing CSV (beyond high level # of errors)

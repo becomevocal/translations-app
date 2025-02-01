@@ -169,17 +169,23 @@
         "button": "アクション"
       },
       "importModal": {
-        "title": "翻訳のインポート",
+        "title": "翻訳をインポート",
         "selectChannel": "チャネルを選択",
         "selectLocale": "言語を選択",
         "cancel": "キャンセル",
         "next": "次へ",
         "upload": {
-          "title": "翻訳ファイルのアップロード",
+          "title": "翻訳ファイルをアップロード",
           "selectFile": "ファイルを選択",
           "uploadButton": "アップロード",
-          "dragAndDrop": "翻訳を含むCSVファイルを選択してください。",
-          "selectedFile": "選択されたファイル: {filename}"
+          "dragAndDrop": "翻訳を含むCSVファイルを選択してください。"
+        },
+        "preview": {
+          "title": "CSVコンテンツのプレビュー",
+          "description": "CSVファイルの最初の行を確認して、内容が正しいことを確認してください。注意：'field_{locale}'形式（例：'description_{locale}'）の列のみがインポートされます。",
+          "fileInfo": "ファイル：{filename}",
+          "learnMore": "詳細を見る",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {

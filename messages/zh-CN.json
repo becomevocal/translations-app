@@ -180,8 +180,14 @@
           "title": "上传翻译文件",
           "selectFile": "选择文件",
           "uploadButton": "上传",
-          "dragAndDrop": "请选择包含翻译的CSV文件。",
-          "selectedFile": "已选择文件：{filename}"
+          "dragAndDrop": "选择包含您翻译的CSV文件。"
+        },
+        "preview": {
+          "title": "CSV内容预览",
+          "description": "检查CSV文件的第一行以确保内容正确。注意：仅导入格式为'field_{locale}'的列（例如：'description_{locale}'）。",
+          "fileInfo": "文件：{filename}",
+          "learnMore": "了解更多",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {

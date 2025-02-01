@@ -178,8 +178,14 @@
           "title": "Carica file di traduzione",
           "selectFile": "Seleziona file",
           "uploadButton": "Carica",
-          "dragAndDrop": "Seleziona un file CSV contenente le tue traduzioni.",
-          "selectedFile": "File selezionato: {filename}"
+          "dragAndDrop": "Seleziona un file CSV contenente le tue traduzioni."
+        },
+        "preview": {
+          "title": "Anteprima contenuto CSV",
+          "description": "Controlla la prima riga del tuo file CSV per assicurarti che il contenuto sia corretto. Nota: Verranno importate solo le colonne nel formato 'field_{locale}' (es. 'description_{locale}').",
+          "fileInfo": "File: {filename}",
+          "learnMore": "Scopri di più",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {

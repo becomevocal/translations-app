@@ -169,7 +169,7 @@
         "button": "Дія"
       },
       "importModal": {
-        "title": "Імпорт перекладів",
+        "title": "Імпортувати переклади",
         "selectChannel": "Вибрати канал",
         "selectLocale": "Вибрати мову",
         "cancel": "Скасувати",
@@ -178,8 +178,14 @@
           "title": "Завантажити файл перекладу",
           "selectFile": "Вибрати файл",
           "uploadButton": "Завантажити",
-          "dragAndDrop": "Виберіть CSV-файл, що містить ваші переклади.",
-          "selectedFile": "Вибраний файл: {filename}"
+          "dragAndDrop": "Виберіть CSV-файл, що містить ваші переклади."
+        },
+        "preview": {
+          "title": "Попередній перегляд вмісту CSV",
+          "description": "Перевірте перший рядок вашого CSV-файлу, щоб переконатися, що вміст правильний. Примітка: Будуть імпортовані лише стовпці у форматі 'field_{locale}' (наприклад, 'description_{locale}').",
+          "fileInfo": "Файл: {filename}",
+          "learnMore": "Дізнатися більше",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {

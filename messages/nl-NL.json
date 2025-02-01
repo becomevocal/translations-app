@@ -178,8 +178,14 @@
           "title": "Vertaalbestand uploaden",
           "selectFile": "Selecteer bestand",
           "uploadButton": "Uploaden",
-          "dragAndDrop": "Selecteer een CSV-bestand met uw vertalingen.",
-          "selectedFile": "Geselecteerd bestand: {filename}"
+          "dragAndDrop": "Selecteer een CSV-bestand met uw vertalingen."
+        },
+        "preview": {
+          "title": "CSV-inhoud voorvertoning",
+          "description": "Controleer de eerste rij van uw CSV-bestand om te zorgen dat de inhoud correct is. Let op: Alleen kolommen in het formaat 'field_{locale}' (bijv. 'description_{locale}') worden geïmporteerd.",
+          "fileInfo": "Bestand: {filename}",
+          "learnMore": "Meer informatie",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {

@@ -178,8 +178,14 @@
           "title": "Upload oversættelsesfil",
           "selectFile": "Vælg fil",
           "uploadButton": "Upload",
-          "dragAndDrop": "Vælg en CSV-fil der indeholder dine oversættelser.",
-          "selectedFile": "Valgt fil: {filename}"
+          "dragAndDrop": "Vælg en CSV-fil der indeholder dine oversættelser."
+        },
+        "preview": {
+          "title": "Forhåndsvisning af CSV-indhold",
+          "description": "Gennemgå den første række i din CSV-fil for at sikre, at indholdet er korrekt. Bemærk: Kun kolonner i formatet 'field_{locale}' (f.eks. 'description_{locale}') vil blive importeret.",
+          "fileInfo": "Fil: {filename}",
+          "learnMore": "Lær mere",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {

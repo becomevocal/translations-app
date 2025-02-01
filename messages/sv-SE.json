@@ -180,6 +180,13 @@
           "uploadButton": "Ladda upp",
           "dragAndDrop": "Välj en CSV-fil som innehåller dina översättningar.",
           "selectedFile": "Vald fil: {filename}"
+        },
+        "preview": {
+          "title": "Förhandsvisning av CSV-innehåll",
+          "description": "Granska den första raden i din CSV-fil för att säkerställa att innehållet är korrekt. Obs: Endast kolumner i formatet 'field_{locale}' (t.ex. 'description_{locale}') kommer att importeras.",
+          "fileInfo": "Fil: {filename}",
+          "learnMore": "Läs mer",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {

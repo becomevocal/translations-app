@@ -169,17 +169,23 @@
         "button": "Ação"
       },
       "importModal": {
-        "title": "Importar Traduções",
-        "selectChannel": "Selecionar Canal",
-        "selectLocale": "Selecionar Idioma",
+        "title": "Importar traduções",
+        "selectChannel": "Selecionar canal",
+        "selectLocale": "Selecionar idioma",
         "cancel": "Cancelar",
         "next": "Próximo",
         "upload": {
-          "title": "Enviar Arquivo de Tradução",
-          "selectFile": "Selecionar Arquivo",
+          "title": "Enviar arquivo de tradução",
+          "selectFile": "Selecionar arquivo",
           "uploadButton": "Enviar",
-          "dragAndDrop": "Selecione um arquivo CSV contendo suas traduções.",
-          "selectedFile": "Arquivo selecionado: {filename}"
+          "dragAndDrop": "Selecione um arquivo CSV contendo suas traduções."
+        },
+        "preview": {
+          "title": "Visualização do conteúdo CSV",
+          "description": "Revise a primeira linha do seu arquivo CSV para garantir que o conteúdo esteja correto. Nota: Apenas colunas no formato 'field_{locale}' (ex: 'description_{locale}') serão importadas.",
+          "fileInfo": "Arquivo: {filename}",
+          "learnMore": "Saiba mais",
+          "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
         }
       },
       "exportModal": {
