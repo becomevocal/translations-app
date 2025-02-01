@@ -21,6 +21,7 @@ import {
   OffsetPaginationProps,
   Dropdown,
   TableFigure,
+  FileUploader,
 } from "@bigcommerce/big-design";
 import {
   ArrowDropDownIcon,
@@ -86,10 +87,9 @@ function TranslationsJobsContent() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [csvPreview, setCsvPreview] = useState<CSVPreview | null>(null);
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
 
@@ -156,8 +156,10 @@ function TranslationsJobsContent() {
     }
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileSelect = (filesOrEvent: File[] | React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.isArray(filesOrEvent) ? filesOrEvent : filesOrEvent.target.files;
+    const file = files?.[0];
+    
     if (!file) {
       setSelectedFile(null);
       setCsvPreview(null);
@@ -165,7 +167,6 @@ function TranslationsJobsContent() {
     }
 
     setSelectedFile(file);
-
     Papa.parse<string[]>(file, {
       header: false,
       preview: 2,
@@ -234,9 +235,6 @@ function TranslationsJobsContent() {
       console.error(t("errors.uploadFile"), error);
     } finally {
       setIsCreatingJob(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     }
   };
 
@@ -638,9 +636,6 @@ function TranslationsJobsContent() {
           setShowImportModal(true);
           setSelectedFile(null);
           setCsvPreview(null);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
         }}
         closeOnClickOutside={false}
         closeOnEscKey={false}
@@ -654,31 +649,22 @@ function TranslationsJobsContent() {
               setShowImportModal(true);
               setSelectedFile(null);
               setCsvPreview(null);
-              if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-              }
             },
             disabled: isCreatingJob,
           },
-          {
-            text: t("importModal.upload.selectFile"),
-            variant: "primary",
-            onClick: () => fileInputRef.current?.click(),
-          },
         ]}
       >
-        <FormGroup>
-          <Text>{t("importModal.upload.dragAndDrop")}</Text>
-        </FormGroup>
-        <FormGroup>
-          <input
-            ref={fileInputRef}
-            type="file"
+        <Box padding="medium">
+          <FileUploader
             accept=".csv"
-            onChange={handleFileSelect}
-            style={{ marginTop: defaultTheme.spacing.small }}
+            dropzoneConfig={{
+              label: t("importModal.upload.dragAndDrop"),
+            }}
+            required={true}
+            files={selectedFile ? [selectedFile] : []}
+            onFilesChange={handleFileSelect}
           />
-        </FormGroup>
+        </Box>
       </Modal>
 
       {/* Preview Modal */}
@@ -687,6 +673,7 @@ function TranslationsJobsContent() {
         onClose={() => {
           setShowPreviewModal(false);
           setShowUploadModal(true);
+          setSelectedFile(null);
           setCsvPreview(null);
         }}
         closeOnClickOutside={false}
@@ -699,6 +686,7 @@ function TranslationsJobsContent() {
             onClick: () => {
               setShowPreviewModal(false);
               setShowUploadModal(true);
+              setSelectedFile(null);
               setCsvPreview(null);
             },
             disabled: isCreatingJob,
