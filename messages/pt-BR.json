@@ -181,11 +181,16 @@
           "dragAndDrop": "Selecione um arquivo CSV contendo suas traduções."
         },
         "preview": {
-          "title": "Visualização do conteúdo CSV",
-          "description": "Revise a primeira linha do seu arquivo CSV para garantir que o conteúdo esteja correto. Nota: Apenas colunas no formato 'field_{locale}' (ex: 'description_{locale}') serão importadas.",
+          "title": "Pré-visualização do conteúdo CSV",
+          "description": "Revise a primeira linha do seu arquivo CSV para garantir que o conteúdo esteja correto. Nota: Apenas colunas no formato 'field_{locale}' (ex. 'description_{locale}') serão importadas.",
           "fileInfo": "Arquivo: {filename}",
           "learnMore": "Saiba mais",
           "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
+        },
+        "errors": {
+          "csvParse": "Não foi possível analisar o arquivo CSV. Por favor, revise o guia de melhores práticas de importação para garantir que seu arquivo esteja formatado corretamente.",
+          "bestPracticesLink": "Ver guia de melhores práticas",
+          "bestPracticesUrl": "https://start.bigcommerce.com/multi-lang-translations/#best-practices-for-imports"
         }
       },
       "exportModal": {

@@ -35,6 +35,7 @@ import { useChannels } from "@/hooks/useChannels";
 import ErrorMessage from "@/components/error-message";
 import { LoadingScreen } from "@/components/loading-indicator";
 import { Suspense } from "react";
+import { addAlert } from "@/components/alerts-manager";
 
 type TranslationJob = {
   id: number;
@@ -92,6 +93,7 @@ function TranslationsJobsContent() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [csvError, setCsvError] = useState<string | null>(null);
 
   const {
     channels,
@@ -167,10 +169,12 @@ function TranslationsJobsContent() {
     if (!file) {
       setSelectedFile(null);
       setCsvPreview(null);
+      setCsvError(null);
       return;
     }
 
     setSelectedFile(file);
+    setCsvError(null);
     Papa.parse<string[]>(file, {
       header: false,
       preview: 2,
@@ -190,19 +194,23 @@ function TranslationsJobsContent() {
             });
             setShowPreviewModal(true);
           } else {
-            console.error(
-              "Invalid CSV structure: Missing headers or first row"
-            );
+            console.error("Invalid CSV structure: Missing headers or first row");
+            setCsvError(t("importModal.errors.csvParse"));
             setCsvPreview(null);
+            setSelectedFile(null);
           }
         } else {
-          console.error("CSV parsing failed or insufficient data");
+          console.error("CSV parsing failed or insufficient data", results.errors);
+          setCsvError(t("importModal.errors.csvParse"));
           setCsvPreview(null);
+          setSelectedFile(null);
         }
       },
       error: (error: Error) => {
         console.error("Error parsing CSV:", error);
+        setCsvError(t("importModal.errors.csvParse"));
         setCsvPreview(null);
+        setSelectedFile(null);
       },
     });
   };
@@ -659,6 +667,7 @@ function TranslationsJobsContent() {
           setShowImportModal(true);
           setSelectedFile(null);
           setCsvPreview(null);
+          setCsvError(null);
         }}
         closeOnClickOutside={false}
         closeOnEscKey={false}
@@ -672,12 +681,29 @@ function TranslationsJobsContent() {
               setShowImportModal(true);
               setSelectedFile(null);
               setCsvPreview(null);
+              setCsvError(null);
             },
             disabled: isCreatingJob,
           },
         ]}
       >
         <Box padding="medium">
+          {csvError && (
+            <InlineMessage
+              type="error"
+              marginBottom="medium"
+              messages={[
+                {
+                  text: csvError,
+                  link: {
+                    text: t("importModal.errors.bestPracticesLink"),
+                    href: t("importModal.errors.bestPracticesUrl"),
+                    target: "_blank",
+                  },
+                },
+              ]}
+            />
+          )}
           <FileUploader
             accept=".csv"
             dropzoneConfig={{

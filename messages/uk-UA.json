@@ -182,10 +182,15 @@
         },
         "preview": {
           "title": "Попередній перегляд вмісту CSV",
-          "description": "Перевірте перший рядок вашого CSV-файлу, щоб переконатися, що вміст правильний. Примітка: Будуть імпортовані лише стовпці у форматі 'field_{locale}' (наприклад, 'description_{locale}').",
+          "description": "Перевірте перший рядок вашого CSV-файлу, щоб переконатися, що вміст правильний. Примітка: Будуть імпортовані лише стовпці у форматі 'field_{locale}' (напр. 'description_{locale}').",
           "fileInfo": "Файл: {filename}",
           "learnMore": "Дізнатися більше",
           "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
+        },
+        "errors": {
+          "csvParse": "Не вдалося проаналізувати CSV-файл. Будь ласка, перегляньте посібник з найкращих практик імпорту, щоб переконатися, що ваш файл правильно відформатований.",
+          "bestPracticesLink": "Переглянути посібник з найкращих практик",
+          "bestPracticesUrl": "https://start.bigcommerce.com/multi-lang-translations/#best-practices-for-imports"
         }
       },
       "exportModal": {

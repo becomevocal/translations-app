@@ -181,11 +181,16 @@
           "dragAndDrop": "Velg en CSV-fil som inneholder oversettelsene dine."
         },
         "preview": {
-          "title": "Forhåndsvisning av CSV-innhold",
-          "description": "Gjennomgå den første raden i CSV-filen for å sikre at innholdet er korrekt. Merk: Kun kolonner i formatet 'field_{locale}' (f.eks. 'description_{locale}') vil bli importert.",
+          "title": "CSV-innhold forhåndsvisning",
+          "description": "Gjennomgå den første raden i CSV-filen din for å sikre at innholdet er korrekt. Merk: Kun kolonner i formatet 'field_{locale}' (f.eks. 'description_{locale}') vil bli importert.",
           "fileInfo": "Fil: {filename}",
           "learnMore": "Lær mer",
           "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
+        },
+        "errors": {
+          "csvParse": "Kunne ikke analysere CSV-filen. Vennligst se gjennom veiledningen for beste importpraksis for å sikre at filen din er riktig formatert.",
+          "bestPracticesLink": "Se veiledning for beste praksis",
+          "bestPracticesUrl": "https://start.bigcommerce.com/multi-lang-translations/#best-practices-for-imports"
         }
       },
       "exportModal": {

@@ -186,6 +186,11 @@
           "fileInfo": "Fil: {filename}",
           "learnMore": "Lær mere",
           "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
+        },
+        "errors": {
+          "csvParse": "Kunne ikke analysere CSV-filen. Gennemgå venligst vejledningen for bedste importpraksis for at sikre, at din fil er korrekt formateret.",
+          "bestPracticesLink": "Se vejledning for bedste praksis",
+          "bestPracticesUrl": "https://start.bigcommerce.com/multi-lang-translations/#best-practices-for-imports"
         }
       },
       "exportModal": {

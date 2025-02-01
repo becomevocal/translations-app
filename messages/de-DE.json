@@ -183,10 +183,15 @@
         },
         "preview": {
           "title": "CSV-Inhaltsvorschau",
-          "description": "Überprüfen Sie die erste Zeile Ihrer CSV-Datei auf Richtigkeit. Hinweis: Es werden nur Spalten im Format 'field_{locale}' (z.B. 'description_{locale}') importiert.",
+          "description": "Überprüfen Sie die erste Zeile Ihrer CSV-Datei, um sicherzustellen, dass der Inhalt korrekt ist. Hinweis: Es werden nur Spalten im Format 'field_{locale}' (z.B. 'description_{locale}') importiert.",
           "fileInfo": "Datei: {filename}",
           "learnMore": "Mehr erfahren",
           "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
+        },
+        "errors": {
+          "csvParse": "CSV-Datei konnte nicht analysiert werden. Bitte lesen Sie den Leitfaden für Import-Best-Practices, um sicherzustellen, dass Ihre Datei korrekt formatiert ist.",
+          "bestPracticesLink": "Best-Practices-Leitfaden anzeigen",
+          "bestPracticesUrl": "https://start.bigcommerce.com/multi-lang-translations/#best-practices-for-imports"
         }
       },
       "exportModal": {

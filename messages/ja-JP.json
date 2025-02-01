@@ -181,11 +181,16 @@
           "dragAndDrop": "翻訳を含むCSVファイルを選択してください。"
         },
         "preview": {
-          "title": "CSVコンテンツのプレビュー",
-          "description": "CSVファイルの最初の行を確認して、内容が正しいことを確認してください。注意：'field_{locale}'形式（例：'description_{locale}'）の列のみがインポートされます。",
+          "title": "CSVコンテンツプレビュー",
+          "description": "CSVファイルの最初の行を確認して、内容が正しいことを確認してください。注：'field_{locale}'形式（例：'description_{locale}'）の列のみがインポートされます。",
           "fileInfo": "ファイル：{filename}",
           "learnMore": "詳細を見る",
           "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
+        },
+        "errors": {
+          "csvParse": "CSVファイルを解析できませんでした。ファイルが正しくフォーマットされていることを確認するため、インポートのベストプラクティスガイドを確認してください。",
+          "bestPracticesLink": "ベストプラクティスガイドを表示",
+          "bestPracticesUrl": "https://start.bigcommerce.com/multi-lang-translations/#best-practices-for-imports"
         }
       },
       "exportModal": {

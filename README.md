@@ -45,10 +45,12 @@ For merchant documentation on how to use this app, please see the [User Guide](h
 - [x] Fix issue with null product description causing save to fail
 - [x] Create help docs
 - [x] Remove ability to export default locale for translation
-- [] Fix mutations if they are all empty fields (re-import blank _fr export)
+- [x] Update import steps to use FileUploader and InlineMessage components
+- [x] Link out to supported import columns and best practices for importing CSV files
+- [ ] Add BC CP SDK to prevent session timeout
 - [ ] Update resource links on home screen
-- [ ] Add BC CP SDK to preview session timeout
-- [ ] Ability to view import errors and get help parsing CSV (beyond high level # of errors)
+- [ ] Skip mutations if they are all empty fields (e.g. re-import blank _fr export)
+- [ ] Ability to view import errors (beyond high level # of errors)
 - [ ] Move server side locale transforms in api route into graphql client
 
 ## Getting Started

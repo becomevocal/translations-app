@@ -184,10 +184,15 @@
         },
         "preview": {
           "title": "CSV内容预览",
-          "description": "检查CSV文件的第一行以确保内容正确。注意：仅导入格式为'field_{locale}'的列（例如：'description_{locale}'）。",
+          "description": "检查CSV文件的第一行以确保内容正确。注意：仅导入'field_{locale}'格式的列（例如'description_{locale}'）。",
           "fileInfo": "文件：{filename}",
           "learnMore": "了解更多",
           "learnMoreUrl": "https://start.bigcommerce.com/multi-lang-translations/#supported-import-csv-columns"
+        },
+        "errors": {
+          "csvParse": "无法解析CSV文件。请查看导入最佳实践指南，以确保您的文件格式正确。",
+          "bestPracticesLink": "查看最佳实践指南",
+          "bestPracticesUrl": "https://start.bigcommerce.com/multi-lang-translations/#best-practices-for-imports"
         }
       },
       "exportModal": {
