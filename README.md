@@ -49,7 +49,7 @@ For merchant documentation on how to use this app, please see the [User Guide](h
 - [x] Link out to supported import columns and best practices for importing CSV files
 - [x] Add BC CP SDK to prevent session timeout
 - [x] Update resource links on home screen
-- [ ] Skip mutations if they are all empty fields (e.g. re-import blank _fr export)
+- [x] Skip mutations if they are all empty fields (e.g. re-import blank _fr export)
 - [ ] Ability to view import errors (beyond high level # of errors)
 - [ ] Move server side locale transforms in api route into graphql client
 
