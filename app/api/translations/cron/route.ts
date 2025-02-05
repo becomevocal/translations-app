@@ -10,6 +10,13 @@ import { getSessionFromContext } from '@/lib/auth';
 import crypto from 'crypto';
 import Papa, { ParseResult, ParseError, UnparseConfig } from 'papaparse';
 import { fallbackLocale } from '@/lib/constants';
+import {
+  getBasicInformationFieldsToRemove,
+  getSeoInformationFieldsToRemove,
+  getStorefrontDetailsFieldsToRemove,
+  getPreOrderSettingsFieldsToRemove,
+  getCustomFieldsToRemove
+} from '@/lib/utils/product-mutation-helpers';
 
 // CSV record type
 interface TranslationRecord {
@@ -489,6 +496,10 @@ interface ProductLocaleUpdateVariables {
     };
     overridesToRemove: string[];
   };
+  removedCustomFieldsInput?: {
+    productId: string;
+    data: any[];
+  };
 }
 
 // Process an import job
@@ -532,11 +543,35 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         console.log(`[Import] Updating product ${record.productId}`);
         
         const productData = prepareProductData(record, job.locale, job.channelId);
-        const defaultData = prepareProductData(record, defaultLocale, job.channelId);
 
         // Format IDs for GraphQL
         const formattedChannelId = formatChannelId(job.channelId);
         const formattedProductId = formatProductId(record.productId);
+
+        // Get fields to remove based on empty values
+        const basicInfoFieldsToRemove = getBasicInformationFieldsToRemove({
+          name: productData.name,
+          description: productData.description
+        });
+
+        const seoFieldsToRemove = getSeoInformationFieldsToRemove({
+          pageTitle: productData.pageTitle,
+          metaDescription: productData.metaDescription
+        });
+
+        const storefrontFieldsToRemove = getStorefrontDetailsFieldsToRemove({
+          warranty: productData.warranty,
+          availabilityDescription: productData.availabilityDescription,
+          searchKeywords: productData.searchKeywords
+        });
+
+        const preOrderFieldsToRemove = getPreOrderSettingsFieldsToRemove({
+          preOrderMessage: productData.preOrderMessage
+        });
+
+        const customFieldsToRemove = getCustomFieldsToRemove({
+          customFields: productData.customFields
+        });
 
         // Prepare input variables for the mutation
         const variables: ProductLocaleUpdateVariables = {
@@ -630,73 +665,64 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
           };
         }
 
-        // Add removal inputs for empty fields that exist in default locale
-        if (defaultData.name && !productData.name) {
+        // Add removal inputs for fields that should be removed
+        if (basicInfoFieldsToRemove.length > 0) {
           variables.removedBasicInfoInput = {
             productId: formattedProductId,
             localeContext: {
               channelId: formattedChannelId,
               locale: job.locale
             },
-            overridesToRemove: ['name']
+            overridesToRemove: basicInfoFieldsToRemove
           };
         }
 
-        if (defaultData.description && !productData.description) {
-          if (!variables.removedBasicInfoInput) {
-            variables.removedBasicInfoInput = {
-              productId: formattedProductId,
-              localeContext: {
-                channelId: formattedChannelId,
-                locale: job.locale
-              },
-              overridesToRemove: []
-            };
-          }
-          variables.removedBasicInfoInput.overridesToRemove.push('description');
-        }
-
-        // Similar removal logic for other fields...
-        // SEO
-        const seoRemovals: string[] = [];
-        if (defaultData.pageTitle && !productData.pageTitle) seoRemovals.push('pageTitle');
-        if (defaultData.metaDescription && !productData.metaDescription) seoRemovals.push('metaDescription');
-        if (seoRemovals.length > 0) {
+        if (seoFieldsToRemove.length > 0) {
           variables.removedSeoInput = {
             productId: formattedProductId,
             localeContext: {
               channelId: formattedChannelId,
               locale: job.locale
             },
-            overridesToRemove: seoRemovals
+            overridesToRemove: seoFieldsToRemove
           };
         }
 
-        // Storefront
-        const storefrontRemovals: string[] = [];
-        if (defaultData.warranty && !productData.warranty) storefrontRemovals.push('warranty');
-        if (defaultData.availabilityDescription && !productData.availabilityDescription) storefrontRemovals.push('availabilityDescription');
-        if (defaultData.searchKeywords && !productData.searchKeywords) storefrontRemovals.push('searchKeywords');
-        if (storefrontRemovals.length > 0) {
+        if (storefrontFieldsToRemove.length > 0) {
           variables.removedStorefrontDetailsInput = {
             productId: formattedProductId,
             localeContext: {
               channelId: formattedChannelId,
               locale: job.locale
             },
-            overridesToRemove: storefrontRemovals
+            overridesToRemove: storefrontFieldsToRemove
           };
         }
 
-        // Pre-order
-        if (defaultData.preOrderMessage && !productData.preOrderMessage) {
+        if (preOrderFieldsToRemove.length > 0) {
           variables.removedPreOrderInput = {
             productId: formattedProductId,
             localeContext: {
               channelId: formattedChannelId,
               locale: job.locale
             },
-            overridesToRemove: ['message']
+            overridesToRemove: preOrderFieldsToRemove
+          };
+        }
+
+        if (customFieldsToRemove.length > 0) {
+          variables.removedCustomFieldsInput = {
+            productId: formattedProductId,
+            data: customFieldsToRemove.map(field => ({
+              customFieldId: field.customFieldId,
+              channelLocaleContextData: {
+                context: {
+                  channelId: formattedChannelId,
+                  locale: job.locale
+                },
+                attributes: field.fields
+              }
+            }))
           };
         }
 
