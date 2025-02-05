@@ -144,7 +144,7 @@ function prepareProductData(record: TranslationRecord, locale: string, channelId
   const transformCustomFieldsData = (customFields: any[], channelId: string, locale: string) => {
     if (!Array.isArray(customFields)) return [];
     
-    const formattedChannelId = formatChannelId(parseInt(channelId, 10));
+    const formattedChannelId = formatChannelId(channelId);
     
     return customFields.map(field => ({
       customFieldId: field.id,
@@ -570,7 +570,15 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         });
 
         const customFieldsToRemove = getCustomFieldsToRemove({
-          customFields: productData.customFields
+          customFields: productData.customFields.reduce((acc: any, field: any) => {
+            if (field.customFieldId) {
+              acc[field.customFieldId] = {
+                name: field.overrides?.[0]?.channelLocaleOverrides?.data?.name,
+                value: field.overrides?.[0]?.channelLocaleOverrides?.data?.value
+              };
+            }
+            return acc;
+          }, {})
         });
 
         // Prepare input variables for the mutation
