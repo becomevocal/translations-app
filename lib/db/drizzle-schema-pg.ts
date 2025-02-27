@@ -48,5 +48,19 @@ export const translationJobs = pgTable('translation_jobs', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const translationErrors = pgTable('translation_errors', {
+  id: serial('id').primaryKey(),
+  jobId: integer('job_id').notNull(), // References translationJobs.id
+  productId: integer('product_id').notNull(),
+  lineNumber: integer('line_number').notNull(),
+  errorType: text('error_type', { 
+    enum: ['parse_error', 'validation_error', 'api_error', 'unknown']
+  }).notNull(),
+  errorMessage: text('error_message').notNull(),
+  rawData: json('raw_data'), // Original data that caused the error
+  createdAt: timestamp('created_at').defaultNow().notNull()
+});
+
 export type TranslationJob = typeof translationJobs.$inferSelect;
-export type NewTranslationJob = typeof translationJobs.$inferInsert; 
+export type NewTranslationJob = typeof translationJobs.$inferInsert;
+export type TranslationError = typeof translationErrors.$inferSelect; 

@@ -137,15 +137,18 @@
         "created": "Created",
         "actions": "Actions",
         "import": "Import",
-        "export": "Export"
+        "export": "Export",
+        "productId": "Product ID",
+        "lineNumber": "Line Number",
+        "errorType": "Error Type",
+        "errorMessage": "Error Message",
+        "preview": "Preview"
       },
       "status_pending": "Pending",
       "status_processing": "Processing",
       "status_completed": "Completed",
       "status_failed": "Failed",
       "refresh": "Refresh Job",
-      "download": "Download",
-      "view": "View file",
       "emptyState": {
         "title": "No translation jobs found",
         "description": "Create a new translation job by clicking the Import or Export button above"
@@ -154,7 +157,11 @@
         "back": "Back"
       },
       "actions": {
-        "button": "Action"
+        "button": "Action",
+        "viewFile": "View file",
+        "viewErrors": "View errors",
+        "download": "Download",
+        "viewDetails": "View Details"
       },
       "importModal": {
         "title": "Import Translations",
@@ -189,10 +196,28 @@
         "export": "Export"
       },
       "errors": {
+        "fetchErrors": "Failed to fetch errors",
         "fetchJobs": "Failed to fetch jobs",
         "runCron": "Failed to run cron job",
         "createJob": "Failed to create job",
         "uploadFile": "Failed to upload file"
+      },
+      "errorsModal": {
+        "title": "Error Details",
+        "noErrors": "No errors found for this job."
+      },
+      "errorsPage": {
+        "title": "Translation Job Errors",
+        "description": "View detailed error information for this translation job",
+        "tableTitle": "Error Details",
+        "itemName": "error",
+        "emptyState": {
+          "title": "No errors found",
+          "description": "This job has not encountered any errors"
+        },
+        "detailsModal": {
+          "title": "Error Details"
+        }
       }
     }
   }

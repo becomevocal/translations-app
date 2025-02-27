@@ -137,7 +137,12 @@
         "created": "Erstellt",
         "actions": "Aktionen",
         "import": "Importieren",
-        "export": "Exportieren"
+        "export": "Exportieren",
+        "productId": "Produkt-ID",
+        "lineNumber": "Zeilennummer",
+        "errorType": "Fehlertyp",
+        "errorMessage": "Fehlermeldung",
+        "preview": "Vorschau"
       },
       "title": "Übersetzungsaufträge",
       "selectChannel": "Kanal auswählen",
@@ -149,8 +154,6 @@
       "channel": "Kanal",
       "locale": "Sprache",
       "created": "Erstellt",
-      "download": "Herunterladen",
-      "view": "Datei anzeigen",
       "status_pending": "Ausstehend",
       "status_processing": "In Bearbeitung",
       "status_completed": "Abgeschlossen",
@@ -164,7 +167,11 @@
         "back": "Zurück"
       },
       "actions": {
-        "button": "Aktion"
+        "button": "Aktion",
+        "viewFile": "Datei anzeigen",
+        "viewErrors": "Fehler anzeigen",
+        "download": "Herunterladen",
+        "viewDetails": "Details anzeigen"
       },
       "importModal": {
         "title": "Übersetzungen importieren",
@@ -200,10 +207,28 @@
         "export": "Exportieren"
       },
       "errors": {
+        "fetchErrors": "Fehler beim Abrufen der Fehler",
         "fetchJobs": "Fehler beim Abrufen der Aufträge",
         "runCron": "Fehler beim Ausführen des geplanten Auftrags",
         "createJob": "Fehler beim Erstellen des Auftrags",
         "uploadFile": "Fehler beim Hochladen der Datei"
+      },
+      "errorsModal": {
+        "title": "Fehlerdetails",
+        "noErrors": "Keine Fehler gefunden für diesen Auftrag."
+      },
+      "errorsPage": {
+        "title": "Übersetzungsauftrag-Fehler",
+        "description": "Detaillierte Fehlerinformationen für diesen Übersetzungsauftrag anzeigen",
+        "tableTitle": "Fehlerdetails",
+        "itemName": "Fehler",
+        "emptyState": {
+          "title": "Keine Fehler gefunden",
+          "description": "Dieser Auftrag hat keine Fehler aufgewiesen"
+        },
+        "detailsModal": {
+          "title": "Fehlerdetails"
+        }
       }
     }
   }

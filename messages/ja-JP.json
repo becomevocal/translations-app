@@ -137,7 +137,12 @@
         "created": "作成日時",
         "actions": "アクション",
         "import": "インポート",
-        "export": "エクスポート"
+        "export": "エクスポート",
+        "productId": "商品ID",
+        "lineNumber": "行番号",
+        "errorType": "エラーの種類",
+        "errorMessage": "エラーメッセージ",
+        "preview": "プレビュー"
       },
       "title": "翻訳ジョブ",
       "selectChannel": "チャネルを選択",
@@ -149,8 +154,6 @@
       "channel": "チャネル",
       "locale": "言語",
       "created": "作成日時",
-      "download": "ダウンロード",
-      "view": "ファイルを表示",
       "status_pending": "保留中",
       "status_processing": "処理中",
       "status_completed": "完了",
@@ -164,7 +167,11 @@
         "back": "戻る"
       },
       "actions": {
-        "button": "アクション"
+        "button": "アクション",
+        "viewFile": "ファイルを表示",
+        "viewErrors": "エラーを表示",
+        "download": "ダウンロード",
+        "viewDetails": "詳細を表示"
       },
       "importModal": {
         "title": "翻訳をインポート",
@@ -199,10 +206,28 @@
         "export": "エクスポート"
       },
       "errors": {
+        "fetchErrors": "エラーの取得に失敗しました",
         "fetchJobs": "ジョブの取得に失敗しました",
         "runCron": "定期実行ジョブの実行に失敗しました",
         "createJob": "ジョブの作成に失敗しました",
         "uploadFile": "ファイルのアップロードに失敗しました"
+      },
+      "errorsModal": {
+        "title": "エラー詳細",
+        "noErrors": "このジョブにはエラーが見つかりませんでした。"
+      },
+      "errorsPage": {
+        "title": "翻訳ジョブのエラー",
+        "description": "この翻訳ジョブの詳細なエラー情報を表示",
+        "tableTitle": "エラーの詳細",
+        "itemName": "エラー",
+        "emptyState": {
+          "title": "エラーが見つかりません",
+          "description": "このジョブではエラーは発生していません"
+        },
+        "detailsModal": {
+          "title": "エラーの詳細"
+        }
       }
     }
   }

@@ -137,7 +137,12 @@
         "created": "Opprettet",
         "actions": "Handlinger",
         "import": "Importer",
-        "export": "Eksporter"
+        "export": "Eksporter",
+        "productId": "Produkt-ID",
+        "lineNumber": "Linjenummer",
+        "errorType": "Feiltype",
+        "errorMessage": "Feilmelding",
+        "preview": "Forhåndsvisning"
       },
       "title": "Oversettelsesoppgaver",
       "selectChannel": "Velg kanal",
@@ -149,8 +154,6 @@
       "channel": "Kanal",
       "locale": "Språk",
       "created": "Opprettet",
-      "download": "Last ned",
-      "view": "Vis fil",
       "status_pending": "Venter",
       "status_processing": "Behandler",
       "status_completed": "Fullført",
@@ -164,7 +167,11 @@
         "back": "Tilbake"
       },
       "actions": {
-        "button": "Handling"
+        "button": "Handling",
+        "viewFile": "Vis fil",
+        "viewErrors": "Vis feil",
+        "download": "Last ned",
+        "viewDetails": "Vis detaljer"
       },
       "importModal": {
         "title": "Importer oversettelser",
@@ -199,10 +206,28 @@
         "export": "Eksporter"
       },
       "errors": {
+        "fetchErrors": "Kunne ikke hente feil",
         "fetchJobs": "Kunne ikke hente oppgaver",
         "runCron": "Kunne ikke kjøre planlagt oppgave",
         "createJob": "Kunne ikke opprette oppgave",
         "uploadFile": "Kunne ikke laste opp fil"
+      },
+      "errorsModal": {
+        "title": "Feilopplysninger",
+        "noErrors": "Ingen feil funnet for denne oppgaven."
+      },
+      "errorsPage": {
+        "title": "Oversettelsesoppgave Feil",
+        "description": "Vis detaljert feilinformasjon for denne oversettelsesoppgaven",
+        "tableTitle": "Feildetaljer",
+        "itemName": "feil",
+        "emptyState": {
+          "title": "Ingen feil funnet",
+          "description": "Denne oppgaven har ikke støtt på noen feil"
+        },
+        "detailsModal": {
+          "title": "Feildetaljer"
+        }
       }
     }
   }

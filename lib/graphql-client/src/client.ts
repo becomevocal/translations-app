@@ -254,10 +254,11 @@ export class GraphQLClient {
       requestId,
       this.headersToObject(response.headers)
     );
+    const responseBody = await response.clone().json();
     this.logger(
       `[%s] Response Body: %j`,
       requestId,
-      await response.clone().json()
+      responseBody
     );
 
     // Handle rate limiting
@@ -269,16 +270,17 @@ export class GraphQLClient {
     if (!response.ok) {
       throw this.createError(
         `HTTP ${response.status} ${response.statusText}`,
-        response
+        response,
+        responseBody
       );
     }
 
-    const data = await response.json();
+    const data = responseBody;
 
     // Handle GraphQL errors
     if (data.errors?.length > 0) {
       const error = this.createError(data.errors[0].message, response, data);
-      this.logger("[%s] Errors: %j", requestId, data.errors);
+      this.logger(`[%s] Errors: %j`, requestId, data.errors);
       throw error;
     }
 
@@ -287,6 +289,7 @@ export class GraphQLClient {
 
   // App Extensions
   async getAppExtensions(): Promise<AppExtension[]> {
+    this.logger("Fetching app extensions");
     type Response = ResultOf<typeof GetAppExtensionsDocument>;
     const response = await this.request<Response>({
       query: print(GetAppExtensionsDocument),
@@ -310,6 +313,7 @@ export class GraphQLClient {
     url: string;
     label: AppExtensionLabel;
   }): Promise<string> {
+    this.logger("Creating app extension");
     const variables = createAppExtensionInput(params);
     type Response = ResultOf<typeof CreateAppExtensionDocument>;
     const response = await this.request<Response>(
@@ -328,6 +332,10 @@ export class GraphQLClient {
     id: string;
     input: { label: AppExtensionLabel };
   }): Promise<AppExtension> {
+    this.logger(
+      "Updating app extension id=%s",
+      params.id
+    );
     const variables = updateAppExtensionInput({
       id: params.id,
       label: params.input.label,
@@ -350,6 +358,7 @@ export class GraphQLClient {
   }
 
   async deleteAppExtension(id: string): Promise<string> {
+    this.logger("Deleting app extension id=%s", id);
     type Response = ResultOf<typeof DeleteAppExtensionDocument>;
     const response = await this.request<Response>(
       { query: print(DeleteAppExtensionDocument) },
@@ -369,13 +378,40 @@ export class GraphQLClient {
     model: AppExtensionModel;
     url: string;
     label: AppExtensionLabel;
+  }, options?: {
+    cleanupDuplicates?: boolean;
   }): Promise<string> {
+    this.logger("Upserting app extension");
     try {
       const extensions = await this.getAppExtensions();
-      const existingExtension = extensions.find(
-        (ext) => ext.context === params.context && ext.model === params.model
+      const matchingExtensions = extensions.filter(
+        (ext) => ext.context === params.context && ext.model === params.model && ext.url === params.url
       );
 
+      // Handle cleanup of duplicates if enabled and there are multiple matches
+      if (options?.cleanupDuplicates && matchingExtensions.length > 1) {
+        this.logger("Cleaning up duplicate app extensions");
+        // Keep the last extension, delete all others
+        const [extensionsToDelete, [extensionToKeep]] = [
+          matchingExtensions.slice(0, -1),
+          matchingExtensions.slice(-1),
+        ];
+
+        await Promise.all(
+          extensionsToDelete.map(async (ext) => this.deleteAppExtension(ext.id))
+        );
+
+        // Update the remaining extension
+        await this.updateAppExtension({
+          id: extensionToKeep.id,
+          input: { label: params.label },
+        });
+        
+        return extensionToKeep.id;
+      }
+
+      // Handle single match or no cleanup requested
+      const existingExtension = matchingExtensions[0];
       if (existingExtension) {
         await this.updateAppExtension({
           id: existingExtension.id,

@@ -1,6 +1,6 @@
 {
-  "name": "@bigcommerce/translations-graphql-client",
-  "version": "0.1.0",
+  "name": "bigcommerce-translations-admin-graphql-client",
+  "version": "0.1.2",
   "description": "BigCommerce GraphQL client for translations app",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

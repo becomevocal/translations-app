@@ -8,9 +8,6 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
-  scripts: {
-    domains: ['cdn.bigcommerce.com'],
-  }
 }
 
 export default withNextIntl(withSentryConfig(nextConfig, {

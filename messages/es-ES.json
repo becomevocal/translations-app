@@ -137,7 +137,12 @@
         "created": "Creado",
         "actions": "Acciones",
         "import": "Importar",
-        "export": "Exportar"
+        "export": "Exportar",
+        "productId": "ID del producto",
+        "lineNumber": "Número de línea",
+        "errorType": "Tipo de error",
+        "errorMessage": "Mensaje de error",
+        "preview": "Vista previa"
       },
       "title": "Trabajos de traducción",
       "selectChannel": "Seleccionar canal",
@@ -149,8 +154,6 @@
       "channel": "Canal",
       "locale": "Idioma",
       "created": "Creado",
-      "download": "Descargar",
-      "view": "Ver archivo",
       "status_pending": "Pendiente",
       "status_processing": "Procesando",
       "status_completed": "Completado",
@@ -164,7 +167,11 @@
         "back": "Volver"
       },
       "actions": {
-        "button": "Acción"
+        "button": "Acción",
+        "viewFile": "Ver archivo",
+        "viewErrors": "Ver errores",
+        "download": "Descargar",
+        "viewDetails": "Ver detalles"
       },
       "importModal": {
         "title": "Importar traducciones",
@@ -199,10 +206,28 @@
         "export": "Exportar"
       },
       "errors": {
+        "fetchErrors": "Error al obtener errores",
         "fetchJobs": "Error al obtener trabajos",
         "runCron": "Error al ejecutar el trabajo programado",
         "createJob": "Error al crear el trabajo",
         "uploadFile": "Error al subir el archivo"
+      },
+      "errorsModal": {
+        "title": "Detalles del error",
+        "noErrors": "No se encontraron errores para este trabajo."
+      },
+      "errorsPage": {
+        "title": "Errores de trabajo de traducción",
+        "description": "Ver información detallada de errores para este trabajo de traducción",
+        "tableTitle": "Detalles del error",
+        "itemName": "error",
+        "emptyState": {
+          "title": "No se encontraron errores",
+          "description": "Este trabajo no ha encontrado ningún error"
+        },
+        "detailsModal": {
+          "title": "Detalles del error"
+        }
       }
     }
   }

@@ -137,7 +137,12 @@
         "created": "Créé",
         "actions": "Actions",
         "import": "Importer",
-        "export": "Exporter"
+        "export": "Exporter",
+        "productId": "ID du produit",
+        "lineNumber": "Numéro de ligne",
+        "errorType": "Type d'erreur",
+        "errorMessage": "Message d'erreur",
+        "preview": "Aperçu"
       },
       "title": "Tâches de traduction",
       "selectChannel": "Sélectionner le canal",
@@ -149,8 +154,6 @@
       "channel": "Canal",
       "locale": "Langue",
       "created": "Créé",
-      "download": "Télécharger",
-      "view": "Voir le fichier",
       "status_pending": "En attente",
       "status_processing": "En cours",
       "status_completed": "Terminé",
@@ -164,7 +167,11 @@
         "back": "Retour"
       },
       "actions": {
-        "button": "Action"
+        "button": "Action",
+        "viewFile": "Voir le fichier",
+        "viewErrors": "Voir les erreurs",
+        "download": "Télécharger",
+        "viewDetails": "Voir les détails"
       },
       "importModal": {
         "title": "Importer des traductions",
@@ -199,10 +206,28 @@
         "export": "Exporter"
       },
       "errors": {
+        "fetchErrors": "Échec de la récupération des erreurs",
         "fetchJobs": "Échec de la récupération des tâches",
         "runCron": "Échec de l'exécution de la tâche planifiée",
         "createJob": "Échec de la création de la tâche",
         "uploadFile": "Échec du téléversement du fichier"
+      },
+      "errorsModal": {
+        "title": "Détails de l'erreur",
+        "noErrors": "Aucune erreur trouvée pour cette tâche."
+      },
+      "errorsPage": {
+        "title": "Erreurs de tâche de traduction",
+        "description": "Afficher les informations détaillées des erreurs pour cette tâche de traduction",
+        "tableTitle": "Détails de l'erreur",
+        "itemName": "erreur",
+        "emptyState": {
+          "title": "Aucune erreur trouvée",
+          "description": "Cette tâche n'a rencontré aucune erreur"
+        },
+        "detailsModal": {
+          "title": "Détails de l'erreur"
+        }
       }
     }
   }

@@ -17,6 +17,7 @@ import {
   getPreOrderSettingsFieldsToRemove,
   getCustomFieldsToRemove
 } from '@/lib/utils/product-mutation-helpers';
+import { logTranslationError } from '@/lib/db';
 
 // CSV record type
 interface TranslationRecord {
@@ -734,11 +735,21 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
           };
         }
 
-        // Call the mutation
-        await graphqlClient.NOTADA_updateProductLocaleData(variables);
+        // Call the mutation and capture the response
+        const response = await graphqlClient.NOTADA_updateProductLocaleData(variables);
         console.log(`[Import] Successfully updated product ${record.productId}`);
       } catch (error) {
         console.error(`[Import] Error updating product ${record.productId}:`, error);
+        const errorWithResponse = error as Error & { response?: any, errors?: any };
+        // Log the error to the database, including the GraphQL response
+        await logTranslationError({
+          jobId: job.id,
+          productId: record.productId,
+          lineNumber: 0, // Assuming line number is not applicable here
+          errorType: 'api_error',
+          errorMessage: errorWithResponse.message,
+          rawData: JSON.stringify({ record, response: errorWithResponse.errors }),
+        });
         throw error;
       }
     });
@@ -936,6 +947,16 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
           };
         } catch (error) {
           console.error(`[Export] Error fetching translation for product ${productId}:`, error);
+          // Log the error to the database, including the GraphQL response
+          const errorWithResponse = error as Error & { response?: any };
+          await logTranslationError({
+            jobId: job.id,
+            productId: productId,
+            lineNumber: 0, // Assuming line number is not applicable here
+            errorType: 'api_error',
+            errorMessage: errorWithResponse.message,
+            rawData: JSON.stringify({ productId, response: errorWithResponse.response }),
+          });
           return {
             productId: productId,
             [`name_${defaultLocale}`]: "",
@@ -982,6 +1003,16 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
     return url;
   } catch (error) {
     console.error('[Export] Job failed:', error);
+    // Log the error to the database, including the GraphQL response
+    const errorWithResponse = error as Error & { response?: any };
+    await logTranslationError({
+      jobId: job.id,
+      productId: 0, // Assuming no specific product ID is applicable here
+      lineNumber: 0, // Assuming line number is not applicable here
+      errorType: 'export_error',
+      errorMessage: errorWithResponse.message,
+      rawData: JSON.stringify({ jobId: job.id, response: errorWithResponse.response }),
+    });
     throw error;
   }
 }

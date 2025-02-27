@@ -153,7 +153,12 @@
         "created": "Skapad",
         "actions": "Åtgärder",
         "import": "Importera",
-        "export": "Exportera"
+        "export": "Exportera",
+        "productId": "Produkt-ID",
+        "lineNumber": "Radnummer",
+        "errorType": "Feltyp",
+        "errorMessage": "Felmeddelande",
+        "preview": "Förhandsvisning"
       },
       "title": "Översättningsjobb",
       "selectChannel": "Välj kanal",
@@ -165,8 +170,6 @@
       "channel": "Kanal",
       "locale": "Språk",
       "created": "Skapad",
-      "download": "Ladda ner",
-      "view": "Visa fil",
       "status_pending": "Väntar",
       "status_processing": "Bearbetar",
       "status_completed": "Slutförd",
@@ -180,7 +183,11 @@
         "back": "Tillbaka"
       },
       "actions": {
-        "button": "Åtgärd"
+        "button": "Åtgärd",
+        "viewFile": "Visa fil",
+        "viewErrors": "Visa fel",
+        "download": "Ladda ner",
+        "viewDetails": "Visa detaljer"
       },
       "importModal": {
         "title": "Importera översättningar",
@@ -216,10 +223,28 @@
         "export": "Exportera"
       },
       "errors": {
+        "fetchErrors": "Det gick inte att hämta fel",
         "fetchJobs": "Det gick inte att hämta jobb",
         "runCron": "Det gick inte att köra schemalagt jobb",
         "createJob": "Det gick inte att skapa jobb",
         "uploadFile": "Det gick inte att ladda upp filen"
+      },
+      "errorsModal": {
+        "title": "Felinformation",
+        "noErrors": "Inga fel hittades för detta jobb."
+      },
+      "errorsPage": {
+        "title": "Översättningsuppdrag Fel",
+        "description": "Visa detaljerad felinformation för detta översättningsuppdrag",
+        "tableTitle": "Feldetaljer",
+        "itemName": "fel",
+        "emptyState": {
+          "title": "Inga fel hittades",
+          "description": "Detta uppdrag har inte stött på några fel"
+        },
+        "detailsModal": {
+          "title": "Feldetaljer"
+        }
       }
     }
   }

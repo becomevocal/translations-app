@@ -48,5 +48,17 @@ export const translationJobs = mysqlTable('translation_jobs', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const translationErrors = mysqlTable('translation_errors', {
+  id: int('id').primaryKey().autoincrement(),
+  jobId: int('job_id').notNull(), // References translationJobs.id
+  productId: int('product_id').notNull(),
+  lineNumber: int('line_number').notNull(),
+  errorType: varchar('error_type', { length: 20, enum: ['parse_error', 'validation_error', 'api_error', 'unknown'] }).notNull(),
+  errorMessage: text('error_message').notNull(),
+  rawData: json('raw_data'), // Original data that caused the error
+  createdAt: timestamp('created_at').defaultNow().notNull()
+});
+
 export type TranslationJob = typeof translationJobs.$inferSelect;
-export type NewTranslationJob = typeof translationJobs.$inferInsert; 
+export type NewTranslationJob = typeof translationJobs.$inferInsert;
+export type TranslationError = typeof translationErrors.$inferSelect;

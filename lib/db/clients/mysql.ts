@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import * as schema from '../drizzle-schema-mysql';
 import { eq, and, desc } from 'drizzle-orm';
-import type { DatabaseOperations, TranslationJob } from './types';
+import type { DatabaseOperations, TranslationJob, TranslationError } from './types';
 import type { BaseUser, AuthSession } from '@/types';
 import type { TranslationJob as MySQLTranslationJob } from '../drizzle-schema-mysql';
 
@@ -178,5 +178,35 @@ export class MySQLClient implements DatabaseOperations {
         eq(this.schema.translationJobs.storeHash, storeHash)
       ))
       .orderBy(this.schema.translationJobs.createdAt);
+  }
+
+  async getTranslationErrors(jobId: number): Promise<TranslationError[]> {
+    return this.db
+      .select()
+      .from(this.schema.translationErrors)
+      .where(eq(this.schema.translationErrors.jobId, jobId))
+      .orderBy(this.schema.translationErrors.lineNumber);
+  }
+
+  async createTranslationError(data: {
+    jobId: number;
+    productId: number;
+    lineNumber: number;
+    errorType: "parse_error" | "validation_error" | "api_error" | "unknown";
+    errorMessage: string;
+    rawData?: Record<string, any>;
+  }): Promise<TranslationError> {
+    const result = await this.db
+      .insert(this.schema.translationErrors)
+      .values(data);
+    
+    // MySQL returns insertId, so we need to fetch the record
+    const inserted = await this.db
+      .select()
+      .from(this.schema.translationErrors)
+      .where(eq(this.schema.translationErrors.id, Number(result[0].insertId)))
+      .limit(1);
+    
+    return inserted[0];
   }
 } 

@@ -26,7 +26,7 @@ A TypeScript GraphQL client for BigCommerce's Admin API, specifically designed f
 ## Installation
 
 ```bash
-npm install @bigcommerce/translations-graphql-client
+npm install bigcommerce-translations-admin-graphql-client
 ```
 
 ## Usage
@@ -34,7 +34,7 @@ npm install @bigcommerce/translations-graphql-client
 ### Basic Setup
 
 ```typescript
-import { createGraphQLClient } from '@bigcommerce/translations-graphql-client';
+import { createGraphQLClient } from 'bigcommerce-translations-admin-graphql-client';
 
 const client = createGraphQLClient('your-access-token', 'store-hash');
 ```
@@ -42,7 +42,7 @@ const client = createGraphQLClient('your-access-token', 'store-hash');
 ### Advanced Configuration
 
 ```typescript
-import { GraphQLClient } from '@bigcommerce/translations-graphql-client';
+import { GraphQLClient } from 'bigcommerce-translations-admin-graphql-client';
 
 const client = new GraphQLClient({
   accessToken: 'your-access-token',

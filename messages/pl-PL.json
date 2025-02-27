@@ -137,7 +137,12 @@
         "created": "Utworzono",
         "actions": "Akcje",
         "import": "Importuj",
-        "export": "Eksportuj"
+        "export": "Eksportuj",
+        "productId": "ID produktu",
+        "lineNumber": "Numer wiersza",
+        "errorType": "Typ błędu",
+        "errorMessage": "Komunikat błędu",
+        "preview": "Podgląd"
       },
       "title": "Zadania tłumaczeniowe",
       "selectChannel": "Wybierz kanał",
@@ -149,8 +154,6 @@
       "channel": "Kanał",
       "locale": "Język",
       "created": "Utworzono",
-      "download": "Pobierz",
-      "view": "Zobacz plik",
       "status_pending": "Oczekujące",
       "status_processing": "Przetwarzanie",
       "status_completed": "Zakończone",
@@ -164,7 +167,11 @@
         "back": "Wstecz"
       },
       "actions": {
-        "button": "Akcja"
+        "button": "Akcja",
+        "viewFile": "Zobacz plik",
+        "viewErrors": "Zobacz błędy",
+        "download": "Pobierz",
+        "viewDetails": "Zobacz szczegóły"
       },
       "importModal": {
         "title": "Importuj tłumaczenia",
@@ -200,10 +207,28 @@
         "export": "Eksportuj"
       },
       "errors": {
+        "fetchErrors": "Nie udało się pobrać błędów",
         "fetchJobs": "Nie udało się pobrać zadań",
         "runCron": "Nie udało się uruchomić zaplanowanego zadania",
         "createJob": "Nie udało się utworzyć zadania",
         "uploadFile": "Nie udało się przesłać pliku"
+      },
+      "errorsModal": {
+        "title": "Szczegóły błędu",
+        "noErrors": "Brak błędów dla tego zadania."
+      },
+      "errorsPage": {
+        "title": "Błędy zadania tłumaczenia",
+        "description": "Zobacz szczegółowe informacje o błędach dla tego zadania tłumaczenia",
+        "tableTitle": "Szczegóły błędu",
+        "itemName": "błąd",
+        "emptyState": {
+          "title": "Nie znaleziono błędów",
+          "description": "To zadanie nie napotkało żadnych błędów"
+        },
+        "detailsModal": {
+          "title": "Szczegóły błędu"
+        }
       }
     }
   }

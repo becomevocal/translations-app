@@ -137,7 +137,12 @@
         "created": "Criado",
         "actions": "Ações",
         "import": "Importar",
-        "export": "Exportar"
+        "export": "Exportar",
+        "productId": "ID do produto",
+        "lineNumber": "Número da linha",
+        "errorType": "Tipo de erro",
+        "errorMessage": "Mensagem de erro",
+        "preview": "Visualização"
       },
       "title": "Trabalhos de tradução",
       "selectChannel": "Selecionar canal",
@@ -149,8 +154,6 @@
       "channel": "Canal",
       "locale": "Idioma",
       "created": "Criado",
-      "download": "Baixar",
-      "view": "Ver arquivo",
       "status_pending": "Pendente",
       "status_processing": "Processando",
       "status_completed": "Concluído",
@@ -164,7 +167,11 @@
         "back": "Voltar"
       },
       "actions": {
-        "button": "Ação"
+        "button": "Ação",
+        "viewFile": "Ver arquivo",
+        "viewErrors": "Ver erros",
+        "download": "Baixar",
+        "viewDetails": "Ver detalhes"
       },
       "importModal": {
         "title": "Importar traduções",
@@ -199,10 +206,28 @@
         "export": "Exportar"
       },
       "errors": {
+        "fetchErrors": "Falha ao buscar erros",
         "fetchJobs": "Falha ao buscar trabalhos",
         "runCron": "Falha ao executar trabalho agendado",
         "createJob": "Falha ao criar trabalho",
         "uploadFile": "Falha ao enviar arquivo"
+      },
+      "errorsModal": {
+        "title": "Detalhes do erro",
+        "noErrors": "Nenhum erro encontrado para este trabalho."
+      },
+      "errorsPage": {
+        "title": "Erros da Tarefa de Tradução",
+        "description": "Visualize informações detalhadas de erros para esta tarefa de tradução",
+        "tableTitle": "Detalhes do Erro",
+        "itemName": "erro",
+        "emptyState": {
+          "title": "Nenhum erro encontrado",
+          "description": "Esta tarefa não encontrou nenhum erro"
+        },
+        "detailsModal": {
+          "title": "Detalhes do Erro"
+        }
       }
     }
   }

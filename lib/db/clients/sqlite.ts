@@ -2,18 +2,19 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import * as schema from "../drizzle-schema-sqlite";
 import { eq, and, desc } from "drizzle-orm";
-import type { DatabaseOperations, TranslationJob } from "./types";
+import type { DatabaseOperations, TranslationJob, TranslationError } from "./types";
 import type { BaseUser, AuthSession } from "@/types";
 import type { TranslationJob as SQLiteTranslationJob } from "../drizzle-schema-sqlite";
 
 const { DATABASE_URL } = process.env;
 
 // Helper to convert SQLite timestamps to Date objects
-function convertTimestamps<T extends { createdAt: number; updatedAt: number }>(record: T): Omit<T, 'createdAt' | 'updatedAt'> & { createdAt: Date; updatedAt: Date } {
+function convertTimestamps<T extends { createdAt: number }>(
+  record: T,
+): Omit<T, "createdAt"> & { createdAt: Date } {
   return {
     ...record,
     createdAt: new Date(record.createdAt),
-    updatedAt: new Date(record.updatedAt),
   };
 }
 
@@ -159,13 +160,18 @@ export class SQLiteClient implements DatabaseOperations {
     return convertTimestamps(inserted[0]);
   }
 
-  async updateTranslationJob(id: number, data: Partial<SQLiteTranslationJob>): Promise<TranslationJob> {
+  async updateTranslationJob(id: number, data: Partial<TranslationJob>): Promise<TranslationJob> {
+    // Convert createdAt and updatedAt from Date to number if they exist
+    const dataToUpdate = {
+      ...data,
+      createdAt: data.createdAt instanceof Date ? data.createdAt.getTime() : data.createdAt,
+      updatedAt: data.updatedAt instanceof Date ? data.updatedAt.getTime() : Date.now(),
+      metadata: typeof data.metadata === 'string' ? data.metadata : null,
+    };
+
     await this.db
       .update(this.schema.translationJobs)
-      .set({
-        ...data,
-        updatedAt: Date.now(),
-      })
+      .set(dataToUpdate)
       .where(eq(this.schema.translationJobs.id, id));
 
     const updated = await this.db
@@ -200,5 +206,41 @@ export class SQLiteClient implements DatabaseOperations {
       .orderBy(this.schema.translationJobs.createdAt)
       .all();
     return jobs.map(convertTimestamps);
+  }
+
+  async getTranslationErrors(jobId: number): Promise<TranslationError[]> {
+    const errors = await this.db
+      .select()
+      .from(this.schema.translationErrors)
+      .where(eq(this.schema.translationErrors.jobId, jobId))
+      .orderBy(this.schema.translationErrors.lineNumber)
+      .all();
+    return errors.map(convertTimestamps);
+  }
+
+  async createTranslationError(data: {
+    jobId: number;
+    productId: number;
+    lineNumber: number;
+    errorType: "parse_error" | "validation_error" | "api_error" | "unknown";
+    errorMessage: string;
+    rawData?: Record<string, any>;
+  }): Promise<TranslationError> {
+    const now = Date.now();
+    const result = await this.db
+      .insert(this.schema.translationErrors)
+      .values({
+        ...data,
+        rawData: data.rawData ? JSON.stringify(data.rawData) : undefined,
+        createdAt: now,
+      });
+    
+    const inserted = await this.db
+      .select()
+      .from(this.schema.translationErrors)
+      .where(eq(this.schema.translationErrors.id, Number(result.lastInsertRowid)))
+      .all();
+    
+    return convertTimestamps(inserted[0]);
   }
 }

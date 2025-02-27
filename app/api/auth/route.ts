@@ -83,7 +83,9 @@ export async function GET(req: NextRequest) {
 
     // Register all configured app extensions
     for (const extension of appExtensions) {
-      await graphqlClient.upsertAppExtension(extension);
+      await graphqlClient.upsertAppExtension(extension, {
+        cleanupDuplicates: true,
+      });
     }
   } else {
     console.warn(

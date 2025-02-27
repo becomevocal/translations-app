@@ -14,6 +14,7 @@ import {
   Panel,
   Select,
   Table,
+  Tabs,
   Text,
   Tooltip,
   ProgressCircle,
@@ -35,6 +36,7 @@ import { useChannels } from "@/hooks/useChannels";
 import ErrorMessage from "@/components/error-message";
 import { LoadingScreen } from "@/components/loading-indicator";
 import { Suspense } from "react";
+import { TranslationError } from "@/lib/db/clients/types";
 
 type TranslationJob = {
   id: number;
@@ -55,6 +57,11 @@ type CSVPreview = {
 
 type CSVPreviewRow = {
   [key: string]: string;
+};
+
+type ErrorRawData = {
+  record: Record<string, any>;
+  response: any[];
 };
 
 const StyledPanelContents = styled.div`
@@ -106,6 +113,14 @@ function TranslationsJobsContent() {
         ?.find((c) => c.channel_id === selectedChannel)
         ?.locales.filter((locale) => !locale.is_default) || []
     : [];
+
+  const formatJsonString = (obj: any): string => {
+    try {
+      return JSON.stringify(obj, null, 2);
+    } catch (e) {
+      return 'Invalid JSON';
+    }
+  };
 
   const fetchJobs = useCallback(async () => {
     setIsLoading(true);
@@ -353,6 +368,10 @@ function TranslationsJobsContent() {
     }
   }, [context, fetchJobs]);
 
+  const handleViewErrors = (jobId: number) => {
+    router.push(`/translations/jobs/${jobId}/errors${context ? `?context=${context}` : ''}`);
+  };
+
   if (channelsError) return <ErrorMessage />;
   if (isChannelsLoading) return <LoadingScreen />;
 
@@ -434,9 +453,14 @@ function TranslationsJobsContent() {
         <Dropdown
           items={[
             {
-              content: item.jobType === "export" ? t("download") : t("view"),
+              content: item.jobType === "export" ? t("actions.download") : t("actions.viewFile"),
               onItemClick: () => window.open(item.fileUrl, "_blank"),
               disabled: item.status !== "completed" || !item.fileUrl,
+            },
+            {
+              content: t("actions.viewErrors"),
+              onItemClick: () => handleViewErrors(item.id),
+              disabled: !item.error,
             },
           ]}
           maxHeight={250}

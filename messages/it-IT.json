@@ -137,7 +137,12 @@
         "created": "Creato",
         "actions": "Azioni",
         "import": "Importa",
-        "export": "Esporta"
+        "export": "Esporta",
+        "productId": "ID prodotto",
+        "lineNumber": "Numero riga",
+        "errorType": "Tipo di errore",
+        "errorMessage": "Messaggio di errore",
+        "preview": "Anteprima"
       },
       "title": "Lavori di traduzione",
       "selectChannel": "Seleziona canale",
@@ -149,8 +154,6 @@
       "channel": "Canale",
       "locale": "Lingua",
       "created": "Creato",
-      "download": "Scarica",
-      "view": "Visualizza file",
       "status_pending": "In attesa",
       "status_processing": "In elaborazione",
       "status_completed": "Completato",
@@ -164,7 +167,11 @@
         "back": "Indietro"
       },
       "actions": {
-        "button": "Azione"
+        "button": "Azione",
+        "viewFile": "Visualizza file",
+        "viewErrors": "Visualizza errori",
+        "download": "Scarica",
+        "viewDetails": "Visualizza dettagli"
       },
       "importModal": {
         "title": "Importa traduzioni",
@@ -199,10 +206,28 @@
         "export": "Esporta"
       },
       "errors": {
+        "fetchErrors": "Impossibile recuperare gli errori",
         "fetchJobs": "Impossibile recuperare i lavori",
         "runCron": "Impossibile eseguire il lavoro pianificato",
         "createJob": "Impossibile creare il lavoro",
         "uploadFile": "Impossibile caricare il file"
+      },
+      "errorsModal": {
+        "title": "Dettagli dell'errore",
+        "noErrors": "Nessun errore trovato per questo lavoro."
+      },
+      "errorsPage": {
+        "title": "Errori del lavoro di traduzione",
+        "description": "Visualizza informazioni dettagliate sugli errori per questo lavoro di traduzione",
+        "tableTitle": "Dettagli errore",
+        "itemName": "errore",
+        "emptyState": {
+          "title": "Nessun errore trovato",
+          "description": "Questo lavoro non ha riscontrato errori"
+        },
+        "detailsModal": {
+          "title": "Dettagli errore"
+        }
       }
     }
   }

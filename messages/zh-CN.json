@@ -155,7 +155,12 @@
         "created": "创建时间",
         "actions": "操作",
         "import": "导入",
-        "export": "导出"
+        "export": "导出",
+        "productId": "商品ID",
+        "lineNumber": "行号",
+        "errorType": "错误类型",
+        "errorMessage": "错误信息",
+        "preview": "预览"
       },
       "title": "翻译任务",
       "selectChannel": "选择渠道",
@@ -167,8 +172,6 @@
       "channel": "渠道",
       "locale": "语言",
       "created": "创建时间",
-      "download": "下载",
-      "view": "查看文件",
       "status_pending": "待处理",
       "status_processing": "处理中",
       "status_completed": "已完成",
@@ -182,7 +185,11 @@
         "back": "返回"
       },
       "actions": {
-        "button": "操作"
+        "button": "操作",
+        "viewFile": "查看文件",
+        "viewErrors": "查看错误",
+        "download": "下载",
+        "viewDetails": "查看详情"
       },
       "importModal": {
         "title": "导入翻译",
@@ -217,10 +224,28 @@
         "export": "导出"
       },
       "errors": {
+        "fetchErrors": "获取错误失败",
         "fetchJobs": "获取任务失败",
         "runCron": "执行定时任务失败",
         "createJob": "创建任务失败",
         "uploadFile": "上传文件失败"
+      },
+      "errorsModal": {
+        "title": "错误详情",
+        "noErrors": "未找到此任务的错误。"
+      },
+      "errorsPage": {
+        "title": "翻译任务错误",
+        "description": "查看此翻译任务的详细错误信息",
+        "tableTitle": "错误详情",
+        "itemName": "错误",
+        "emptyState": {
+          "title": "未找到错误",
+          "description": "此任务未遇到任何错误"
+        },
+        "detailsModal": {
+          "title": "错误详情"
+        }
       }
     }
   }

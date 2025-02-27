@@ -137,7 +137,12 @@
         "created": "생성일",
         "actions": "작업",
         "import": "가져오기",
-        "export": "내보내기"
+        "export": "내보내기",
+        "productId": "상품 ID",
+        "lineNumber": "행 번호",
+        "errorType": "오류 유형",
+        "errorMessage": "오류 메시지",
+        "preview": "미리보기"
       },
       "title": "번역 작업",
       "selectChannel": "채널 선택",
@@ -149,8 +154,6 @@
       "channel": "채널",
       "locale": "언어",
       "created": "생성일",
-      "download": "다운로드",
-      "view": "파일 보기",
       "status_pending": "대기 중",
       "status_processing": "처리 중",
       "status_completed": "완료됨",
@@ -164,7 +167,11 @@
         "back": "뒤로"
       },
       "actions": {
-        "button": "작업"
+        "button": "작업",
+        "viewFile": "파일 보기",
+        "viewErrors": "오류 보기",
+        "download": "다운로드",
+        "viewDetails": "상세 보기"
       },
       "importModal": {
         "title": "번역 가져오기",
@@ -199,10 +206,28 @@
         "export": "내보내기"
       },
       "errors": {
+        "fetchErrors": "오류를 가져오는데 실패했습니다",
         "fetchJobs": "작업을 가져오는데 실패했습니다",
         "runCron": "예약된 작업 실행에 실패했습니다",
         "createJob": "작업 생성에 실패했습니다",
         "uploadFile": "파일 업로드에 실패했습니다"
+      },
+      "errorsModal": {
+        "title": "오류 세부 정보",
+        "noErrors": "이 작업에 오류가 없습니다."
+      },
+      "errorsPage": {
+        "title": "번역 작업 오류",
+        "description": "이 번역 작업의 상세 오류 정보 보기",
+        "tableTitle": "오류 상세",
+        "itemName": "오류",
+        "emptyState": {
+          "title": "오류를 찾을 수 없음",
+          "description": "이 작업에서 발생한 오류가 없습니다"
+        },
+        "detailsModal": {
+          "title": "오류 상세"
+        }
       }
     }
   }

@@ -137,7 +137,12 @@
         "created": "Aangemaakt",
         "actions": "Acties",
         "import": "Importeren",
-        "export": "Exporteren"
+        "export": "Exporteren",
+        "productId": "Product-ID",
+        "lineNumber": "Regelnummer",
+        "errorType": "Fouttype",
+        "errorMessage": "Foutmelding",
+        "preview": "Voorbeeld"
       },
       "title": "Vertaaltaken",
       "selectChannel": "Selecteer kanaal",
@@ -149,8 +154,6 @@
       "channel": "Kanaal",
       "locale": "Taal",
       "created": "Aangemaakt",
-      "download": "Downloaden",
-      "view": "Bestand bekijken",
       "status_pending": "In afwachting",
       "status_processing": "Verwerken",
       "status_completed": "Voltooid",
@@ -164,7 +167,11 @@
         "back": "Terug"
       },
       "actions": {
-        "button": "Actie"
+        "button": "Actie",
+        "viewFile": "Bestand bekijken",
+        "viewErrors": "Fouten bekijken",
+        "download": "Downloaden",
+        "viewDetails": "Details bekijken"
       },
       "importModal": {
         "title": "Vertalingen importeren",
@@ -199,10 +206,28 @@
         "export": "Exporteren"
       },
       "errors": {
+        "fetchErrors": "Kon fouten niet ophalen",
         "fetchJobs": "Kon taken niet ophalen",
         "runCron": "Kon geplande taak niet uitvoeren",
         "createJob": "Kon taak niet aanmaken",
         "uploadFile": "Kon bestand niet uploaden"
+      },
+      "errorsModal": {
+        "title": "Foutdetails",
+        "noErrors": "Geen fouten gevonden voor deze taak."
+      },
+      "errorsPage": {
+        "title": "Vertaalopdracht Fouten",
+        "description": "Bekijk gedetailleerde foutinformatie voor deze vertaalopdracht",
+        "tableTitle": "Foutdetails",
+        "itemName": "fout",
+        "emptyState": {
+          "title": "Geen fouten gevonden",
+          "description": "Deze opdracht heeft geen fouten aangetroffen"
+        },
+        "detailsModal": {
+          "title": "Foutdetails"
+        }
       }
     }
   }
