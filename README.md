@@ -50,7 +50,9 @@ For merchant documentation on how to use this app, please see the [User Guide](h
 - [x] Add BC CP SDK to prevent session timeout
 - [x] Update resource links on home screen
 - [x] Skip mutations if they are all empty fields (e.g. re-import blank _fr export)
-- [ ] Ability to view import errors (beyond high level # of errors)
+- [x] Ability to view import errors (beyond high level # of errors)
+- [ ] Add ability to update url path
+- [ ] Add ability to update categories (via metafields or direct api)
 - [ ] Move server side locale transforms in api route into graphql client
 
 ## Getting Started
