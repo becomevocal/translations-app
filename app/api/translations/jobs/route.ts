@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
       const file = form.get('file') as File;
       const channelId = form.get('channelId') as string;
       const locale = form.get('locale') as string;
+      const resourceType = form.get('resourceType') as 'products' | 'categories' || 'products';
 
       if (!file || !channelId || !locale) {
         return new Response('Missing required fields', { status: 400 });
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest) {
       const job = await db.createTranslationJob({
         storeHash,
         jobType: 'import',
+        resourceType,
         channelId: parseInt(channelId, 10),
         locale,
         fileUrl: blob.url,
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     // Handle export job creation
     const body = await request.json();
-    const { jobType, channelId, locale } = body;
+    const { jobType, channelId, locale, resourceType = 'products' } = body;
 
     if (!jobType || !channelId || !locale) {
       return new Response('Missing required fields', { status: 400 });
@@ -89,6 +91,7 @@ export async function POST(request: NextRequest) {
     const job = await db.createTranslationJob({
       storeHash,
       jobType,
+      resourceType,
       channelId,
       locale,
       fileUrl: undefined,

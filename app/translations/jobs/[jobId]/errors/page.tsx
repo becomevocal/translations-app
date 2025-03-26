@@ -128,6 +128,7 @@ function TranslationsJobErrorsContent({ jobId }: { jobId: string }) {
     },
     {
       hash: "actions",
+      header: t("columnHeaders.actions"),
       render: (error: TranslationErrorWithRawData) => (
         <Button
           variant="secondary"

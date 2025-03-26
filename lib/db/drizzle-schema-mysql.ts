@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, uniqueIndex, json, timestamp, text } from 'drizzle-orm/mysql-core';
+import { mysqlTable, int, varchar, uniqueIndex, json, timestamp, text, mysqlEnum } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
   id: int('id').primaryKey().autoincrement(),
@@ -36,16 +36,17 @@ export const storeUsers = mysqlTable('storeusers', {
 
 export const translationJobs = mysqlTable('translation_jobs', {
   id: int('id').primaryKey().autoincrement(),
-  storeHash: text('store_hash').notNull(),
-  status: varchar('status', { length: 20, enum: ['pending', 'processing', 'completed', 'failed'] }).notNull().default('pending'),
-  jobType: varchar('job_type', { length: 10, enum: ['import', 'export'] }).notNull(),
-  fileUrl: text('file_url'),
+  storeHash: varchar('store_hash', { length: 255 }).notNull(),
+  status: mysqlEnum('status', ['pending', 'processing', 'completed', 'failed']).notNull().default('pending'),
+  jobType: mysqlEnum('job_type', ['import', 'export']).notNull(),
+  resourceType: mysqlEnum('resource_type', ['products', 'categories']).notNull().default('products'),
+  fileUrl: varchar('file_url', { length: 1024 }),
   channelId: int('channel_id').notNull(),
   locale: varchar('locale', { length: 10 }).notNull(),
   metadata: json('metadata'),
   error: text('error'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export const translationErrors = mysqlTable('translation_errors', {

@@ -36,16 +36,17 @@ export const storeUsers = pgTable('storeusers', {
 
 export const translationJobs = pgTable('translation_jobs', {
   id: serial('id').primaryKey(),
-  storeHash: text('store_hash').notNull(),
-  status: text('status', { enum: ['pending', 'processing', 'completed', 'failed'] }).notNull().default('pending'),
-  jobType: text('job_type', { enum: ['import', 'export'] }).notNull(),
-  fileUrl: text('file_url'),
+  storeHash: varchar('store_hash', { length: 255 }).notNull(),
+  status: varchar('status', { enum: ['pending', 'processing', 'completed', 'failed'] }).notNull().default('pending'),
+  jobType: varchar('job_type', { enum: ['import', 'export'] }).notNull(),
+  resourceType: varchar('resource_type', { enum: ['products', 'categories'] }).notNull().default('products'),
+  fileUrl: varchar('file_url', { length: 1024 }),
   channelId: integer('channel_id').notNull(),
-  locale: text('locale').notNull(),
+  locale: varchar('locale', { length: 10 }).notNull(),
   metadata: json('metadata'),
   error: text('error'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
 export const translationErrors = pgTable('translation_errors', {

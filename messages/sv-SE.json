@@ -158,7 +158,12 @@
         "lineNumber": "Radnummer",
         "errorType": "Feltyp",
         "errorMessage": "Felmeddelande",
-        "preview": "Förhandsvisning"
+        "preview": "Förhandsvisning",
+        "resourceType": "Resurstyp"
+      },
+      "resourceTypes": {
+        "products": "Produkter",
+        "categories": "Kategorier"
       },
       "title": "Översättningsjobb",
       "selectChannel": "Välj kanal",

@@ -142,7 +142,12 @@
         "lineNumber": "Numéro de ligne",
         "errorType": "Type d'erreur",
         "errorMessage": "Message d'erreur",
-        "preview": "Aperçu"
+        "preview": "Aperçu",
+        "resourceType": "Type de ressource"
+      },
+      "resourceTypes": {
+        "products": "Produits",
+        "categories": "Catégories"
       },
       "title": "Tâches de traduction",
       "selectChannel": "Sélectionner le canal",

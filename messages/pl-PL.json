@@ -142,7 +142,12 @@
         "lineNumber": "Numer wiersza",
         "errorType": "Typ błędu",
         "errorMessage": "Komunikat błędu",
-        "preview": "Podgląd"
+        "preview": "Podgląd",
+        "resourceType": "Typ zasobu"
+      },
+      "resourceTypes": {
+        "products": "Produkty",
+        "categories": "Kategorie"
       },
       "title": "Zadania tłumaczeniowe",
       "selectChannel": "Wybierz kanał",

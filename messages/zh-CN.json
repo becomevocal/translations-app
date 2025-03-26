@@ -160,7 +160,12 @@
         "lineNumber": "行号",
         "errorType": "错误类型",
         "errorMessage": "错误信息",
-        "preview": "预览"
+        "preview": "预览",
+        "resourceType": "资源类型"
+      },
+      "resourceTypes": {
+        "products": "产品",
+        "categories": "分类"
       },
       "title": "翻译任务",
       "selectChannel": "选择渠道",

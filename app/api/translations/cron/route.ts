@@ -18,6 +18,12 @@ import {
   getCustomFieldsToRemove
 } from '@/lib/utils/product-mutation-helpers';
 import { logTranslationError } from '@/lib/db';
+import { 
+  CategoryTranslationRecord, 
+  prepareCategoryTranslationData,
+  generateCategoryCSVHeaders,
+  formatCategoryDataForCSV
+} from '@/lib/utils/category-translation-helpers';
 
 // CSV record type
 interface TranslationRecord {
@@ -25,9 +31,8 @@ interface TranslationRecord {
   [key: string]: string | number; // Allow dynamic locale-based column names
 }
 
-
-// Helper function to get locale-specific field
-function getLocaleField(record: TranslationRecord, fieldPrefix: string, locale: string): string {
+// Helper function to get locale-specific field for products
+function getLocaleField(record: TranslationRecord | CategoryTranslationRecord, fieldPrefix: string, locale: string): string {
   const key = `${fieldPrefix}_${locale}`;
   const value = record[key];
   return typeof value === 'string' ? value : '';
@@ -195,9 +200,9 @@ function prepareProductData(record: TranslationRecord, locale: string, channelId
 }
 
 // Helper function to parse CSV using PapaParse
-async function parseCSV(text: string): Promise<TranslationRecord[]> {
+async function parseCSV<T>(text: string): Promise<T[]> {
   return new Promise((resolve, reject) => {
-    Papa.parse<TranslationRecord>(text, {
+    Papa.parse<T>(text, {
       header: true,
       skipEmptyLines: 'greedy',
       delimiter: ',',
@@ -205,17 +210,17 @@ async function parseCSV(text: string): Promise<TranslationRecord[]> {
       escapeChar: '"',
       transformHeader: (header) => header.trim(),
       transform: (value: string, field: string) => {
-        // Transform productId to number
-        if (field === 'productId') {
+        // Transform ID fields to number
+        if (field === 'productId' || field === 'categoryId') {
           const parsed = parseInt(value.trim(), 10);
           if (isNaN(parsed)) {
-            throw new Error(`Invalid product ID in CSV: ${value}`);
+            throw new Error(`Invalid ID in CSV: ${value}`);
           }
           return parsed;
         }
         return value.trim();
       },
-      complete: (results: ParseResult<TranslationRecord>) => {
+      complete: (results: ParseResult<T>) => {
         if (results.errors.length > 0) {
           console.error('CSV parsing errors:', results.errors);
           reject(new Error('Failed to parse CSV: ' + results.errors.map(e => e.message).join(', ')));
@@ -534,7 +539,7 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
 
     const csvContent = await response.text();
     console.log('[Import] Parsing CSV content');
-    const records = await parseCSV(csvContent);
+    const records = await parseCSV<TranslationRecord>(csvContent);
     console.log(`[Import] Found ${records.length} records to import`);
 
     // Process records in batches with rate limiting
@@ -840,14 +845,20 @@ function formatCustomFieldsData(customFields: any) {
   });
 }
 
-// Helper to generate a unique filename for exports
-function generateUniqueExportFilename(jobId: number, storeHash: string, locale: string, channelName: string): string {
+// Helper to generate a unique filename for exports with resource type
+function generateUniqueExportFilename(
+  jobId: number, 
+  storeHash: string, 
+  locale: string, 
+  channelName: string,
+  resourceType: string = 'products'
+): string {
   const timestamp = Date.now();
   const randomBytes = crypto.randomBytes(8).toString('hex');
   // Sanitize the channel name to remove any potentially unsafe characters
   const sanitizedChannelName = channelName.replace(/[^a-zA-Z0-9.-]/g, '_');
-  // Create a descriptive filename that includes job ID, channel, and locale
-  const descriptiveFilename = `${jobId}-${sanitizedChannelName}-${locale}.csv`;
+  // Create a descriptive filename that includes job ID, channel, locale, and resource type
+  const descriptiveFilename = `${jobId}-${sanitizedChannelName}-${locale}-${resourceType}.csv`;
   return `exports/${storeHash}/${timestamp}-${randomBytes}-${descriptiveFilename}`;
 }
 
@@ -1017,6 +1028,190 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
   }
 }
 
+// Process a category import job
+async function processCategoryImportJob(job: TranslationJob, graphqlClient: any) {
+  console.log(`[Category Import] Starting import job ${job.id} for channel ${job.channelId} and locale ${job.locale}`);
+  
+  try {
+    if (!job.fileUrl) {
+      throw new Error('No file URL provided for import job');
+    }
+
+    // Get store token and create REST client
+    const accessToken = await db.getStoreToken(job.storeHash);
+    if (!accessToken) {
+      throw new Error('Store token not found');
+    }
+    const restClient = createRestClient({accessToken, storeHash: job.storeHash});
+
+    // Fetch channel locales to get default locale
+    console.log(`[Category Import] Fetching channel locales for channel ${job.channelId}`);
+    const { data: localesData } = await restClient.getChannelLocales(job.channelId);
+    const defaultLocale = localesData.find(locale => locale.is_default)?.code || fallbackLocale.code;
+    console.log(`[Category Import] Using default locale: ${defaultLocale}`);
+
+    // Fetch CSV file
+    console.log(`[Category Import] Fetching CSV from ${job.fileUrl}`);
+    const response = await fetch(job.fileUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CSV file: ${response.statusText}`);
+    }
+
+    const csvContent = await response.text();
+    console.log('[Category Import] Parsing CSV content');
+    const records = await parseCSV<CategoryTranslationRecord>(csvContent);
+    console.log(`[Category Import] Found ${records.length} records to import`);
+
+    // Group records in batches for efficiency
+    const batchSize = 20; // Process 20 categories at a time
+    for (let i = 0; i < records.length; i += batchSize) {
+      const batch = records.slice(i, i + batchSize);
+      
+      try {
+        console.log(`[Category Import] Processing batch ${Math.floor(i / batchSize) + 1}`);
+        
+        // Prepare categories for update
+        const categories = batch.map(record => prepareCategoryTranslationData(record, job.locale))
+          .filter(category => category.fields.length > 0); // Skip categories with no fields to update
+        
+        if (categories.length === 0) {
+          console.log('[Category Import] No fields to update in this batch, skipping');
+          continue;
+        }
+        
+        // Update categories
+        await graphqlClient.updateCategoryTranslations({
+          channelId: job.channelId,
+          locale: job.locale,
+          categories
+        });
+        
+        console.log(`[Category Import] Successfully updated ${categories.length} categories`);
+      } catch (error) {
+        console.error(`[Category Import] Error updating batch:`, error);
+        const errorWithResponse = error as Error & { response?: any, errors?: any };
+        // Log the error to the database
+        await logTranslationError({
+          jobId: job.id,
+          productId: 0, // Not applicable for categories
+          lineNumber: i + 1,
+          errorType: 'api_error',
+          errorMessage: errorWithResponse.message,
+          rawData: JSON.stringify({ 
+            batch, 
+            response: errorWithResponse.errors || errorWithResponse.response 
+          }),
+        });
+        // Continue with next batch
+      }
+      
+      // Add a small delay between batches for rate limiting
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    console.log(`[Category Import] Job ${job.id} completed successfully`);
+  } catch (error) {
+    console.error('[Category Import] Job failed:', error);
+    throw error;
+  }
+}
+
+// Process a category export job
+async function processCategoryExportJob(job: TranslationJob, graphqlClient: any, restClient: BigCommerceRestClient) {
+  console.log(`[Category Export] Starting export job ${job.id} for channel ${job.channelId} and locale ${job.locale}`);
+  
+  try {
+    // Get channel details first
+    console.log(`[Category Export] Fetching channel details for channel ${job.channelId}`);
+    const channelResponse = await restClient.getChannel(job.channelId);
+    const channelName = channelResponse.data?.name || `channel-${job.channelId}`;
+
+    // Get channel locales to determine default locale
+    console.log(`[Category Export] Fetching channel locales for channel ${job.channelId}`);
+    const { data: localesData } = await restClient.getChannelLocales(job.channelId);
+    const defaultLocale = localesData.find(locale => locale.is_default)?.code || fallbackLocale.code;
+    console.log(`[Category Export] Using default locale: ${defaultLocale}`);
+
+    // Get category translations
+    console.log(`[Category Export] Fetching category translations for channel ${job.channelId} and locale ${job.locale}`);
+    const translations = await graphqlClient.getCategoryTranslations({
+      channelId: job.channelId,
+      locale: job.locale
+    });
+    
+    console.log(`[Category Export] Found ${translations.edges.length} category translations`);
+
+    if (!translations.edges.length) {
+      throw new Error('No category translations found for export');
+    }
+
+    // Format translations for CSV
+    const categoryRecords = translations.edges.map((edge: any) => {
+      const node = edge.node;
+      return formatCategoryDataForCSV(
+        node.resourceId,
+        node.fields,
+        defaultLocale,
+        job.locale
+      );
+    });
+
+    console.log(`[Category Export] Creating CSV for ${categoryRecords.length} categories`);
+
+    // Generate CSV content
+    const headers = generateCategoryCSVHeaders(defaultLocale, job.locale);
+    const csvConfig: UnparseConfig = {
+      quotes: true,
+      quoteChar: '"',
+      escapeChar: '"',
+      delimiter: ',',
+      header: true,
+      newline: '\n',
+      skipEmptyLines: true
+    };
+
+    // Format records for CSV
+    const csvData = categoryRecords.map((record: any) => {
+      const row: Record<string, any> = {};
+      headers.forEach(header => {
+        const value = record[header];
+        row[header] = value === undefined || value === null ? '' : value;
+      });
+      return row;
+    });
+
+    const csvContent = Papa.unparse({
+      fields: headers,
+      data: csvData
+    }, csvConfig);
+
+    // Upload to blob storage with unique filename including channel name
+    console.log('[Category Export] Uploading CSV to blob storage');
+    const uniqueFilename = generateUniqueExportFilename(job.id, job.storeHash, job.locale, channelName, 'categories');
+    const { url } = await put(uniqueFilename, csvContent, {
+      access: 'public',
+      contentType: 'text/csv',
+      addRandomSuffix: false
+    });
+
+    console.log(`[Category Export] Upload complete. File URL: ${url}`);
+    return url;
+  } catch (error) {
+    console.error('[Category Export] Job failed:', error);
+    // Log the error to the database
+    const errorWithResponse = error as Error & { response?: any };
+    await logTranslationError({
+      jobId: job.id,
+      productId: 0, // Not applicable for categories
+      lineNumber: 0,
+      errorType: 'export_error',
+      errorMessage: errorWithResponse.message,
+      rawData: JSON.stringify({ jobId: job.id, response: errorWithResponse.response }),
+    });
+    throw error;
+  }
+}
+
 // Remove POST handler and keep only GET handler
 export async function GET(request: NextRequest) {
   try {
@@ -1045,11 +1240,20 @@ export async function GET(request: NextRequest) {
         // Update job status to processing
         await db.updateTranslationJob(job.id, { status: 'processing' });
 
-        // Process based on job type
+        // Process based on job type and resource type
         if (job.jobType === 'import') {
-          await processImportJob(job, graphqlClient);
+          if (job.resourceType === 'categories') {
+            await processCategoryImportJob(job, graphqlClient);
+          } else {
+            await processImportJob(job, graphqlClient);
+          }
         } else {
-          const fileUrl = await processExportJob(job, graphqlClient, restClient);
+          let fileUrl;
+          if (job.resourceType === 'categories') {
+            fileUrl = await processCategoryExportJob(job, graphqlClient, restClient);
+          } else {
+            fileUrl = await processExportJob(job, graphqlClient, restClient);
+          }
           job.fileUrl = fileUrl;
         }
 

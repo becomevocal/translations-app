@@ -38,6 +38,14 @@ import {
   createGetAllProductsVariables,
   createGetProductLocaleDataVariables,
 } from "./queries/product.tada";
+import {
+  GetCategoryTranslationsDocument,
+  UpdateCategoryTranslationsDocument,
+  DeleteCategoryTranslationsDocument,
+  createGetCategoryTranslationsVariables,
+  createUpdateCategoryTranslationsVariables,
+  createDeleteCategoryTranslationsVariables,
+} from "./queries/category.tada";
 import { graphql } from "./graphql";
 import type { ResultOf, VariablesOf } from "./graphql";
 import type { GraphQLResponse } from "./types/graphql";
@@ -1047,5 +1055,80 @@ export class GraphQLClient {
       };
     }
     return typedResponse.data.site.products;
+  }
+
+  // Category Translation Methods
+  async getCategoryTranslations(params: {
+    channelId: number;
+    locale: string;
+  }) {
+    type Response = ResultOf<typeof GetCategoryTranslationsDocument>;
+    type TranslationsType = NonNullable<Response["store"]>["translations"];
+
+    const variables = createGetCategoryTranslationsVariables(params);
+    
+    const response = await this.request<Response>(
+      { query: print(GetCategoryTranslationsDocument) },
+      variables
+    );
+
+    if (!response.data?.store?.translations) {
+      throw new Error("Failed to get category translations");
+    }
+
+    return response.data.store.translations;
+  }
+
+  async updateCategoryTranslations(params: {
+    channelId: number;
+    locale: string;
+    categories: Array<{
+      categoryId: number;
+      fields: Array<{
+        fieldName: string;
+        value: string;
+      }>
+    }>
+  }) {
+    type Response = ResultOf<typeof UpdateCategoryTranslationsDocument>;
+    
+    const variables = createUpdateCategoryTranslationsVariables(params);
+    
+    const response = await this.request<Response>(
+      { query: print(UpdateCategoryTranslationsDocument) },
+      variables
+    );
+
+    if (response.data?.translation?.updateTranslations?.errors?.length) {
+      const errors = response.data.translation.updateTranslations.errors;
+      throw new Error(`Failed to update category translations: ${errors.map(e => e.message).join(', ')}`);
+    }
+
+    return response.data;
+  }
+
+  async deleteCategoryTranslations(params: {
+    channelId: number;
+    locale: string;
+    categories: Array<{
+      categoryId: number;
+      fields: string[]
+    }>
+  }) {
+    type Response = ResultOf<typeof DeleteCategoryTranslationsDocument>;
+    
+    const variables = createDeleteCategoryTranslationsVariables(params);
+    
+    const response = await this.request<Response>(
+      { query: print(DeleteCategoryTranslationsDocument) },
+      variables
+    );
+
+    if (response.data?.translation?.deleteTranslations?.errors?.length) {
+      const errors = response.data.translation.deleteTranslations.errors;
+      throw new Error(`Failed to delete category translations: ${errors.map(e => e.message).join(', ')}`);
+    }
+
+    return response.data;
   }
 }

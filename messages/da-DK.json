@@ -142,7 +142,12 @@
         "lineNumber": "Linjenummer",
         "errorType": "Fejltype",
         "errorMessage": "Fejlmeddelelse",
-        "preview": "Forhåndsvisning"
+        "preview": "Forhåndsvisning",
+        "resourceType": "Ressourcetype"
+      },
+      "resourceTypes": {
+        "products": "Produkter",
+        "categories": "Kategorier"
       },
       "title": "Oversættelsesopgaver",
       "selectChannel": "Vælg kanal",

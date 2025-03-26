@@ -142,7 +142,12 @@
         "lineNumber": "행 번호",
         "errorType": "오류 유형",
         "errorMessage": "오류 메시지",
-        "preview": "미리보기"
+        "preview": "미리보기",
+        "resourceType": "리소스 유형"
+      },
+      "resourceTypes": {
+        "products": "상품",
+        "categories": "카테고리"
       },
       "title": "번역 작업",
       "selectChannel": "채널 선택",

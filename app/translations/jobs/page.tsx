@@ -42,6 +42,7 @@ type TranslationJob = {
   id: number;
   status: "pending" | "processing" | "completed" | "failed";
   jobType: "import" | "export";
+  resourceType: "products" | "categories";
   fileUrl?: string;
   channelId: number;
   locale: string;
@@ -100,6 +101,7 @@ function TranslationsJobsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [csvError, setCsvError] = useState<string | null>(null);
+  const [selectedResourceType, setSelectedResourceType] = useState<"products" | "categories">("products");
 
   const {
     channels,
@@ -153,6 +155,7 @@ function TranslationsJobsContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             jobType,
+            resourceType: selectedResourceType,
             channelId: selectedChannel,
             locale: selectedLocale,
           }),
@@ -239,6 +242,7 @@ function TranslationsJobsContent() {
       formData.append("file", selectedFile);
       formData.append("channelId", selectedChannel!.toString());
       formData.append("locale", selectedLocale);
+      formData.append("resourceType", selectedResourceType);
 
       // Upload file and create job
       const response = await fetch(
@@ -386,6 +390,11 @@ function TranslationsJobsContent() {
     content: l.title || l.code,
   }));
 
+  const resourceTypeOptions = [
+    { value: "products", content: t("resourceTypes.products") },
+    { value: "categories", content: t("resourceTypes.categories") },
+  ];
+
   const columns = [
     {
       header: t("columnHeaders.id"),
@@ -439,6 +448,11 @@ function TranslationsJobsContent() {
       render: (item: TranslationJob) => {
         return item.locale;
       },
+    },
+    {
+      header: t("columnHeaders.resourceType"),
+      hash: "resourceType",
+      render: (item: TranslationJob) => t(`resourceTypes.${item.resourceType || 'products'}`),
     },
     {
       header: t("columnHeaders.created"),
@@ -598,27 +612,41 @@ function TranslationsJobsContent() {
       >
         <Box padding="medium">
           <FormGroup>
-            <Flex>
-              <FlexItem flexGrow={1} marginRight="medium">
+            <Flex flexDirection="column">
+              {/* Commented out as feature is not ready for release yet
+              <FlexItem marginBottom="medium">
                 <Select
-                  label={t("importModal.selectChannel")}
-                  options={channelOptions}
-                  onOptionChange={handleChannelChange}
-                  value={selectedChannel?.toString() || ""}
+                  label={t("modals.resourceType")}
+                  options={resourceTypeOptions}
+                  onOptionChange={(value) => setSelectedResourceType(value as "products" | "categories")}
+                  value={selectedResourceType}
                   required
                 />
               </FlexItem>
+              */}
+              
+              <Flex>
+                <FlexItem flexGrow={1} marginRight="medium">
+                  <Select
+                    label={t("importModal.selectChannel")}
+                    options={channelOptions}
+                    onOptionChange={handleChannelChange}
+                    value={selectedChannel?.toString() || ""}
+                    required
+                  />
+                </FlexItem>
 
-              <FlexItem flexGrow={1}>
-                <Select
-                  label={t("importModal.selectLocale")}
-                  options={localeOptions}
-                  onOptionChange={handleLocaleChange}
-                  value={selectedLocale}
-                  disabled={!selectedChannel}
-                  required
-                />
-              </FlexItem>
+                <FlexItem flexGrow={1}>
+                  <Select
+                    label={t("importModal.selectLocale")}
+                    options={localeOptions}
+                    onOptionChange={handleLocaleChange}
+                    value={selectedLocale}
+                    disabled={!selectedChannel}
+                    required
+                  />
+                </FlexItem>
+              </Flex>
             </Flex>
           </FormGroup>
         </Box>
@@ -656,27 +684,41 @@ function TranslationsJobsContent() {
       >
         <Box padding="medium">
           <FormGroup>
-            <Flex>
-              <FlexItem flexGrow={1} marginRight="medium">
+            <Flex flexDirection="column">
+              {/* Commented out as feature is not ready for release yet
+              <FlexItem marginBottom="medium">
                 <Select
-                  label={t("exportModal.selectChannel")}
-                  options={channelOptions}
-                  onOptionChange={handleChannelChange}
-                  value={selectedChannel?.toString() || ""}
+                  label={t("modals.resourceType")}
+                  options={resourceTypeOptions}
+                  onOptionChange={(value) => setSelectedResourceType(value as "products" | "categories")}
+                  value={selectedResourceType}
                   required
                 />
               </FlexItem>
+              */}
+              
+              <Flex>
+                <FlexItem flexGrow={1} marginRight="medium">
+                  <Select
+                    label={t("exportModal.selectChannel")}
+                    options={channelOptions}
+                    onOptionChange={handleChannelChange}
+                    value={selectedChannel?.toString() || ""}
+                    required
+                  />
+                </FlexItem>
 
-              <FlexItem flexGrow={1}>
-                <Select
-                  label={t("exportModal.selectLocale")}
-                  options={localeOptions}
-                  onOptionChange={handleLocaleChange}
-                  value={selectedLocale}
-                  disabled={!selectedChannel}
-                  required
-                />
-              </FlexItem>
+                <FlexItem flexGrow={1}>
+                  <Select
+                    label={t("exportModal.selectLocale")}
+                    options={localeOptions}
+                    onOptionChange={handleLocaleChange}
+                    value={selectedLocale}
+                    disabled={!selectedChannel}
+                    required
+                  />
+                </FlexItem>
+              </Flex>
             </Flex>
           </FormGroup>
         </Box>

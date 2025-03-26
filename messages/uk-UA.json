@@ -142,7 +142,12 @@
         "lineNumber": "Номер рядка",
         "errorType": "Тип помилки",
         "errorMessage": "Повідомлення про помилку",
-        "preview": "Попередній перегляд"
+        "preview": "Попередній перегляд",
+        "resourceType": "Тип ресурсу"
+      },
+      "resourceTypes": {
+        "products": "Товари",
+        "categories": "Категорії"
       },
       "title": "Завдання перекладу",
       "selectChannel": "Вибрати канал",

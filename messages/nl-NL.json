@@ -142,7 +142,12 @@
         "lineNumber": "Regelnummer",
         "errorType": "Fouttype",
         "errorMessage": "Foutmelding",
-        "preview": "Voorbeeld"
+        "preview": "Voorbeeld",
+        "resourceType": "Brontype"
+      },
+      "resourceTypes": {
+        "products": "Producten",
+        "categories": "Categorieën"
       },
       "title": "Vertaaltaken",
       "selectChannel": "Selecteer kanaal",

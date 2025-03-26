@@ -142,7 +142,12 @@
         "lineNumber": "Line Number",
         "errorType": "Error Type",
         "errorMessage": "Error Message",
-        "preview": "Preview"
+        "preview": "Preview",
+        "resourceType": "Resource Type"
+      },
+      "resourceTypes": {
+        "products": "Products",
+        "categories": "Categories"
       },
       "status_pending": "Pending",
       "status_processing": "Processing",
@@ -162,6 +167,9 @@
         "viewErrors": "View errors",
         "download": "Download",
         "viewDetails": "View Details"
+      },
+      "modals": {
+        "resourceType": "Select Resource Type"
       },
       "importModal": {
         "title": "Import Translations",

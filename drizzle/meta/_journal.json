@@ -15,6 +15,13 @@
       "when": 1738990560556,
       "tag": "0001_sad_vampiro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1742777166889,
+      "tag": "0002_bumpy_alice",
+      "breakpoints": true
     }
   ]
 }

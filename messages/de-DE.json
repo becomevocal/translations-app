@@ -142,7 +142,12 @@
         "lineNumber": "Zeilennummer",
         "errorType": "Fehlertyp",
         "errorMessage": "Fehlermeldung",
-        "preview": "Vorschau"
+        "preview": "Vorschau",
+        "resourceType": "Ressourcentyp"
+      },
+      "resourceTypes": {
+        "products": "Produkte",
+        "categories": "Kategorien"
       },
       "title": "Übersetzungsaufträge",
       "selectChannel": "Kanal auswählen",

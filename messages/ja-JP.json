@@ -142,7 +142,12 @@
         "lineNumber": "行番号",
         "errorType": "エラーの種類",
         "errorMessage": "エラーメッセージ",
-        "preview": "プレビュー"
+        "preview": "プレビュー",
+        "resourceType": "リソースタイプ"
+      },
+      "resourceTypes": {
+        "products": "商品",
+        "categories": "カテゴリ"
       },
       "title": "翻訳ジョブ",
       "selectChannel": "チャネルを選択",
