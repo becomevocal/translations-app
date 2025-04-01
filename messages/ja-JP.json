@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "翻訳センターへようこそ",
-      "description": "ここでは、Catalystストアフロント向けにカタログの多言語翻訳を管理できます。"
+      "description": "ここでは、カタログの多言語翻訳を管理できます。"
     },
     "resources": {
       "title": "リソース",
@@ -139,6 +139,8 @@
         "import": "インポート",
         "export": "エクスポート",
         "productId": "商品ID",
+        "categoryId": "カテゴリID",
+        "entityId": "エンティティID",
         "lineNumber": "行番号",
         "errorType": "エラーの種類",
         "errorMessage": "エラーメッセージ",

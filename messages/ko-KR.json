@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "번역 센터에 오신 것을 환영합니다",
-      "description": "여기에서 Catalyst 스토어프론트를 위한 카탈로그의 다국어 번역을 관리할 수 있습니다."
+      "description": "여기에서 카탈로그의 다국어 번역을 관리할 수 있습니다."
     },
     "resources": {
       "title": "리소스",
@@ -138,7 +138,9 @@
         "actions": "작업",
         "import": "가져오기",
         "export": "내보내기",
-        "productId": "상품 ID",
+        "productId": "제품 ID",
+        "categoryId": "카테고리 ID",
+        "entityId": "엔티티 ID",
         "lineNumber": "행 번호",
         "errorType": "오류 유형",
         "errorMessage": "오류 메시지",

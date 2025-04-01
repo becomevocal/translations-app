@@ -749,7 +749,7 @@ async function processImportJob(job: TranslationJob, graphqlClient: GraphQLClien
         // Log the error to the database, including the GraphQL response
         await logTranslationError({
           jobId: job.id,
-          productId: record.productId,
+          entityId: record.productId,
           lineNumber: 0, // Assuming line number is not applicable here
           errorType: 'api_error',
           errorMessage: errorWithResponse.message,
@@ -962,7 +962,7 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
           const errorWithResponse = error as Error & { response?: any };
           await logTranslationError({
             jobId: job.id,
-            productId: productId,
+            entityId: productId,
             lineNumber: 0, // Assuming line number is not applicable here
             errorType: 'api_error',
             errorMessage: errorWithResponse.message,
@@ -1018,7 +1018,7 @@ async function processExportJob(job: TranslationJob, graphqlClient: GraphQLClien
     const errorWithResponse = error as Error & { response?: any };
     await logTranslationError({
       jobId: job.id,
-      productId: 0, // Assuming no specific product ID is applicable here
+      entityId: 0, // Assuming no specific entity ID is applicable here
       lineNumber: 0, // Assuming line number is not applicable here
       errorType: 'export_error',
       errorMessage: errorWithResponse.message,
@@ -1093,7 +1093,7 @@ async function processCategoryImportJob(job: TranslationJob, graphqlClient: any)
         // Log the error to the database
         await logTranslationError({
           jobId: job.id,
-          productId: 0, // Not applicable for categories
+          entityId: 0, // Not applicable for categories
           lineNumber: i + 1,
           errorType: 'api_error',
           errorMessage: errorWithResponse.message,
@@ -1202,7 +1202,7 @@ async function processCategoryExportJob(job: TranslationJob, graphqlClient: any,
     const errorWithResponse = error as Error & { response?: any };
     await logTranslationError({
       jobId: job.id,
-      productId: 0, // Not applicable for categories
+      entityId: 0, // Not applicable for categories
       lineNumber: 0,
       errorType: 'export_error',
       errorMessage: errorWithResponse.message,

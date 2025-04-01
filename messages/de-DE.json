@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Willkommen im Übersetzungszentrum",
-      "description": "Hier können Sie Übersetzungen Ihres Katalogs in mehrere Sprachen für Ihre Catalyst-Storefront verwalten."
+      "description": "Hier können Sie Übersetzungen Ihres Katalogs in mehrere Sprachen verwalten."
     },
     "resources": {
       "title": "Ressourcen",
@@ -139,6 +139,8 @@
         "import": "Importieren",
         "export": "Exportieren",
         "productId": "Produkt-ID",
+        "categoryId": "Kategorie-ID",
+        "entityId": "Entität-ID",
         "lineNumber": "Zeilennummer",
         "errorType": "Fehlertyp",
         "errorMessage": "Fehlermeldung",

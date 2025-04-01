@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "欢迎来到翻译中心",
-      "description": "在这里您可以管理Catalyst店铺目录的多语言翻译。"
+      "description": "在这里您可以管理目录的多语言翻译。"
     },
     "resources": {
       "title": "资源",
@@ -156,7 +156,9 @@
         "actions": "操作",
         "import": "导入",
         "export": "导出",
-        "productId": "商品ID",
+        "productId": "产品ID",
+        "categoryId": "分类ID",
+        "entityId": "实体ID",
         "lineNumber": "行号",
         "errorType": "错误类型",
         "errorMessage": "错误信息",

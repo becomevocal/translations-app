@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Witaj w Centrum Tłumaczeń",
-      "description": "Tutaj możesz zarządzać tłumaczeniami swojego katalogu na wiele języków dla swojej witryny Catalyst."
+      "description": "Tutaj możesz zarządzać tłumaczeniami swojego katalogu na wiele języków."
     },
     "resources": {
       "title": "Zasoby",
@@ -139,6 +139,8 @@
         "import": "Importuj",
         "export": "Eksportuj",
         "productId": "ID produktu",
+        "categoryId": "ID kategorii",
+        "entityId": "ID entitety",
         "lineNumber": "Numer wiersza",
         "errorType": "Typ błędu",
         "errorMessage": "Komunikat błędu",

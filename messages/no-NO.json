@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Velkommen til Oversettelsessenteret",
-      "description": "Her kan du administrere oversettelser av katalogen din til flere språk for din Catalyst-butikkfront."
+      "description": "Her kan du administrere oversettelser av katalogen din til flere språk."
     },
     "resources": {
       "title": "Ressurser",
@@ -139,6 +139,8 @@
         "import": "Importer",
         "export": "Eksporter",
         "productId": "Produkt-ID",
+        "categoryId": "Kategori-ID",
+        "entityId": "Entitet-ID",
         "lineNumber": "Linjenummer",
         "errorType": "Feiltype",
         "errorMessage": "Feilmelding",

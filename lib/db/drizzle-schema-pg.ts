@@ -52,7 +52,7 @@ export const translationJobs = pgTable('translation_jobs', {
 export const translationErrors = pgTable('translation_errors', {
   id: serial('id').primaryKey(),
   jobId: integer('job_id').notNull(), // References translationJobs.id
-  productId: integer('product_id').notNull(),
+  entityId: integer('entity_id').notNull(), // Generic ID for products, categories, etc.
   lineNumber: integer('line_number').notNull(),
   errorType: text('error_type', { 
     enum: ['parse_error', 'validation_error', 'api_error', 'unknown']

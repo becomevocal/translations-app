@@ -52,7 +52,7 @@ export const translationJobs = sqliteTable('translation_jobs', {
 export const translationErrors = sqliteTable('translation_errors', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   jobId: integer('job_id').notNull(), // References translationJobs.id
-  productId: integer('product_id').notNull(),
+  entityId: integer('entity_id').notNull(), // Generic ID for products, categories, etc.
   lineNumber: integer('line_number').notNull(),
   errorType: text('error_type').notNull(), // SQLite does not support enum types
   errorMessage: text('error_message').notNull(),

@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Välkommen till Översättningscentret",
-      "description": "Här kan du hantera översättningar av din katalog till flera språk för din Catalyst-butik."
+      "description": "Här kan du hantera översättningar av din katalog till flera språk."
     },
     "resources": {
       "title": "Resurser",
@@ -155,6 +155,8 @@
         "import": "Importera",
         "export": "Exportera",
         "productId": "Produkt-ID",
+        "categoryId": "Kategori-ID",
+        "entityId": "Entitet-ID",
         "lineNumber": "Radnummer",
         "errorType": "Feltyp",
         "errorMessage": "Felmeddelande",

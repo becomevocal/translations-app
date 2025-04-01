@@ -180,17 +180,33 @@ export class MySQLClient implements DatabaseOperations {
       .orderBy(this.schema.translationJobs.createdAt);
   }
 
-  async getTranslationErrors(jobId: number): Promise<TranslationError[]> {
-    return this.db
-      .select()
+  async getTranslationErrors(jobId: number, storeHash: string): Promise<TranslationError[]> {
+    const errors = await this.db
+      .select({
+        translation_errors: this.schema.translationErrors,
+        resourceType: this.schema.translationJobs.resourceType
+      })
       .from(this.schema.translationErrors)
-      .where(eq(this.schema.translationErrors.jobId, jobId))
-      .orderBy(this.schema.translationErrors.lineNumber);
+      .innerJoin(
+        this.schema.translationJobs,
+        and(
+          eq(this.schema.translationErrors.jobId, jobId),
+          eq(this.schema.translationJobs.id, jobId),
+          eq(this.schema.translationJobs.storeHash, storeHash)
+        )
+      )
+      .orderBy(this.schema.translationErrors.lineNumber)
+      .execute();
+    
+    return errors.map(row => ({
+      ...row.translation_errors,
+      resourceType: row.resourceType
+    }));
   }
 
   async createTranslationError(data: {
     jobId: number;
-    productId: number;
+    entityId: number;
     lineNumber: number;
     errorType: "parse_error" | "validation_error" | "api_error" | "unknown";
     errorMessage: string;

@@ -29,6 +29,7 @@ type ErrorRawData = {
 
 type TranslationErrorWithRawData = BaseTranslationError & {
   rawData: ErrorRawData;
+  resourceType: string;
 };
 
 const StyledPanelContents = styled.div`
@@ -98,14 +99,9 @@ function TranslationsJobErrorsContent({ jobId }: { jobId: string }) {
 
   const columns = [
     {
-      header: t("columnHeaders.id"),
-      hash: "id",
-      render: (error: TranslationErrorWithRawData) => error.id,
-    },
-    {
-      header: t("columnHeaders.productId"),
-      hash: "productId",
-      render: (error: TranslationErrorWithRawData) => error.productId,
+      header: errors?.[0]?.resourceType == "categories" ? t("columnHeaders.categoryId") : errors?.[0]?.resourceType == "products" ? t("columnHeaders.productId") : t("columnHeaders.entityId"),
+      hash: "entityId",
+      render: (error: TranslationErrorWithRawData) => error.entityId == 0 ? "N/A" : error.entityId,
     },
     {
       header: t("columnHeaders.lineNumber"),
@@ -230,7 +226,7 @@ function TranslationsJobErrorsContent({ jobId }: { jobId: string }) {
               >
                 <Flex flexDirection="column" flexGap="small">
                   <Flex justifyContent="space-between" alignItems="center">
-                    <Text bold>Product ID: {selectedError.productId}</Text>
+                    <Text bold>{selectedError.resourceType == "categories" ? t("columnHeaders.categoryId") : selectedError.resourceType == "products" ? t("columnHeaders.productId") : t("columnHeaders.entityId")}: {selectedError.entityId}</Text>
                     <Text color="secondary60">
                       {new Date(selectedError.createdAt).toLocaleString()}
                     </Text>
@@ -244,7 +240,7 @@ function TranslationsJobErrorsContent({ jobId }: { jobId: string }) {
                       Type: {selectedError.errorType}
                     </Text>
                   </Flex>
-                  <Box>
+                  <Box marginTop="medium">
                     <Text bold marginBottom="xSmall">Original Record:</Text>
                     <Box 
                       backgroundColor="white" 

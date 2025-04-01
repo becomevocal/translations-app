@@ -52,7 +52,7 @@ export const translationJobs = mysqlTable('translation_jobs', {
 export const translationErrors = mysqlTable('translation_errors', {
   id: int('id').primaryKey().autoincrement(),
   jobId: int('job_id').notNull(), // References translationJobs.id
-  productId: int('product_id').notNull(),
+  entityId: int('entity_id').notNull(), // Generic ID for products, categories, etc.
   lineNumber: int('line_number').notNull(),
   errorType: varchar('error_type', { length: 20, enum: ['parse_error', 'validation_error', 'api_error', 'unknown'] }).notNull(),
   errorMessage: text('error_message').notNull(),

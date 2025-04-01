@@ -49,10 +49,10 @@ export interface DatabaseOperations {
   getPendingTranslationJobsByStore(storeHash: string): Promise<TranslationJob[]>;
 
   // Translation error operations
-  getTranslationErrors(jobId: number): Promise<TranslationError[]>;
+  getTranslationErrors(jobId: number, storeHash: string): Promise<TranslationError[]>;
   createTranslationError(data: {
     jobId: number;
-    productId: number;
+    entityId: number;
     lineNumber: number;
     errorType: string;
     errorMessage: string;

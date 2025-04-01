@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Bem-vindo ao Centro de Traduções",
-      "description": "Aqui você pode gerenciar traduções do seu catálogo em vários idiomas para sua loja Catalyst."
+      "description": "Aqui você pode gerenciar traduções do seu catálogo em vários idiomas."
     },
     "resources": {
       "title": "Recursos",
@@ -138,7 +138,9 @@
         "actions": "Ações",
         "import": "Importar",
         "export": "Exportar",
-        "productId": "ID do produto",
+        "productId": "ID do Produto",
+        "categoryId": "ID da Categoria",
+        "entityId": "ID da entidade",
         "lineNumber": "Número da linha",
         "errorType": "Tipo de erro",
         "errorMessage": "Mensagem de erro",

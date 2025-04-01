@@ -15,7 +15,7 @@ export const dbClient: DatabaseOperations = (() => {
 
 export async function logTranslationError({
   jobId,
-  productId,
+  entityId,
   lineNumber,
   errorType,
   errorMessage,
@@ -23,7 +23,7 @@ export async function logTranslationError({
   createdAt = Date.now(),
 }: {
   jobId: number;
-  productId: number;
+  entityId: number;
   lineNumber: number;
   errorType: string;
   errorMessage: string;
@@ -32,7 +32,7 @@ export async function logTranslationError({
 }) {
   await dbClient.createTranslationError({
     jobId,
-    productId,
+    entityId,
     lineNumber,
     errorType,
     errorMessage,

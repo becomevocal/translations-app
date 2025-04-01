@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Welkom bij het Vertaalcentrum",
-      "description": "Hier kunt u vertalingen van uw catalogus in meerdere talen beheren voor uw Catalyst-winkel."
+      "description": "Hier kunt u vertalingen van uw catalogus in meerdere talen beheren."
     },
     "resources": {
       "title": "Bronnen",
@@ -139,6 +139,8 @@
         "import": "Importeren",
         "export": "Exporteren",
         "productId": "Product-ID",
+        "categoryId": "Categorie-ID",
+        "entityId": "Entiteit-ID",
         "lineNumber": "Regelnummer",
         "errorType": "Fouttype",
         "errorMessage": "Foutmelding",

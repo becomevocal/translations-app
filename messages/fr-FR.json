@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Bienvenue au Centre de Traduction",
-      "description": "Ici, vous pouvez gérer les traductions de votre catalogue en plusieurs langues pour votre vitrine Catalyst."
+      "description": "Ici, vous pouvez gérer les traductions de votre catalogue en plusieurs langues."
     },
     "resources": {
       "title": "Ressources",
@@ -138,7 +138,9 @@
         "actions": "Actions",
         "import": "Importer",
         "export": "Exporter",
-        "productId": "ID du produit",
+        "productId": "ID de Produit",
+        "categoryId": "ID de Catégorie",
+        "entityId": "ID de l'entité",
         "lineNumber": "Numéro de ligne",
         "errorType": "Type d'erreur",
         "errorMessage": "Message d'erreur",

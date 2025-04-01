@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ jobI
 
   try {
     const { storeHash } = await getSessionFromContext(context);
-    const errors = await dbClient.getTranslationErrors(Number(jobId));
+    const errors = await dbClient.getTranslationErrors(Number(jobId), storeHash);
     return NextResponse.json({ errors });
   } catch (error) {
     console.error('Error fetching translation errors:', error);

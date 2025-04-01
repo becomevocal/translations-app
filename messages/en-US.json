@@ -17,7 +17,7 @@
     },
     "home": {
       "welcome": "Welcome to the Translation Center",
-      "description": "Where you can manage translations of your catalog into multiple languages for your Catalyst storefront."
+      "description": "Where you can manage translations of your catalog into multiple languages."
     },
     "resources": {
       "title": "Resources",
@@ -139,6 +139,8 @@
         "import": "Import",
         "export": "Export",
         "productId": "Product ID",
+        "categoryId": "Category ID",
+        "entityId": "Entity ID",
         "lineNumber": "Line Number",
         "errorType": "Error Type",
         "errorMessage": "Error Message",

@@ -1,0 +1,1 @@
+ALTER TABLE "translation_errors" RENAME COLUMN "product_id" TO "entity_id";
