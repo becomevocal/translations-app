@@ -21,6 +21,10 @@ export function prepareCategoryTranslationData(record: CategoryTranslationRecord
         value: getLocaleField(record, 'name', locale),
       },
       {
+        fieldName: "description",
+        value: getLocaleField(record, 'description', locale),
+      },
+      {
         fieldName: "page_title",
         value: getLocaleField(record, 'page_title', locale),
       },
@@ -42,6 +46,8 @@ export function generateCategoryCSVHeaders(defaultLocale: string, targetLocale: 
     'categoryId',
     `name_${defaultLocale}`,
     `name_${targetLocale}`,
+    `description_${defaultLocale}`,
+    `description_${targetLocale}`,
     `page_title_${defaultLocale}`,
     `page_title_${targetLocale}`,
     `meta_description_${defaultLocale}`,
