@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run build:auth-client && npm run build:graphql-client && npm run build:rest-client && next build",
+    "build": "npm run build:auth-client && npm run build:graphql-client && npm run build:rest-client && npm run db:migrate && next build",
     "start": "next start",
     "lint": "next lint",
     "build:auth-client": "npm run build --prefix lib/auth-client",
