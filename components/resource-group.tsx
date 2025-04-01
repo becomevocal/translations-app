@@ -69,7 +69,7 @@ export const ResourceGroup = ({
       links: [
         {
           text: t('userGuide.links.view'),
-          href: "https://start.bigcommerce.com/multi-lang-translations/",
+          href: "https://support.bigcommerce.com/s/article/The-BigCommerce-Translations-App",
         },
       ],
     },
