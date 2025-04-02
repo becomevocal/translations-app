@@ -22,6 +22,11 @@ A TypeScript GraphQL client for BigCommerce's Admin API, specifically designed f
   - Rate limit tracking
   - Complexity monitoring
   - Error tracing
+- 🗂️ Category Localization
+  - Fetch category translations
+  - Update category translations 
+  - Delete category translations
+  - Support for all translatable category fields
 
 ## Installation
 
@@ -100,8 +105,8 @@ const result = await client.updateProductLocaleData({
 // With options and modifiers
 const result = await client.updateProductLocaleData({
   locale: 'es',
-  channelId: 123,
-  productId: 456,
+  channelId: 123456,
+  productId: 789,
   productData: {
     name: 'Producto Nuevo',
     // Options
@@ -232,6 +237,69 @@ const extensionId = await client.upsertAppExtension({
 });
 ```
 
+### Category Localization
+
+#### Fetching Category Translations
+
+```typescript
+const categoryTranslations = await client.getCategoryTranslations({
+  channelId: 123,
+  locale: 'es'
+});
+
+// The response contains all translated fields for each category
+console.log(categoryTranslations.edges.map(edge => ({
+  categoryId: edge.node.resourceId,
+  fields: edge.node.fields
+})));
+```
+
+#### Updating Category Translations
+
+```typescript
+const updateResult = await client.updateCategoryTranslations({
+  channelId: 123456,
+  locale: 'es',
+  categories: [
+    {
+      categoryId: 456,
+      fields: [
+        { fieldName: 'name', value: 'Categoría Nueva' },
+        { fieldName: 'description', value: 'Descripción de la categoría' },
+        { fieldName: 'page_title', value: 'Título de la página' },
+        { fieldName: 'meta_description', value: 'Meta descripción' }
+      ]
+    },
+    {
+      categoryId: 789,
+      fields: [
+        { fieldName: 'name', value: 'Otra Categoría' },
+        { fieldName: 'description', value: 'Descripción de otra categoría' }
+      ]
+    }
+  ]
+});
+```
+
+#### Deleting Category Translations
+
+```typescript
+const deleteResult = await client.deleteCategoryTranslations({
+  channelId: 123456,
+  locale: 'es',
+  categories: [
+    {
+      categoryId: 456,
+      fields: ['name', 'description'] // Fields to remove translations for
+    },
+    {
+      categoryId: 789,
+      fields: ['name', 'page_title', 'meta_description']
+    }
+  ]
+});
+```
+
 ## Error Handling
 
 The client includes comprehensive error handling:
@@ -322,4 +390,4 @@ Contributions are welcome! Please read our contributing guidelines for details.
 
 ## License
 
-MIT 
+MIT
