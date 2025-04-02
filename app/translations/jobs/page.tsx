@@ -14,8 +14,8 @@ import {
   Panel,
   Select,
   Table,
-  Tabs,
   Text,
+  Toggle,
   Tooltip,
   ProgressCircle,
   FormGroup,
@@ -395,6 +395,52 @@ function TranslationsJobsContent() {
     router.push(`/translations/jobs/${jobId}/errors${context ? `?context=${context}` : ''}`);
   };
 
+  const openImportModal = () => {
+    setShowImportModal(true);
+    
+    // Use a short timeout to wait for the modal to render then blur any focused element
+    setTimeout(() => {
+      // Query the toggle button that gets auto-focused
+      const toggleButtons = document.querySelectorAll('#import-resource-type-toggle button');
+      if (toggleButtons.length > 0) {
+        // Remove focus from all toggle buttons
+        toggleButtons.forEach(button => {
+          if (button instanceof HTMLElement) {
+            button.blur();
+          }
+        });
+      }
+      
+      // Also try to blur any active element
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    }, 50);
+  };
+
+  const openExportModal = () => {
+    setShowExportModal(true);
+    
+    // Use a short timeout to wait for the modal to render then blur any focused element
+    setTimeout(() => {
+      // Query the toggle button that gets auto-focused
+      const toggleButtons = document.querySelectorAll('#export-resource-type-toggle button');
+      if (toggleButtons.length > 0) {
+        // Remove focus from all toggle buttons
+        toggleButtons.forEach(button => {
+          if (button instanceof HTMLElement) {
+            button.blur();
+          }
+        });
+      }
+      
+      // Also try to blur any active element
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    }, 50);
+  };
+
   if (channelsError) return <ErrorMessage />;
   if (isChannelsLoading) return <LoadingScreen />;
 
@@ -408,11 +454,6 @@ function TranslationsJobsContent() {
     value: l.code,
     content: l.title || l.code,
   }));
-
-  const resourceTypeOptions = [
-    { value: "products", content: t("resourceTypes.products") },
-    { value: "categories", content: t("resourceTypes.categories") },
-  ];
 
   const columns = [
     {
@@ -521,6 +562,14 @@ function TranslationsJobsContent() {
     currentPage * itemsPerPage
   );
 
+  const closeImportModal = () => {
+    setShowImportModal(false);
+  };
+
+  const closeExportModal = () => {
+    setShowExportModal(false);
+  };
+
   return (
     <Page
       header={
@@ -530,12 +579,12 @@ function TranslationsJobsContent() {
               items: [
                 {
                   content: t("importModal.title"),
-                  onItemClick: () => setShowImportModal(true),
+                  onItemClick: openImportModal,
                   icon: <ArrowUpwardIcon />,
                 },
                 {
                   content: t("exportModal.title"),
-                  onItemClick: () => setShowExportModal(true),
+                  onItemClick: openExportModal,
                   icon: <FileDownloadIcon />,
                 },
               ],
@@ -598,11 +647,7 @@ function TranslationsJobsContent() {
       {/* Import Modal */}
       <Modal
         isOpen={showImportModal}
-        onClose={() => {
-          setShowImportModal(false);
-          setSelectedChannel(null);
-          setSelectedLocale("");
-        }}
+        onClose={closeImportModal}
         closeOnClickOutside={false}
         closeOnEscKey={false}
         header={t("importModal.title")}
@@ -610,22 +655,18 @@ function TranslationsJobsContent() {
           {
             text: t("importModal.cancel"),
             variant: "subtle",
-            onClick: () => {
-              setShowImportModal(false);
-              setSelectedChannel(null);
-              setSelectedLocale("");
-            },
+            onClick: closeImportModal,
           },
           {
             text: t("importModal.next"),
             variant: "primary",
             onClick: () => {
               if (selectedChannel && selectedLocale) {
-                setShowImportModal(false);
+                closeImportModal();
                 setShowUploadModal(true);
               }
             },
-            disabled: !selectedChannel || !selectedLocale,
+            disabled: !selectedChannel || !selectedLocale || (isStoreInCategoryFeatureAllowlist && !selectedResourceType),
           },
         ]}
       >
@@ -634,12 +675,15 @@ function TranslationsJobsContent() {
             <Flex flexDirection="column">
               {isStoreInCategoryFeatureAllowlist && (
                 <FlexItem marginBottom="medium">
-                  <Select
+                  <Toggle
+                    id="import-resource-type-toggle"
                     label={t("modals.resourceType")}
-                    options={resourceTypeOptions}
-                    onOptionChange={(value) => setSelectedResourceType(value as "products" | "categories")}
+                    items={[
+                      { value: "products", label: t("resourceTypes.products") },
+                      { value: "categories", label: t("resourceTypes.categories") }
+                    ]}
+                    onChange={(value) => setSelectedResourceType(value as "products" | "categories")}
                     value={selectedResourceType}
-                    required
                   />
                 </FlexItem>
               )}
@@ -674,11 +718,7 @@ function TranslationsJobsContent() {
       {/* Export Modal */}
       <Modal
         isOpen={showExportModal}
-        onClose={() => {
-          setShowExportModal(false);
-          setSelectedChannel(null);
-          setSelectedLocale("");
-        }}
+        onClose={closeExportModal}
         closeOnClickOutside={false}
         closeOnEscKey={false}
         header={t("exportModal.title")}
@@ -686,17 +726,13 @@ function TranslationsJobsContent() {
           {
             text: t("exportModal.cancel"),
             variant: "subtle",
-            onClick: () => {
-              setShowExportModal(false);
-              setSelectedChannel(null);
-              setSelectedLocale("");
-            },
+            onClick: closeExportModal,
           },
           {
             text: t("exportModal.export"),
             variant: "primary",
             onClick: () => handleCreateJob("export"),
-            disabled: !selectedChannel || !selectedLocale || isCreatingJob,
+            disabled: !selectedChannel || !selectedLocale || isCreatingJob || (isStoreInCategoryFeatureAllowlist && !selectedResourceType),
             isLoading: isCreatingJob,
           },
         ]}
@@ -706,12 +742,15 @@ function TranslationsJobsContent() {
             <Flex flexDirection="column">
               {isStoreInCategoryFeatureAllowlist && (
                 <FlexItem marginBottom="medium">
-                  <Select
+                  <Toggle
+                    id="export-resource-type-toggle"
                     label={t("modals.resourceType")}
-                    options={resourceTypeOptions}
-                    onOptionChange={(value) => setSelectedResourceType(value as "products" | "categories")}
+                    items={[
+                      { value: "products", label: t("resourceTypes.products") },
+                      { value: "categories", label: t("resourceTypes.categories") }
+                    ]}
+                    onChange={(value) => setSelectedResourceType(value as "products" | "categories")}
                     value={selectedResourceType}
-                    required
                   />
                 </FlexItem>
               )}
