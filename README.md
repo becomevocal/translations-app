@@ -51,7 +51,7 @@ For merchant documentation on how to use this app, please see the [User Guide](h
 - [x] Update resource links on home screen
 - [x] Skip mutations if they are all empty fields (e.g. re-import blank _fr export)
 - [x] Ability to view import errors (beyond high level # of errors)
-- [ ] Add ability to update categories (in progress)
+- [x] Add ability to update categories
 - [ ] Add ability to update url path
 - [ ] Move server side locale transforms in api route into graphql client
 
