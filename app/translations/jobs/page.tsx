@@ -36,13 +36,6 @@ import { useChannels } from "@/hooks/useChannels";
 import ErrorMessage from "@/components/error-message";
 import { LoadingScreen } from "@/components/loading-indicator";
 import { Suspense } from "react";
-import { TranslationError } from "@/lib/db/clients/types";
-
-// Get the allowlist from environment variables
-const CATEGORY_TRANSLATIONS_STOREHASH_ALLOWLIST: string[] = 
-  process.env.NEXT_PUBLIC_CATEGORY_TRANSLATIONS_STOREHASH_ALLOWLIST
-    ? process.env.NEXT_PUBLIC_CATEGORY_TRANSLATIONS_STOREHASH_ALLOWLIST.split(',')
-    : [];
 
 type TranslationJob = {
   id: number;
@@ -108,19 +101,6 @@ function TranslationsJobsContent() {
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [csvError, setCsvError] = useState<string | null>(null);
   const [selectedResourceType, setSelectedResourceType] = useState<"products" | "categories">("products");
-  
-  // Direct check if store is in allowlist during rendering
-  // TODO: Remove when feature is rolled out to every store
-  let isStoreInCategoryFeatureAllowlist = false;
-  if (typeof window !== 'undefined' && window.location.ancestorOrigins && window.location.ancestorOrigins.length > 0) {
-    try {
-      const origin = window.location.ancestorOrigins[0];
-      const storeHash = origin.replace('https://store-', '').split('.')[0];
-      isStoreInCategoryFeatureAllowlist = CATEGORY_TRANSLATIONS_STOREHASH_ALLOWLIST.includes(storeHash);
-    } catch (error) {
-      console.error("Error checking store allowlist:", error);
-    }
-  }
 
   const {
     channels,
@@ -134,14 +114,6 @@ function TranslationsJobsContent() {
         ?.find((c) => c.channel_id === selectedChannel)
         ?.locales.filter((locale) => !locale.is_default) || []
     : [];
-
-  const formatJsonString = (obj: any): string => {
-    try {
-      return JSON.stringify(obj, null, 2);
-    } catch (e) {
-      return 'Invalid JSON';
-    }
-  };
 
   const fetchJobs = useCallback(async () => {
     setIsLoading(true);
@@ -666,27 +638,25 @@ function TranslationsJobsContent() {
                 setShowUploadModal(true);
               }
             },
-            disabled: !selectedChannel || !selectedLocale || (isStoreInCategoryFeatureAllowlist && !selectedResourceType),
+            disabled: !selectedChannel || !selectedLocale || !selectedResourceType,
           },
         ]}
       >
         <Box padding="medium">
           <FormGroup>
             <Flex flexDirection="column">
-              {isStoreInCategoryFeatureAllowlist && (
-                <FlexItem marginBottom="medium">
-                  <Toggle
-                    id="import-resource-type-toggle"
-                    label={t("modals.resourceType")}
-                    items={[
-                      { value: "products", label: t("resourceTypes.products") },
-                      { value: "categories", label: t("resourceTypes.categories") }
-                    ]}
-                    onChange={(value) => setSelectedResourceType(value as "products" | "categories")}
-                    value={selectedResourceType}
-                  />
-                </FlexItem>
-              )}
+              <FlexItem marginBottom="medium">
+                <Toggle
+                  id="import-resource-type-toggle"
+                  label={t("modals.resourceType")}
+                  items={[
+                    { value: "products", label: t("resourceTypes.products") },
+                    { value: "categories", label: t("resourceTypes.categories") }
+                  ]}
+                  onChange={(value) => setSelectedResourceType(value as "products" | "categories")}
+                  value={selectedResourceType}
+                />
+              </FlexItem>
               
               <Flex>
                 <FlexItem flexGrow={1} marginRight="medium">
@@ -732,7 +702,7 @@ function TranslationsJobsContent() {
             text: t("exportModal.export"),
             variant: "primary",
             onClick: () => handleCreateJob("export"),
-            disabled: !selectedChannel || !selectedLocale || isCreatingJob || (isStoreInCategoryFeatureAllowlist && !selectedResourceType),
+            disabled: !selectedChannel || !selectedLocale || isCreatingJob || !selectedResourceType,
             isLoading: isCreatingJob,
           },
         ]}
@@ -740,20 +710,18 @@ function TranslationsJobsContent() {
         <Box padding="medium">
           <FormGroup>
             <Flex flexDirection="column">
-              {isStoreInCategoryFeatureAllowlist && (
-                <FlexItem marginBottom="medium">
-                  <Toggle
-                    id="export-resource-type-toggle"
-                    label={t("modals.resourceType")}
-                    items={[
-                      { value: "products", label: t("resourceTypes.products") },
-                      { value: "categories", label: t("resourceTypes.categories") }
-                    ]}
-                    onChange={(value) => setSelectedResourceType(value as "products" | "categories")}
-                    value={selectedResourceType}
-                  />
-                </FlexItem>
-              )}
+              <FlexItem marginBottom="medium">
+                <Toggle
+                  id="export-resource-type-toggle"
+                  label={t("modals.resourceType")}
+                  items={[
+                    { value: "products", label: t("resourceTypes.products") },
+                    { value: "categories", label: t("resourceTypes.categories") }
+                  ]}
+                  onChange={(value) => setSelectedResourceType(value as "products" | "categories")}
+                  value={selectedResourceType}
+                />
+              </FlexItem>
               
               <Flex>
                 <FlexItem flexGrow={1} marginRight="medium">

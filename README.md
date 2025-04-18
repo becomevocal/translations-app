@@ -15,47 +15,15 @@ This is a BigCommerce App built using [Next.js](https://nextjs.org/) that enable
 
 For merchant documentation on how to use this app, please see the [User Guide](https://start.bigcommerce.com/multi-lang-translations/).
 
-# Todo
-
-- [x] Ability to translate product name and description
-- [x] Ability to translate SEO page title and meta description
-- [x] Ability to translate dropdown variant option labels
-- [x] Ability to translate custom fields
-- [x] Add check for multi-lang functionality and fail gracefully if it's not enabled
-- [x] Ability to translate non-dropdown variant option labels
-- [x] Ability to translate pre-order settings
-- [x] Ability to translate storefront details
-- [x] Ability to translate modifier option labels
-- [x] Ability to translate modifier initial / default values
-- [x] Add remove mutations for all nodes
-- [x] Improve UX of custom field editing (should use two column layout on mobile)
-- [x] Add Sentry error tracking
-- [x] Translate app strings (including API route responses and setting user locale via JWT)
-- [x] Use default locale and available locales from channel locale settings instead of constant
-- [x] Verify app extension is only added once after app is reinstalled 
-- [x] Simplify multiple database support, setup, and deployment docs
-- [x] Ability to explicitly set api token, store hash, and locale as env variables
-- [x] Streamline types across callbacks, sessions, and db functions
-- [x] Update uninstall and remove user routes
-- [x] Separate auth and session code into client with it's own types so it can be a separate package
-- [x] Separate out Admin GraphQL client (including app extensions) into a separate package
-- [x] Improve global "failed to load" design
-- [x] Split up graphql queries to reduce complexity limits
-- [x] Initial import / export functionality (include ensuring uploads are securely named)
-- [x] Fix issue with null product description causing save to fail
-- [x] Create help docs
-- [x] Remove ability to export default locale for translation
-- [x] Update import steps to use FileUploader and InlineMessage components
-- [x] Link out to supported import columns and best practices for importing CSV files
-- [x] Add BC CP SDK to prevent session timeout
-- [x] Update resource links on home screen
-- [x] Skip mutations if they are all empty fields (e.g. re-import blank _fr export)
-- [x] Ability to view import errors (beyond high level # of errors)
-- [x] Add ability to update categories
-- [ ] Add ability to update url path
-- [ ] Move server side locale transforms in api route into graphql client
-
 ## Getting Started
+
+## Requirements
+
+- Node.js 20 or later
+  ```bash
+  # Using nvm (Node Version Manager)
+  nvm use
+  ```
 
 ### Environment Variables Setup
 
@@ -176,10 +144,6 @@ bigcommerce:graphql Making GraphQL request: { query: "query { store { ... } }" }
 bigcommerce:auth Verifying BigCommerce JWT +1ms
 ```
 
-## Requirements
-
-- Node.js 20 or later
-  ```bash
-  # Using nvm (Node Version Manager)
-  nvm use
-  ```
+# Todo
+- [ ] Move server side locale transforms in api route into graphql client
+- [ ] Add ability to update url path (dependent on platform update)
